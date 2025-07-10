@@ -129,7 +129,7 @@ def exibir_churn():
     # Remover títulos dos eixos
     ax.set_xlabel('')
     ax.set_ylabel('')
-    ax.tick_params(axis='x', colors='#FF8C00', labelsize=10, labelrotation=30, labelrotation_mode='anchor')
+    ax.tick_params(axis='x', colors='#FF8C00', labelsize=10, labelrotation=30)
     ax.tick_params(axis='y', colors='#FF8C00', labelsize=10)
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_fontweight('bold')
@@ -154,7 +154,7 @@ def exibir_churn():
     # Remover títulos dos eixos
     ax2.set_xlabel('')
     ax2.set_ylabel('')
-    ax2.tick_params(axis='x', colors='#FF8C00', labelsize=10, labelrotation=30, labelrotation_mode='anchor')
+    ax2.tick_params(axis='x', colors='#FF8C00', labelsize=10, labelrotation=30)
     ax2.tick_params(axis='y', colors='#FF8C00', labelsize=10)
     for label in ax2.get_xticklabels() + ax2.get_yticklabels():
         label.set_fontweight('bold')
