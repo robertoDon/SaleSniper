@@ -1,3 +1,4 @@
+import sys
 import streamlit as st
 from services.auth import carregar_usuarios, salvar_usuario, autenticar
 from components.dashboard import exibir_dashboard
@@ -7,6 +8,7 @@ from components.churn import exibir_churn
 # Importação comentada para MVP inicial
 # from components.tamsamsom import exibir_tamsamsom
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from PIL import Image
 
 # Carregando a logo
