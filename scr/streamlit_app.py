@@ -42,7 +42,7 @@ def exibir_login():
         # Mensagem de boas-vindas
         st.markdown("""
         <div style='text-align: center; margin-bottom: 30px;'>
-            <h1>Bem-vindo ao SaleSniper!</h1>
+            <h1>Bem-vindo(a) ao SaleSniper!</h1>
             <p style='font-size: 18px; color: #666;'>
                 Sua plataforma inteligente para análise e gestão de vendas SaaS.
             </p>
