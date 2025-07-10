@@ -8,7 +8,7 @@ from components.churn import exibir_churn
 # Importação comentada para MVP inicial
 # from components.tamsamsom import exibir_tamsamsom
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from PIL import Image
 
 # Carregando a logo
