@@ -1,0 +1,9 @@
+@startuml
+start
+:Administrador acessa painel de usuários;
+:Visualiza lista de usuários;
+:Adiciona ou edita usuário e senha;
+:Sistema salva alterações;
+:Exibe confirmação;
+stop
+@enduml 

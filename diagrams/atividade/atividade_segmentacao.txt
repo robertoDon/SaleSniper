@@ -1,0 +1,10 @@
+
+
+@startuml
+start
+:Usuário acessa aba de segmentação;
+:Seleciona tipo de segmentação e parâmetros;
+:Sistema processa segmentação;
+:Exibe resultados em tabela;
+stop
+@enduml 

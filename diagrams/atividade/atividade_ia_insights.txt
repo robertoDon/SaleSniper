@@ -1,0 +1,9 @@
+@startuml
+start
+:Usuário solicita insights de IA;
+:Sistema prepara dados e prompt;
+:Envia requisição para IA (Ollama);
+:Recebe resposta da IA;
+:Exibe insights e ações sugeridas;
+stop
+@enduml 

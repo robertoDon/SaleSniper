@@ -1,0 +1,16 @@
+@startuml
+start
+repeat
+  :Usuário acessa tela de login;
+  :Usuário informa usuário e senha;
+  :Sistema valida credenciais;
+  if (Credenciais válidas?) then (Sim)
+    :Autentica usuário;
+    :Redireciona para dashboard;
+    stop
+  else (Não)
+    :Exibe mensagem de erro;
+    :Permite nova tentativa;
+  endif
+repeat while (Não autenticado)
+@enduml 

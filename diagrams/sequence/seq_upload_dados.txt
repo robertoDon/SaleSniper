@@ -1,0 +1,12 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant Importador
+participant Sistema
+Usuario -> Frontend: Faz upload do arquivo Excel
+Frontend -> Importador: carregar_clientes_do_excel(arquivo)
+Importador --> Frontend: DataFrame de clientes
+Frontend -> Sistema: carregar_dados(df)
+Sistema --> Frontend: Confirmação
+Frontend -> Usuario: Exibe sucesso ou erro
+@enduml 

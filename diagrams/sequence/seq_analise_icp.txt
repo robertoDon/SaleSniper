@@ -1,0 +1,15 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant Sistema
+participant AnaliseICP
+
+Usuario -> Frontend: Seleciona aba de ICP
+Frontend -> Sistema: Solicita análise ICP
+Sistema -> AnaliseICP: calcular_capitao_america(df, qualitativos)
+AnaliseICP --> Sistema: Perfil ideal
+Sistema -> AnaliseICP: calcular_correlacoes(df, qualitativos, quantitativos)
+AnaliseICP --> Sistema: Correlações
+Sistema --> Frontend: Resultados (perfil, correlações)
+Frontend -> Usuario: Exibe perfil ideal e métricas
+@enduml 

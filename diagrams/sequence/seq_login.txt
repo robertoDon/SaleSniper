@@ -1,0 +1,13 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant AuthService
+Usuario -> Frontend: Informa usuario e senha
+Frontend -> AuthService: autenticar(usuario, senha)
+AuthService --> Frontend: Resultado (sucesso/erro)
+alt Sucesso
+  Frontend -> Usuario: Redireciona para dashboard
+else Erro
+  Frontend -> Usuario: Exibe mensagem de erro
+end
+@enduml 

@@ -1,0 +1,16 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant Sistema
+participant FaixasTicketService
+participant FunilService
+
+Usuario -> Frontend: Seleciona aba de metas e funil
+Frontend -> Sistema: Solicita dados para projeção
+Sistema -> FaixasTicketService: identificar_faixa(valor)
+FaixasTicketService --> Sistema: Faixa identificada
+Sistema -> FunilService: calcular_funil(dados)
+FunilService --> Sistema: Projeção de funil
+Sistema --> Frontend: Resultados e gráficos
+Frontend -> Usuario: Exibe projeções e gráficos
+@enduml 

@@ -1,0 +1,8 @@
+streamlit==1.31.1
+pandas==2.2.0
+numpy==1.26.3
+openpyxl==3.1.2  # Para ler arquivos Excel
+python-dotenv==1.0.0  # Para variáveis de ambiente
+scipy==1.12.0  # Para otimizações numéricas
+numba==0.58.1  # Para compilação JIT
+psutil==5.9.8  # Para monitoramento de recursos 

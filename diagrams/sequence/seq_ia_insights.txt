@@ -1,0 +1,10 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant AIInsightsService
+
+Usuario -> Frontend: Solicita insights de IA
+Frontend -> AIInsightsService: gerar_insights_ia(correlacoes)
+AIInsightsService --> Frontend: Insights e ações sugeridas
+Frontend -> Usuario: Exibe insights e ações
+@enduml 

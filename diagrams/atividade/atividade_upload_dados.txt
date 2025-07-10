@@ -1,0 +1,16 @@
+@startuml
+start
+repeat
+  :Usuário acessa aba de upload;
+  :Seleciona arquivo Excel de clientes;
+  :Sistema valida formato do arquivo;
+  if (Formato válido?) then (Sim)
+    :Carrega dados para análise;
+    :Exibe confirmação de sucesso;
+    stop
+  else (Não)
+    :Exibe mensagem de erro;
+    :Permite novo upload;
+  endif
+repeat while (Arquivo inválido)
+@enduml 

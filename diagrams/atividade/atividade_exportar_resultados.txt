@@ -1,0 +1,8 @@
+@startuml
+start
+:Usuário seleciona opção de exportação;
+:Escolhe formato (CSV, XLSX, PDF);
+:Sistema gera arquivo;
+:Disponibiliza download ao usuário;
+stop
+@enduml 

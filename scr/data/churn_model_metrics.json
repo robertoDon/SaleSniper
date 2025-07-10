@@ -1,0 +1,5 @@
+{
+  "modelo": "WeibullAFT",
+  "acuracia": 0.8575,
+  "roc_auc": 0.8831490680104378
+}

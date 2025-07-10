@@ -1,0 +1,13 @@
+@startuml
+start
+:Usuário acessa aba de ICP;
+:Sistema verifica se há dados carregados;
+if (Dados disponíveis?) then (Sim)
+  :Processa análise ICP;
+  :Exibe perfil ideal e métricas;
+  stop
+else (Não)
+  :Solicita upload de dados;
+  stop
+endif
+@enduml 

@@ -1,0 +1,13 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant Sistema
+participant Segmentacao
+
+Usuario -> Frontend: Seleciona aba de segmentação
+Frontend -> Sistema: Solicita segmentação
+Sistema -> Segmentacao: aplicar_segmentacao_8020(df, campo, percentual_a) / aplicar_segmentacao_20_30_30_20(df, campo, percentuais)
+Segmentacao --> Sistema: Segmentos
+Sistema --> Frontend: Resultados da segmentação
+Frontend -> Usuario: Exibe tabela de segmentos
+@enduml 

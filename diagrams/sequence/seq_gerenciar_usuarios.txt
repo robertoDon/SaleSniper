@@ -1,0 +1,13 @@
+@startuml
+actor Admin
+participant Frontend as Streamlit
+participant AuthService
+
+Admin -> Frontend: Acessa painel de usuários
+Frontend -> AuthService: carregar_usuarios()
+AuthService --> Frontend: Lista de usuários
+Admin -> Frontend: Adiciona/edita usuário
+Frontend -> AuthService: salvar_usuario(usuario, senha)
+AuthService --> Frontend: Confirmação
+Frontend -> Admin: Exibe confirmação
+@enduml 

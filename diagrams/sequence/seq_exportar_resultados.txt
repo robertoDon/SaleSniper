@@ -1,0 +1,10 @@
+@startuml
+actor Usuario
+participant Frontend as Streamlit
+participant Sistema
+
+Usuario -> Frontend: Solicita exportação de resultados
+Frontend -> Sistema: Gera arquivo (CSV/XLSX/PDF)
+Sistema --> Frontend: Arquivo gerado
+Frontend -> Usuario: Disponibiliza download
+@enduml 

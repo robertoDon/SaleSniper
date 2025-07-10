@@ -1,0 +1,10 @@
+
+
+@startuml
+start
+:Usuário acessa aba de metas e funil;
+:Informa objetivos e parâmetros;
+:Sistema calcula projeções e metas;
+:Exibe resultados e gráficos;
+stop
+@enduml 
