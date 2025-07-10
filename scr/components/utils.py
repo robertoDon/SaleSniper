@@ -6,7 +6,10 @@ import locale
 from core.sistema import Sistema
 
 # Configurar locale para português do Brasil
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')  # Usa o padrão do sistema
 
 def formatar_valor(valor):
     # Se não for um número ou string numérica, retorna o valor original
