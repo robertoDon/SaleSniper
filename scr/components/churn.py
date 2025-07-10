@@ -9,7 +9,7 @@ import os
 import json
 
 def exibir_churn():
-    st.markdown("<h1 style='color: #FF8C00;'>Previsão de Churn de Clientes</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Previsão de Churn de Clientes</h1>", unsafe_allow_html=True)
     
     # Upload do arquivo de clientes
     arquivo_clientes = st.file_uploader(

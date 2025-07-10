@@ -208,8 +208,7 @@ def ajustar_meta_por_dias_uteis(meta_mensal, dias_uteis_mes, dias_uteis_padrao=2
     return round(meta_mensal * (dias_uteis_mes / dias_uteis_padrao))
 
 def exibir_calculadora():
-    # Aplicar cor laranja ao título principal
-    st.markdown("<h1 style='color: #FF8C00;'>Calculadora de Metas & Projeção de Funil</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Calculadora de Metas & Projeção de Funil</h1>", unsafe_allow_html=True)
 
     # Verificar se temos dados do ICP
     if "icp_data" not in st.session_state or st.session_state["icp_data"] is None:

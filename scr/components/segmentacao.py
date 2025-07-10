@@ -43,7 +43,7 @@ def calcular_ltv(df):
     return df
 
 def exibir_segmentacao():
-    st.title("Segmentação de Clientes")
+    st.title("SaleSniper - Segmentação de Clientes")
     
     if "icp_data" not in st.session_state or st.session_state["icp_data"] is None:
         st.warning("Por favor, primeiro carregue os dados na aba 'Análise de ICP'")

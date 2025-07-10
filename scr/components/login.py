@@ -2,7 +2,7 @@ import streamlit as st
 from services.auth import autenticar, carregar_usuarios
 
 def exibir_login():
-    st.title("🔐 Login")
+    st.title("SaleSniper - 🔐 Login")
     usuarios = carregar_usuarios()
 
     usuario = st.text_input("Usuário")

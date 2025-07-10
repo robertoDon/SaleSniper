@@ -105,8 +105,7 @@ def _processar_correlacoes(correlacoes: dict) -> tuple:
     return insights
 
 def exibir_dashboard():
-    # Aplicar cor laranja ao título principal
-    st.markdown("<h1 style='color: #FF8C00;'>Análise de ICP (Ideal Customer Profile)</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Análise de ICP (Ideal Customer Profile)</h1>", unsafe_allow_html=True)
 
     # Se já temos dados calculados, usar eles
     if st.session_state.get("icp_data") is not None:

@@ -17,7 +17,7 @@ logo_img = Image.open(logo_path)
 
 # Configuração da página
 st.set_page_config(
-    page_title="SaaS",
+    page_title="SaleSniper",
     page_icon=logo_img,
     layout="wide"
 )
@@ -42,9 +42,9 @@ def exibir_login():
         # Mensagem de boas-vindas
         st.markdown("""
         <div style='text-align: center; margin-bottom: 30px;'>
-            <h1>Bem-vindo à Don!</h1>
+            <h1>Bem-vindo ao SaleSniper!</h1>
             <p style='font-size: 18px; color: #666;'>
-                Sua plataforma inteligente para análise e gestão de SaaS.
+                Sua plataforma inteligente para análise e gestão de vendas SaaS.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -77,7 +77,7 @@ col1, col2 = st.sidebar.columns([1, 3])
 with col1:
     st.image(logo_img, width=50)
 with col2:
-    st.title("Cardápio")
+    st.title("SaleSniper - Menu")
 st.sidebar.markdown(f"👤 **{st.session_state['usuario']}**")
 
 # Botão de logout na sidebar

@@ -1,3 +1,5 @@
+# App: SaleSniper
+# Requisitos de dependências para o projeto SaleSniper
 streamlit==1.31.1
 pandas==2.2.0
 numpy==1.26.3
@@ -9,3 +11,12 @@ psutil==5.9.8  # Para monitoramento de recursos
 
 reportlab
 xlsxwriter 
+
+holidays
+requests
+lifelines
+scikit-learn
+scikit-survival
+matplotlib
+seaborn
+pillow 
