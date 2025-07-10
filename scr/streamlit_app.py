@@ -37,7 +37,7 @@ def exibir_login():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         # Logo centralizada com tamanho menor
-        st.image(logo_img, width=60, use_container_width=False)
+        st.image(logo_img, width=60)
         
         # Mensagem de boas-vindas
         st.markdown("""
