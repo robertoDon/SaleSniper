@@ -13,7 +13,10 @@ import pandas as pd
 from typing import Dict, List
 
 # Configurar locale para português do Brasil
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')  # Usa o padrão do sistema
 
 def formatar_numero_br(valor, casas_decimais=2):
     """Formata número para o padrão brasileiro."""
