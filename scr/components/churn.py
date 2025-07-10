@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import json
+import io
 
 def exibir_churn():
     st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Previsão de Churn de Clientes</h1>", unsafe_allow_html=True)
@@ -122,34 +123,54 @@ def exibir_churn():
     
     # Gráficos
     st.markdown(f"<h3 style='color:#FF8C00;'>Distribuição dos churns previstos por mês</h3>", unsafe_allow_html=True)
-    fig, ax = plt.subplots(figsize=(10, 4))
-    fig.patch.set_facecolor('#0E1117')
+    fig, ax = plt.subplots(figsize=(10, 4), facecolor='#0E1117')
     ax.set_facecolor('#0E1117')
-    sns.barplot(x=churns_mes['mes_ano_churn_pred'].astype(str), y=churns_mes['qtd_churns'], ax=ax, color='#FF8C00', edgecolor='#FF8C00')
-    ax.set_xlabel('Mês/Ano', fontsize=12, color='#FF8C00', fontweight='bold')
-    ax.set_ylabel('Churns previstos', color='#FF8C00', fontweight='bold')
+    bars = sns.barplot(x=churns_mes['mes_ano_churn_pred'].astype(str), y=churns_mes['qtd_churns'], ax=ax, color='#FF8C00', edgecolor='#FF8C00')
+    # Remover títulos dos eixos
+    ax.set_xlabel('')
+    ax.set_ylabel('')
     ax.tick_params(axis='x', colors='#FF8C00', labelsize=10, labelrotation=30, labelrotation_mode='anchor')
     ax.tick_params(axis='y', colors='#FF8C00', labelsize=10)
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_fontweight('bold')
     plt.xticks(rotation=30, ha='right', fontweight='bold')
     plt.yticks(fontweight='bold')
-    st.pyplot(fig, use_container_width=True)
-    
+    # Adicionar valor em cima de cada barra
+    for bar, value in zip(bars.patches, churns_mes['qtd_churns']):
+        ax.annotate(f'{int(value)}',
+                    (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+                    ha='center', va='bottom',
+                    fontsize=11, fontweight='bold', color='#FF8C00')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', facecolor=fig.get_facecolor(), bbox_inches='tight')
+    buf.seek(0)
+    st.image(buf)
+    plt.close(fig)
+
     st.markdown(f"<h3 style='color:#FF8C00;'>Valor perdido previsto por mês</h3>", unsafe_allow_html=True)
-    fig2, ax2 = plt.subplots(figsize=(10, 4))
-    fig2.patch.set_facecolor('#0E1117')
+    fig2, ax2 = plt.subplots(figsize=(10, 4), facecolor='#0E1117')
     ax2.set_facecolor('#0E1117')
-    sns.barplot(x=valor_perdido_mes['mes_ano_churn_pred'].astype(str), y=valor_perdido_mes['valor_perdido'], ax=ax2, color='#FF8C00', edgecolor='#FF8C00')
-    ax2.set_xlabel('Mês/Ano', fontsize=12, color='#FF8C00', fontweight='bold')
-    ax2.set_ylabel('Valor perdido (R$)', color='#FF8C00', fontweight='bold')
+    bars2 = sns.barplot(x=valor_perdido_mes['mes_ano_churn_pred'].astype(str), y=valor_perdido_mes['valor_perdido'], ax=ax2, color='#FF8C00', edgecolor='#FF8C00')
+    # Remover títulos dos eixos
+    ax2.set_xlabel('')
+    ax2.set_ylabel('')
     ax2.tick_params(axis='x', colors='#FF8C00', labelsize=10, labelrotation=30, labelrotation_mode='anchor')
     ax2.tick_params(axis='y', colors='#FF8C00', labelsize=10)
     for label in ax2.get_xticklabels() + ax2.get_yticklabels():
         label.set_fontweight('bold')
     plt.xticks(rotation=30, ha='right', fontweight='bold')
     plt.yticks(fontweight='bold')
-    st.pyplot(fig2, use_container_width=True)
+    # Adicionar valor em cima de cada barra
+    for bar, value in zip(bars2.patches, valor_perdido_mes['valor_perdido']):
+        ax2.annotate(f'{int(value):,}'.replace(',', '.'),
+                     (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+                     ha='center', va='bottom',
+                     fontsize=11, fontweight='bold', color='#FF8C00')
+    buf2 = io.BytesIO()
+    plt.savefig(buf2, format='png', facecolor=fig2.get_facecolor(), bbox_inches='tight')
+    buf2.seek(0)
+    st.image(buf2)
+    plt.close(fig2)
     
     # Exportar previsões detalhadas
     st.markdown(f"<h3 style='color:#FF8C00;'>Exportar previsões detalhadas dos clientes ativos</h3>", unsafe_allow_html=True)
