@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-from services.faixas_ticket import identificar_faixa, ajuste_por_faixa, base_taxas
-from services.funil import calcular_funil, calcular_projecao
+from scr.services.faixas_ticket import identificar_faixa, ajuste_por_faixa, base_taxas
+from scr.services.funil import calcular_funil, calcular_projecao
 import io
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter

@@ -1,7 +1,7 @@
 import pandas as pd
-from domain.servicos.analise_icp import AnaliseICP
-from domain.servicos.segmentacao import Segmentacao
-from domain.servicos.dados_mercado import DadosMercado
+from scr.domain.servicos.analise_icp import AnaliseICP
+from scr.domain.servicos.segmentacao import Segmentacao
+from scr.domain.servicos.dados_mercado import DadosMercado
 
 class Sistema:
     def __init__(self):

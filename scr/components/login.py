@@ -1,5 +1,5 @@
 import streamlit as st
-from services.auth import autenticar, carregar_usuarios
+from scr.services.auth import autenticar, carregar_usuarios
 
 def exibir_login():
     st.title("🔐 Login")
