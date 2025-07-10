@@ -14,7 +14,10 @@ import holidays
 import numpy as np
 
 # Configurar locale para português do Brasil
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')  # Usa o padrão do sistema
 
 # Definir etapas do funil globalmente
 etapas = ["Lead", "MQL", "SAL", "Agendamento", "Reunião Ocorrida", "Oportunidade (SQL)", "Venda"]
