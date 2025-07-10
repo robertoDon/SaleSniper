@@ -1,13 +1,13 @@
 import streamlit as st
-from scr.adapters.importador import carregar_clientes_do_excel
-from scr.core.sistema import Sistema
-from scr.components.utils import (
+from adapters.importador import carregar_clientes_do_excel
+from core.sistema import Sistema
+from components.utils import (
     carregar_e_preprocessar_dados, 
     calcular_analise_icp,
     get_variaveis_default,
     formatar_valor
 )
-from scr.services.ai_insights import gerar_insights_ia, gerar_insights_e_acoes_por_categoria, gerar_acao_sugerida_para_insight
+from services.ai_insights import gerar_insights_ia, gerar_insights_e_acoes_por_categoria, gerar_acao_sugerida_para_insight
 import locale
 import pandas as pd
 from typing import Dict, List

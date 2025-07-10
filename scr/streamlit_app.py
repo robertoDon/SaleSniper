@@ -1,12 +1,12 @@
 import sys
 import streamlit as st
-from scr.services.auth import carregar_usuarios, salvar_usuario, autenticar
-from scr.components.dashboard import exibir_dashboard
-from scr.components.segmentacao import exibir_segmentacao
-from scr.components.metas_funil import exibir_calculadora
-from scr.components.churn import exibir_churn
+from services.auth import carregar_usuarios, salvar_usuario, autenticar
+from components.dashboard import exibir_dashboard
+from components.segmentacao import exibir_segmentacao
+from components.metas_funil import exibir_calculadora
+from components.churn import exibir_churn
 # Importação comentada para MVP inicial
-# from scr.components.tamsamsom import exibir_tamsamsom
+# from components.tamsamsom import exibir_tamsamsom
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from PIL import Image

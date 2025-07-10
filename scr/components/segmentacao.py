@@ -1,5 +1,5 @@
 import streamlit as st
-from scr.components.utils import calcular_segmentacao, calcular_metricas_segmentacao
+from components.utils import calcular_segmentacao, calcular_metricas_segmentacao
 import pandas as pd
 import numpy as np
 import locale

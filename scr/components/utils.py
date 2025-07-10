@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Tuple, Dict, Any, List
 import numpy as np
 import locale
-from scr.core.sistema import Sistema
+from core.sistema import Sistema
 
 # Configurar locale para português do Brasil
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
