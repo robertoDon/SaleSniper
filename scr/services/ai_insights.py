@@ -426,13 +426,11 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
         f"Dado o insight: '{insight_texto}', gere uma ação sugerida criativa, específica e contextualizada para um gestor de vendas SaaS, explicando o racional da ação. Responda em português, apenas com a ação sugerida, sem explicações extras."
     )
 
-    # 1. Tenta OpenAI GPT-3.5
+    # 1. Tenta OpenAI GPT-3.5 (nova API)
     try:
         import openai
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
-        if not openai.api_key:
-            raise Exception("OPENAI_API_KEY não encontrada na variável de ambiente.")
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Você é um especialista em vendas SaaS."},
@@ -441,7 +439,7 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
             max_tokens=80,
             temperature=0.7,
         )
-        texto = response["choices"][0]["message"]["content"].strip()
+        texto = response.choices[0].message.content.strip()
         print("[IA] Resposta gerada pelo OpenAI GPT-3.5.")
         return texto
     except Exception as e:
