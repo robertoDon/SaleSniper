@@ -414,14 +414,17 @@ def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, 
 def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     """
     Gera uma ação sugerida para um insight específico usando a API do Ollama.
-    Se falhar, tenta a Hugging Face. Se falhar, usa regra simples.
+    Se falhar, tenta a Hugging Face. Se falhar, usa regra dinâmica baseada no insight.
     """
     import os
     import requests
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
 
-    # Prompt padrão
-    prompt = f"""Com base no seguinte insight sobre correlações de clientes, gere apenas uma ação sugerida concisa para otimizar LTV e Ticket Médio. Sua resposta deve ser apenas a ação sugerida, sem introduções ou explicações adicionais.\n\nINSIGHT: {insight_texto}\n\nAção Sugerida:"""
+    # Prompt mais direto e em português
+    prompt = (
+        f"Dado o insight: '{insight_texto}', gere uma ação sugerida específica para aumentar LTV ou ticket médio. "
+        f"Responda em português, apenas com a ação, sem explicações."
+    )
 
     # 1. Tenta Ollama local
     try:
@@ -445,13 +448,10 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
             # O resultado pode ser uma lista de dicts com 'generated_text'
             if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
                 return result[0]['generated_text'].strip()
-            # Ou pode ser só 'generated_text'
             if isinstance(result, dict) and 'generated_text' in result:
                 return result['generated_text'].strip()
-            # Ou pode ser só 'text'
             if isinstance(result, dict) and 'text' in result:
                 return result['text'].strip()
-            # Ou pode ser só string
             if isinstance(result, str):
                 return result.strip()
         else:
@@ -459,5 +459,29 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     except Exception as e:
         print(f"Erro ao gerar ação com Hugging Face: {e}")
 
-    # 3. Fallback simples baseado em regra
-    return f"Sugere-se criar uma campanha focada neste perfil para aumentar o LTV e o ticket médio." 
+    # 3. Fallback dinâmico baseado no insight
+    insight_lower = insight_texto.lower()
+    if "ticket médio" in insight_lower:
+        if "maior que" in insight_lower or "% maior" in insight_lower:
+            return "Aumentar o foco em clientes desse perfil para elevar o ticket médio."
+        elif "menor que" in insight_lower or "% menor" in insight_lower:
+            return "Rever estratégias para aumentar o ticket médio desse segmento."
+        else:
+            return "Criar campanhas para otimizar o ticket médio deste grupo."
+    if "ltv" in insight_lower:
+        if "maior que" in insight_lower or "% maior" in insight_lower:
+            return "Criar estratégias de retenção para esse segmento visando aumentar o LTV."
+        elif "menor que" in insight_lower or "% menor" in insight_lower:
+            return "Investir em ações para elevar o LTV deste perfil."
+        else:
+            return "Desenvolver iniciativas para otimizar o LTV deste grupo."
+    if "região" in insight_lower or "sudeste" in insight_lower or "centro-oeste" in insight_lower or "norte" in insight_lower or "sul" in insight_lower or "nordeste" in insight_lower:
+        return "Investir em campanhas direcionadas para a região destacada."
+    if "segmento" in insight_lower or "saas" in insight_lower or "retailtech" in insight_lower or "saúde" in insight_lower:
+        return "Personalizar ofertas para o segmento identificado."
+    if "porte" in insight_lower or "médio" in insight_lower or "pequeno" in insight_lower or "grande" in insight_lower:
+        return "Ajustar estratégias comerciais conforme o porte do cliente."
+    if "dor" in insight_lower or "performance" in insight_lower or "financeiro" in insight_lower:
+        return "Desenvolver soluções específicas para a dor identificada."
+    # Fallback genérico
+    return "Criar uma ação personalizada para este perfil visando aumentar LTV e ticket médio." 
