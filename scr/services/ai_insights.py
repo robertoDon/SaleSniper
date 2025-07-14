@@ -414,22 +414,23 @@ def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, 
 def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     """
     Gera uma ação sugerida para um insight específico usando a API do Ollama.
-    Se falhar, tenta a Hugging Face. Se falhar, usa regra dinâmica baseada no insight.
+    Se falhar, tenta a Hugging Face (com prompt forçando menção ao grupo). Se falhar, usa regra dinâmica baseada no insight.
     """
     import os
     import requests
+    import re
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
 
-    # Prompt mais direto e em português
+    # Prompt mais direto e forçando menção ao grupo
     prompt = (
-        f"Dado o insight: '{insight_texto}', gere uma ação sugerida específica para aumentar LTV ou ticket médio. "
-        f"Responda em português, apenas com a ação, sem explicações."
+        f"Dado o insight: '{insight_texto}', gere uma ação sugerida específica, mencionando explicitamente o grupo destacado (ex: segmento, região, porte, dor), para aumentar LTV ou ticket médio. Responda em português, apenas com a ação, sem explicações."
     )
 
     # 1. Tenta Ollama local
     try:
         prompt_hash = _gerar_hash_prompt(prompt)
         response_text = _chamar_ollama_api_cached(prompt_hash, prompt)
+        print("[IA] Resposta gerada pelo Ollama.")
         return response_text.strip()
     except Exception as e:
         print(f"Erro ao gerar ação com Ollama: {e}")
@@ -445,43 +446,48 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
         response = requests.post(api_url, headers=headers, json=payload, timeout=30)
         if response.status_code == 200:
             result = response.json()
-            # O resultado pode ser uma lista de dicts com 'generated_text'
+            texto = None
             if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
-                return result[0]['generated_text'].strip()
-            if isinstance(result, dict) and 'generated_text' in result:
-                return result['generated_text'].strip()
-            if isinstance(result, dict) and 'text' in result:
-                return result['text'].strip()
-            if isinstance(result, str):
-                return result.strip()
+                texto = result[0]['generated_text']
+            elif isinstance(result, dict) and 'generated_text' in result:
+                texto = result['generated_text']
+            elif isinstance(result, dict) and 'text' in result:
+                texto = result['text']
+            elif isinstance(result, str):
+                texto = result
+            if texto:
+                print("[IA] Resposta gerada pela Hugging Face.")
+                return texto.strip()
         else:
             print(f"Erro Hugging Face: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"Erro ao gerar ação com Hugging Face: {e}")
 
-    # 3. Fallback dinâmico baseado no insight
+    # 3. Fallback dinâmico baseado no insight (personalizado)
     insight_lower = insight_texto.lower()
+    # Regex para extrair grupos
+    match = re.search(r"([\wÀ-ÿ ]+) tem (ticket médio|ltv) ([\d\.,]+)% maior que ([\wÀ-ÿ ]+)", insight_texto, re.IGNORECASE)
+    if match:
+        grupo = match.group(1).strip()
+        metrica = match.group(2).strip()
+        percentual = match.group(3).strip()
+        grupo_base = match.group(4).strip()
+        if metrica.lower() == "ticket médio":
+            return f"Foque campanhas de vendas no grupo {grupo} para aumentar ainda mais o ticket médio em relação a {grupo_base}."
+        elif metrica.lower() == "ltv":
+            return f"Invista em estratégias de retenção para clientes do grupo {grupo} visando elevar o LTV em relação a {grupo_base}."
+    # Outras regras
     if "ticket médio" in insight_lower:
-        if "maior que" in insight_lower or "% maior" in insight_lower:
-            return "Aumentar o foco em clientes desse perfil para elevar o ticket médio."
-        elif "menor que" in insight_lower or "% menor" in insight_lower:
-            return "Rever estratégias para aumentar o ticket médio desse segmento."
-        else:
-            return "Criar campanhas para otimizar o ticket médio deste grupo."
+        return "Criar campanhas para otimizar o ticket médio do grupo destacado."
     if "ltv" in insight_lower:
-        if "maior que" in insight_lower or "% maior" in insight_lower:
-            return "Criar estratégias de retenção para esse segmento visando aumentar o LTV."
-        elif "menor que" in insight_lower or "% menor" in insight_lower:
-            return "Investir em ações para elevar o LTV deste perfil."
-        else:
-            return "Desenvolver iniciativas para otimizar o LTV deste grupo."
-    if "região" in insight_lower or "sudeste" in insight_lower or "centro-oeste" in insight_lower or "norte" in insight_lower or "sul" in insight_lower or "nordeste" in insight_lower:
+        return "Desenvolver iniciativas para otimizar o LTV do grupo destacado."
+    if any(reg in insight_lower for reg in ["região", "sudeste", "centro-oeste", "norte", "sul", "nordeste"]):
         return "Investir em campanhas direcionadas para a região destacada."
-    if "segmento" in insight_lower or "saas" in insight_lower or "retailtech" in insight_lower or "saúde" in insight_lower:
+    if any(seg in insight_lower for seg in ["segmento", "saas", "retailtech", "saúde"]):
         return "Personalizar ofertas para o segmento identificado."
-    if "porte" in insight_lower or "médio" in insight_lower or "pequeno" in insight_lower or "grande" in insight_lower:
-        return "Ajustar estratégias comerciais conforme o porte do cliente."
-    if "dor" in insight_lower or "performance" in insight_lower or "financeiro" in insight_lower:
+    if any(porte in insight_lower for porte in ["porte", "médio", "pequeno", "grande"]):
+        return "Ajustar estratégias comerciais conforme o porte do cliente." 
+    if any(dor in insight_lower for dor in ["dor", "performance", "financeiro"]):
         return "Desenvolver soluções específicas para a dor identificada."
     # Fallback genérico
     return "Criar uma ação personalizada para este perfil visando aumentar LTV e ticket médio." 
