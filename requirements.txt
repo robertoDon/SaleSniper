@@ -16,7 +16,7 @@ holidays
 requests
 lifelines
 scikit-learn
-scikit-survival
+scikit-survival==0.10
 matplotlib
 seaborn
 pillow 
