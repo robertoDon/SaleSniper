@@ -414,10 +414,9 @@ def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, 
 def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     """
     Gera uma ação sugerida para um insight específico usando a API do OpenAI GPT-3.5.
-    Se falhar, tenta a Hugging Face (com prompt forçando menção ao grupo). Se falhar, usa regra dinâmica baseada no insight.
+    Se falhar, usa regra dinâmica baseada no insight.
     """
     import os
-    import requests
     import re
     import traceback
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
@@ -449,38 +448,7 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
         print(f"Erro ao gerar ação com OpenAI: {e}")
         print(traceback.format_exc())
 
-    # 2. Tenta Hugging Face Inference API gratuita
-    try:
-        hf_token = os.environ.get("HF_TOKEN", None)
-        if not hf_token:
-            raise Exception("Token Hugging Face não encontrado na variável de ambiente HF_TOKEN.")
-        prompt = (
-            f"Dado o insight: '{insight_texto}', gere uma ação sugerida específica, mencionando explicitamente o grupo destacado (ex: segmento, região, porte, dor), para aumentar LTV ou ticket médio. Responda em português, apenas com a ação, sem explicações."
-        )
-        api_url = "https://api-inference.huggingface.co/models/google/flan-t5-small"
-        headers = {"Authorization": f"Bearer {hf_token}"}
-        payload = {"inputs": prompt}
-        response = requests.post(api_url, headers=headers, json=payload, timeout=30)
-        if response.status_code == 200:
-            result = response.json()
-            texto = None
-            if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
-                texto = result[0]['generated_text']
-            elif isinstance(result, dict) and 'generated_text' in result:
-                texto = result['generated_text']
-            elif isinstance(result, dict) and 'text' in result:
-                texto = result['text']
-            elif isinstance(result, str):
-                texto = result
-            if texto:
-                print("[IA] Resposta gerada pela Hugging Face.")
-                return texto.strip()
-        else:
-            print(f"Erro Hugging Face: {response.status_code} - {response.text}")
-    except Exception as e:
-        print(f"Erro ao gerar ação com Hugging Face: {e}")
-
-    # 3. Fallback dinâmico baseado no insight (personalizado)
+    # 2. Fallback dinâmico baseado no insight (personalizado)
     insight_lower = insight_texto.lower()
     # Regex para extrair grupos
     match = re.search(r"([\wÀ-ÿ ]+) tem (ticket médio|ltv) ([\d\.,]+)% maior que ([\wÀ-ÿ ]+)", insight_texto, re.IGNORECASE)
