@@ -413,7 +413,7 @@ def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, 
 
 def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     """
-    Gera uma ação sugerida para um insight específico usando a API do Ollama.
+    Gera uma ação sugerida para um insight específico usando a API do OpenAI GPT-3.5.
     Se falhar, tenta a Hugging Face (com prompt forçando menção ao grupo). Se falhar, usa regra dinâmica baseada no insight.
     """
     import os
@@ -421,25 +421,40 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     import re
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
 
-    # Prompt mais direto e forçando menção ao grupo
-    prompt = (
-        f"Dado o insight: '{insight_texto}', gere uma ação sugerida específica, mencionando explicitamente o grupo destacado (ex: segmento, região, porte, dor), para aumentar LTV ou ticket médio. Responda em português, apenas com a ação, sem explicações."
+    # Prompt para o OpenAI GPT-3.5
+    openai_prompt = (
+        f"Dado o insight: '{insight_texto}', gere uma ação sugerida criativa, específica e contextualizada para um gestor de vendas SaaS, explicando o racional da ação. Responda em português, apenas com a ação sugerida, sem explicações extras."
     )
 
-    # 1. Tenta Ollama local
+    # 1. Tenta OpenAI GPT-3.5
     try:
-        prompt_hash = _gerar_hash_prompt(prompt)
-        response_text = _chamar_ollama_api_cached(prompt_hash, prompt)
-        print("[IA] Resposta gerada pelo Ollama.")
-        return response_text.strip()
+        import openai
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        if not openai.api_key:
+            raise Exception("OPENAI_API_KEY não encontrada na variável de ambiente.")
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Você é um especialista em vendas SaaS."},
+                {"role": "user", "content": openai_prompt}
+            ],
+            max_tokens=80,
+            temperature=0.7,
+        )
+        texto = response["choices"][0]["message"]["content"].strip()
+        print("[IA] Resposta gerada pelo OpenAI GPT-3.5.")
+        return texto
     except Exception as e:
-        print(f"Erro ao gerar ação com Ollama: {e}")
+        print(f"Erro ao gerar ação com OpenAI: {e}")
 
     # 2. Tenta Hugging Face Inference API gratuita
     try:
         hf_token = os.environ.get("HF_TOKEN", None)
         if not hf_token:
             raise Exception("Token Hugging Face não encontrado na variável de ambiente HF_TOKEN.")
+        prompt = (
+            f"Dado o insight: '{insight_texto}', gere uma ação sugerida específica, mencionando explicitamente o grupo destacado (ex: segmento, região, porte, dor), para aumentar LTV ou ticket médio. Responda em português, apenas com a ação, sem explicações."
+        )
         api_url = "https://api-inference.huggingface.co/models/google/flan-t5-small"
         headers = {"Authorization": f"Bearer {hf_token}"}
         payload = {"inputs": prompt}
