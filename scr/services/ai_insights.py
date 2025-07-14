@@ -413,37 +413,47 @@ def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, 
 
 def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     """
-    Gera uma ação sugerida para um insight específico usando a API do OpenAI GPT-3.5.
+    Gera uma ação sugerida para um insight específico usando a Hugging Face Inference API (modelo ptt5-base-portuguese-vocab).
     Se falhar, usa regra dinâmica baseada no insight.
     """
     import os
     import re
     import traceback
+    import requests
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
 
-    # Prompt para o OpenAI GPT-3.5
-    openai_prompt = (
-        f"Dado o insight: '{insight_texto}', gere uma ação sugerida criativa, específica e contextualizada para um gestor de vendas SaaS, explicando o racional da ação. Responda em português, apenas com a ação sugerida, sem explicações extras."
+    # Prompt para a Hugging Face
+    hf_prompt = (
+        f"Dado o insight: '{insight_texto}', gere uma ação sugerida criativa, específica e contextualizada para um gestor de vendas SaaS. Responda em português, apenas com a ação sugerida, sem explicações extras."
     )
 
-    # 1. Tenta OpenAI GPT-3.5 (nova API)
+    # 1. Tenta Hugging Face Inference API
     try:
-        import openai
-        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Você é um especialista em vendas SaaS."},
-                {"role": "user", "content": openai_prompt}
-            ],
-            max_tokens=80,
-            temperature=0.7,
-        )
-        texto = response.choices[0].message.content.strip()
-        print("[IA] Resposta gerada pelo OpenAI GPT-3.5.")
-        return texto
+        hf_token = os.environ.get("HF_TOKEN", None)
+        api_url = "https://api-inference.huggingface.co/models/unicamp-dl/ptt5-base-portuguese-vocab"
+        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
+        payload = {"inputs": hf_prompt}
+        response = requests.post(api_url, headers=headers, json=payload, timeout=60)
+        if response.status_code == 200:
+            result = response.json()
+            texto = None
+            if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
+                texto = result[0]['generated_text']
+            elif isinstance(result, dict) and 'generated_text' in result:
+                texto = result['generated_text']
+            elif isinstance(result, dict) and 'text' in result:
+                texto = result['text']
+            elif isinstance(result, str):
+                texto = result
+            if texto:
+                print("[IA] Resposta gerada pela Hugging Face.")
+                return texto.strip()
+            else:
+                print(f"[IA] Resposta inesperada da Hugging Face: {result}")
+        else:
+            print(f"Erro Hugging Face: {response.status_code} - {response.text}")
     except Exception as e:
-        print(f"Erro ao gerar ação com OpenAI: {e}")
+        print(f"Erro ao gerar ação com Hugging Face: {e}")
         print(traceback.format_exc())
 
     # 2. Fallback dinâmico baseado no insight (personalizado)
