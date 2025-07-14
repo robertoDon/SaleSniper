@@ -419,6 +419,7 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     import os
     import requests
     import re
+    import traceback
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
 
     # Prompt para o OpenAI GPT-3.5
@@ -446,6 +447,7 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
         return texto
     except Exception as e:
         print(f"Erro ao gerar ação com OpenAI: {e}")
+        print(traceback.format_exc())
 
     # 2. Tenta Hugging Face Inference API gratuita
     try:
