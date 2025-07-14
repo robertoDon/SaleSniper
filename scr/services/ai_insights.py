@@ -414,21 +414,50 @@ def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, 
 def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     """
     Gera uma ação sugerida para um insight específico usando a API do Ollama.
+    Se falhar, tenta a Hugging Face. Se falhar, usa regra simples.
     """
+    import os
+    import requests
     print(f"Gerando ação sugerida para o insight: {insight_texto}...")
 
-    # Gerar prompt para a IA
+    # Prompt padrão
     prompt = f"""Com base no seguinte insight sobre correlações de clientes, gere apenas uma ação sugerida concisa para otimizar LTV e Ticket Médio. Sua resposta deve ser apenas a ação sugerida, sem introduções ou explicações adicionais.\n\nINSIGHT: {insight_texto}\n\nAção Sugerida:"""
 
+    # 1. Tenta Ollama local
     try:
-        # Chamar a API do Ollama com cache
         prompt_hash = _gerar_hash_prompt(prompt)
-        # Usar a função de cache que chama a API real
         response_text = _chamar_ollama_api_cached(prompt_hash, prompt)
-
-        # A resposta deve ser apenas a ação sugerida
         return response_text.strip()
-
     except Exception as e:
-        print(f"Erro ao gerar ação para o insight '{insight_texto}': {e}")
-        return "Não foi possível gerar ação sugerida." # Retorna mensagem de erro em caso de falha 
+        print(f"Erro ao gerar ação com Ollama: {e}")
+
+    # 2. Tenta Hugging Face Inference API gratuita
+    try:
+        hf_token = os.environ.get("HF_TOKEN", None)
+        if not hf_token:
+            raise Exception("Token Hugging Face não encontrado na variável de ambiente HF_TOKEN.")
+        api_url = "https://api-inference.huggingface.co/models/google/flan-t5-small"
+        headers = {"Authorization": f"Bearer {hf_token}"}
+        payload = {"inputs": prompt}
+        response = requests.post(api_url, headers=headers, json=payload, timeout=30)
+        if response.status_code == 200:
+            result = response.json()
+            # O resultado pode ser uma lista de dicts com 'generated_text'
+            if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
+                return result[0]['generated_text'].strip()
+            # Ou pode ser só 'generated_text'
+            if isinstance(result, dict) and 'generated_text' in result:
+                return result['generated_text'].strip()
+            # Ou pode ser só 'text'
+            if isinstance(result, dict) and 'text' in result:
+                return result['text'].strip()
+            # Ou pode ser só string
+            if isinstance(result, str):
+                return result.strip()
+        else:
+            print(f"Erro Hugging Face: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Erro ao gerar ação com Hugging Face: {e}")
+
+    # 3. Fallback simples baseado em regra
+    return f"Sugere-se criar uma campanha focada neste perfil para aumentar o LTV e o ticket médio." 
