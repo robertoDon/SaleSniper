@@ -8,6 +8,9 @@ import requests
 import time
 from functools import lru_cache
 import hashlib
+import os
+import re
+import traceback
 
 def _preparar_correlacoes(correlacoes: Dict[str, pd.DataFrame]) -> List[str]:
     """Prepara o texto das correlações de forma otimizada."""
@@ -52,56 +55,57 @@ def _gerar_hash_prompt(prompt: str) -> str:
     """Gera um hash único para o prompt."""
     return hashlib.md5(prompt.encode()).hexdigest()
 
-@lru_cache(maxsize=200)  # Aumenta cache para 200 entradas
-def _chamar_ollama_api_cached(prompt_hash: str, prompt: str) -> str:
-    """Versão em cache da chamada à API do Ollama."""
-    return _chamar_ollama_api(prompt)
+# Remover funções relacionadas ao Ollama
+#@lru_cache(maxsize=200)  # Aumenta cache para 200 entradas
+#def _chamar_ollama_api_cached(prompt_hash: str, prompt: str) -> str:
+#    """Versão em cache da chamada à API do Ollama."""
+#    return _chamar_ollama_api(prompt)
 
-def _chamar_ollama_api(prompt: str) -> str:
-    """Chama a API do Ollama e mede o tempo de execução."""
-    url = "http://localhost:11434/api/generate"
-    
-    print("Iniciando chamada à API...")
-    start_time = time.time()
-    
-    try:
-        response = requests.post(
-            url,
-            json={
-                "model": "neural-chat",
-                "prompt": prompt,
-                "stream": False,
-                "options": {
-                    "temperature": 0.5,
-                    "top_p": 0.8,
-                    "top_k": 20,
-                    "num_ctx": 512,  # Reduzido para evitar timeout
-                    "num_thread": 4,  # Reduzido para evitar sobrecarga
-                    "repeat_penalty": 1.1,
-                    "mirostat": 2,
-                    "mirostat_eta": 0.1,
-                    "mirostat_tau": 5.0,
-                    "num_batch": 256  # Reduzido para evitar timeout
-                }
-            },
-            timeout=180,  # Aumentado para 3 minutos
-            headers={"Content-Type": "application/json"},
-            verify=False
-        )
-        
-        if response.status_code == 200:
-            result = response.json()
-            end_time = time.time()
-            execution_time = end_time - start_time
-            print(f"Resposta recebida com sucesso em {execution_time:.2f} segundos")
-            return result.get('response', '').strip()
-        else:
-            print(f"Erro na API: {response.status_code}")
-            raise Exception(f"Erro na API: {response.status_code}")
-            
-    except requests.exceptions.RequestException as e:
-        print(f"Erro na requisição: {str(e)}")
-        raise
+#def _chamar_ollama_api(prompt: str) -> str:
+#    """Chama a API do Ollama e mede o tempo de execução."""
+#    url = "http://localhost:11434/api/generate"
+#    
+#    print("Iniciando chamada à API...")
+#    start_time = time.time()
+#    
+#    try:
+#        response = requests.post(
+#            url,
+#            json={
+#                "model": "neural-chat",
+#                "prompt": prompt,
+#                "stream": False,
+#                "options": {
+#                    "temperature": 0.5,
+#                    "top_p": 0.8,
+#                    "top_k": 20,
+#                    "num_ctx": 512,  # Reduzido para evitar timeout
+#                    "num_thread": 4,  # Reduzido para evitar sobrecarga
+#                    "repeat_penalty": 1.1,
+#                    "mirostat": 2,
+#                    "mirostat_eta": 0.1,
+#                    "mirostat_tau": 5.0,
+#                    "num_batch": 256  # Reduzido para evitar timeout
+#                }
+#            },
+#            timeout=180,  # Aumentado para 3 minutos
+#            headers={"Content-Type": "application/json"},
+#            verify=False
+#        )
+#        
+#        if response.status_code == 200:
+#            result = response.json()
+#            end_time = time.time()
+#            execution_time = end_time - start_time
+#            print(f"Resposta recebida com sucesso em {execution_time:.2f} segundos")
+#            return result.get('response', '').strip()
+#        else:
+#            print(f"Erro na API: {response.status_code}")
+#            raise Exception(f"Erro na API: {response.status_code}")
+#            
+#    except requests.exceptions.RequestException as e:
+#        print(f"Erro na requisição: {str(e)}")
+#        raise
 
 def _gerar_prompt(correlacoes_texto: List[str], top_insights: List[str]) -> str:
     """Gera o prompt para a IA de forma otimizada."""
@@ -224,7 +228,7 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
     
     # Processar correlações numéricas
     if 'numericas' in correlacoes:
-        print("Processando correlações numéricas...")
+        print("[DEBUG] Processando correlações numéricas...")
         matriz_corr = correlacoes['numericas']
         for var in matriz_corr.index:
             if var not in ['ltv', 'ticket_medio']:
@@ -236,7 +240,7 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
     
     # Processar correlações por categoria
     if 'categorias' in correlacoes:
-        print("Processando correlações por categoria...")
+        print("[DEBUG] Processando correlações por categoria...")
         for cat, dados in correlacoes['categorias'].items():
             # Adicionar o valor específico da categoria
             melhor_categoria_ltv = dados['ltv']['melhor_categoria']
@@ -251,7 +255,7 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
     
     # Converter para DataFrame
     df = pd.DataFrame(correlacoes_list)
-    print(f"DataFrame criado com {len(df)} correlações")
+    print(f"[DEBUG] DataFrame criado com {len(df)} correlações")
     
     # Identificar top insights para o prompt
     top_ltv = df.nlargest(3, "correlacao_com_ltv")
@@ -330,29 +334,43 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
         
         # Gerar prompt otimizado
         prompt = _gerar_prompt(correlacoes_texto, top_insights)
-        print("[DEBUG] Prompt gerado, chamando IA...")
+        print("[DEBUG] Prompt gerado, chamando Hugging Face...")
         
-        # Chamar API do Ollama com cache
-        try:
-            print("[DEBUG] Chamando API do Ollama...")
-            prompt_hash = _gerar_hash_prompt(prompt)
-            response = _chamar_ollama_api_cached(prompt_hash, prompt)
-            print(f"[DEBUG] Resposta da IA: {response}")
-            end_time = time.time()
-            total_time = end_time - start_time
-            print(f"[DEBUG] Processo completo finalizado em {total_time:.2f} segundos")
-            return response
-            
-        except Exception as e:
-            print(f"[DEBUG] Erro ao chamar API: {str(e)}")
-            raise
-            
+        # Chamada para Hugging Face
+        hf_token = os.environ.get("HF_TOKEN", None)
+        api_url = "https://api-inference.huggingface.co/models/unicamp-dl/ptt5-base-portuguese-vocab"
+        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
+        payload = {"inputs": prompt}
+        response = requests.post(api_url, headers=headers, json=payload, timeout=120)
+        print(f"[DEBUG] Status code Hugging Face: {response.status_code}")
+        if response.status_code == 200:
+            result = response.json()
+            texto = None
+            if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
+                texto = result[0]['generated_text']
+            elif isinstance(result, dict) and 'generated_text' in result:
+                texto = result['generated_text']
+            elif isinstance(result, dict) and 'text' in result:
+                texto = result['text']
+            elif isinstance(result, str):
+                texto = result
+            print(f"[DEBUG] Resposta Hugging Face: {texto}")
+            if texto:
+                print("[DEBUG] [IA] Resposta gerada pela Hugging Face.")
+                return texto.strip()
+            else:
+                print(f"[DEBUG] [IA] Resposta inesperada da Hugging Face: {result}")
+        else:
+            print(f"[DEBUG] Erro Hugging Face: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"[DEBUG] Erro ao gerar insights: {str(e)}")
-        # Gerar fallback em caso de erro
         fallback = _gerar_fallback(top_ltv, top_ticket)
         print(f"[DEBUG] Fallback acionado: {fallback}")
         return fallback
+    # Fallback final
+    fallback = _gerar_fallback(top_ltv, top_ticket)
+    print(f"[DEBUG] Fallback acionado: {fallback}")
+    return fallback
 
 def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, correlacoes_gerais: pd.DataFrame) -> List[Dict[str, str]]:
     """
@@ -415,10 +433,6 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     Gera uma ação sugerida para um insight específico usando a Hugging Face Inference API (modelo ptt5-base-portuguese-vocab).
     Se falhar, usa regra dinâmica baseada no insight.
     """
-    import os
-    import re
-    import traceback
-    import requests
     print(f"[DEBUG] Gerando ação sugerida para o insight: {insight_texto}...")
     # Prompt para a Hugging Face
     hf_prompt = (
