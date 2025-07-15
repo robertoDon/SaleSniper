@@ -17,19 +17,26 @@ Este roadmap apresenta o plano de evolução do SaleSniper, detalhando as etapas
   - **Streamlit Cloud:** Plataforma para rodar o app na nuvem, facilitando acesso e compartilhamento.
   - **Hugging Face (Inference API):** Serviço de IA para geração de textos e insights, sem necessidade de rodar modelos pesados localmente.
 
-### 1.2. Testes com Clientes (Beta Controlado e Early Adopters)
-- **Objetivo:** Validar o produto em ambiente real, com dados e feedback de clientes parceiros e early adopters.
+### 1.2. Testes Internos com Dados Reais de Clientes e Beta Tester
+- **Objetivo:** Validar o produto com dados reais, garantindo privacidade e consenso dos clientes.
 - **Ações:**
-  - Seleção de um grupo inicial de clientes para acesso controlado.
-  - Coleta de feedback sobre usabilidade, clareza dos insights e utilidade das recomendações.
-  - Monitoramento de performance, eventuais gargalos e escalabilidade.
-  - Suporte dedicado para dúvidas e problemas.
-  - Ajustes baseados no uso real e sugestões dos clientes.
-  - Início da documentação pública e treinamento de usuários.
+  - Equipe interna utiliza dados reais de clientes (com consentimento) para testar o sistema em situações reais.
+  - Ajustes baseados em problemas e oportunidades identificadas com dados reais.
+  - Após validação interna, liberar para um cliente atuar como beta tester exclusivo.
+  - Coleta de feedback detalhado desse cliente beta tester.
 - **Explicação:**
-  - **Beta Controlado/Early Adopters:** Fase em que clientes selecionados testam o sistema, permitindo ajustes antes de abrir para todos.
+  - **Testes Internos com Dados Reais:** Permite identificar problemas que só aparecem com dados do mundo real, sem expor o sistema a múltiplos clientes ainda.
+  - **Beta Tester:** Um cliente parceiro testa o sistema antes da abertura para outros, permitindo ajustes finos.
 
-### 1.3. Liberação Geral (Go Live)
+### 1.3. Testes Ampliados (Early Adopters)
+- **Objetivo:** Ampliar o uso para mais clientes, validando escalabilidade e robustez.
+- **Ações:**
+  - Liberação para um grupo maior de clientes interessados.
+  - Suporte dedicado para dúvidas e problemas.
+  - Coleta de métricas de uso e satisfação.
+  - Início da documentação pública e treinamento de usuários.
+
+### 1.4. Liberação Geral (Go Live)
 - **Objetivo:** Disponibilizar o SaleSniper para o mercado.
 - **Ações:**
   - Liberação para todos os clientes.
