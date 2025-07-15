@@ -11,6 +11,7 @@ import hashlib
 import os
 import re
 import traceback
+from huggingface_hub import InferenceClient
 
 def _preparar_correlacoes(correlacoes: Dict[str, pd.DataFrame]) -> List[str]:
     """Prepara o texto das correlações de forma otimizada."""
@@ -334,34 +335,25 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
         
         # Gerar prompt otimizado
         prompt = _gerar_prompt(correlacoes_texto, top_insights)
-        print("[DEBUG] Prompt gerado, chamando Hugging Face...")
+        print("[DEBUG] Prompt gerado, chamando Hugging Face via InferenceClient...")
         
         # Chamada para Hugging Face
-        hf_token = os.environ.get("HF_TOKEN", None)
-        api_url = "https://api-inference.huggingface.co/models/bigscience/bloomz-560m"
-        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
-        payload = {"inputs": prompt}
-        response = requests.post(api_url, headers=headers, json=payload, timeout=120)
-        print(f"[DEBUG] Status code Hugging Face: {response.status_code}")
-        if response.status_code == 200:
-            result = response.json()
-            texto = None
-            if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
-                texto = result[0]['generated_text']
-            elif isinstance(result, dict) and 'generated_text' in result:
-                texto = result['generated_text']
-            elif isinstance(result, dict) and 'text' in result:
-                texto = result['text']
-            elif isinstance(result, str):
-                texto = result
-            print(f"[DEBUG] Resposta Hugging Face: {texto}")
-            if texto:
-                print("[DEBUG] [IA] Resposta gerada pela Hugging Face.")
-                return texto.strip()
+        try:
+            hf_token = os.environ.get("HF_TOKEN", None)
+            client = InferenceClient(model="bigscience/bloomz-560m", token=hf_token)
+            resposta = client.text_generation(prompt, max_new_tokens=200)
+            print(f"[DEBUG] Resposta Hugging Face: {resposta.generated_text if hasattr(resposta, 'generated_text') else resposta}")
+            if hasattr(resposta, 'generated_text'):
+                return resposta.generated_text.strip()
+            elif isinstance(resposta, str):
+                return resposta.strip()
             else:
-                print(f"[DEBUG] [IA] Resposta inesperada da Hugging Face: {result}")
-        else:
-            print(f"[DEBUG] Erro Hugging Face: {response.status_code} - {response.text}")
+                print(f"[DEBUG] Resposta inesperada da Hugging Face: {resposta}")
+        except Exception as e:
+            print(f"[DEBUG] Erro ao gerar insights: {str(e)}")
+            fallback = _gerar_fallback(top_ltv, top_ticket)
+            print(f"[DEBUG] Fallback acionado: {fallback}")
+            return fallback
     except Exception as e:
         print(f"[DEBUG] Erro ao gerar insights: {str(e)}")
         fallback = _gerar_fallback(top_ltv, top_ticket)
@@ -441,57 +433,41 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     # 1. Tenta Hugging Face Inference API
     try:
         hf_token = os.environ.get("HF_TOKEN", None)
-        api_url = "https://api-inference.huggingface.co/models/bigscience/bloomz-560m"
-        headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
-        payload = {"inputs": hf_prompt}
-        response = requests.post(api_url, headers=headers, json=payload, timeout=60)
-        print(f"[DEBUG] Status code Hugging Face: {response.status_code}")
-        if response.status_code == 200:
-            result = response.json()
-            texto = None
-            if isinstance(result, list) and len(result) > 0 and 'generated_text' in result[0]:
-                texto = result[0]['generated_text']
-            elif isinstance(result, dict) and 'generated_text' in result:
-                texto = result['generated_text']
-            elif isinstance(result, dict) and 'text' in result:
-                texto = result['text']
-            elif isinstance(result, str):
-                texto = result
-            print(f"[DEBUG] Resposta Hugging Face: {texto}")
-            if texto:
-                print("[DEBUG] [IA] Resposta gerada pela Hugging Face.")
-                return texto.strip()
-            else:
-                print(f"[DEBUG] [IA] Resposta inesperada da Hugging Face: {result}")
+        client = InferenceClient(model="bigscience/bloomz-560m", token=hf_token)
+        resposta = client.text_generation(hf_prompt, max_new_tokens=100)
+        print(f"[DEBUG] Resposta Hugging Face: {resposta.generated_text if hasattr(resposta, 'generated_text') else resposta}")
+        if hasattr(resposta, 'generated_text'):
+            return resposta.generated_text.strip()
+        elif isinstance(resposta, str):
+            return resposta.strip()
         else:
-            print(f"[DEBUG] Erro Hugging Face: {response.status_code} - {response.text}")
+            print(f"[DEBUG] Resposta inesperada da Hugging Face: {resposta}")
     except Exception as e:
-        print(f"[DEBUG] Erro ao gerar ação com Hugging Face: {e}")
-        print(traceback.format_exc())
-    # 2. Fallback dinâmico baseado no insight (personalizado)
-    print("[DEBUG] Acionando fallback dinâmico para ação sugerida.")
-    insight_lower = insight_texto.lower()
-    match = re.search(r"([\wÀ-ÿ ]+) tem (ticket médio|ltv) ([\d\.,]+)% maior que ([\wÀ-ÿ ]+)", insight_texto, re.IGNORECASE)
-    if match:
-        grupo = match.group(1).strip()
-        metrica = match.group(2).strip()
-        percentual = match.group(3).strip()
-        grupo_base = match.group(4).strip()
-        if metrica.lower() == "ticket médio":
-            return f"Foque campanhas de vendas no grupo {grupo} para aumentar ainda mais o ticket médio em relação a {grupo_base}."
-        elif metrica.lower() == "ltv":
-            return f"Invista em estratégias de retenção para clientes do grupo {grupo} visando elevar o LTV em relação a {grupo_base}."
-    if "ticket médio" in insight_lower:
-        return "Criar campanhas para otimizar o ticket médio do grupo destacado."
-    if "ltv" in insight_lower:
-        return "Desenvolver iniciativas para otimizar o LTV do grupo destacado."
-    if any(reg in insight_lower for reg in ["região", "sudeste", "centro-oeste", "norte", "sul", "nordeste"]):
-        return "Investir em campanhas direcionadas para a região destacada."
-    if any(seg in insight_lower for seg in ["segmento", "saas", "retailtech", "saúde"]):
-        return "Personalizar ofertas para o segmento identificado."
-    if any(porte in insight_lower for porte in ["porte", "médio", "pequeno", "grande"]):
-        return "Ajustar estratégias comerciais conforme o porte do cliente."
-    if any(dor in insight_lower for dor in ["dor", "performance", "financeiro"]):
-        return "Desenvolver soluções específicas para a dor identificada."
-    print("[DEBUG] Fallback genérico acionado para ação sugerida.")
-    return "Criar uma ação personalizada para este perfil visando aumentar LTV e ticket médio." 
+        print(f"[DEBUG] Erro ao gerar ação sugerida: {str(e)}")
+        print("[DEBUG] Acionando fallback dinâmico para ação sugerida.")
+        # 2. Fallback dinâmico baseado no insight (personalizado)
+        insight_lower = insight_texto.lower()
+        match = re.search(r"([\wÀ-ÿ ]+) tem (ticket médio|ltv) ([\d\.,]+)% maior que ([\wÀ-ÿ ]+)", insight_texto, re.IGNORECASE)
+        if match:
+            grupo = match.group(1).strip()
+            metrica = match.group(2).strip()
+            percentual = match.group(3).strip()
+            grupo_base = match.group(4).strip()
+            if metrica.lower() == "ticket médio":
+                return f"Foque campanhas de vendas no grupo {grupo} para aumentar ainda mais o ticket médio em relação a {grupo_base}."
+            elif metrica.lower() == "ltv":
+                return f"Invista em estratégias de retenção para clientes do grupo {grupo} visando elevar o LTV em relação a {grupo_base}."
+        if "ticket médio" in insight_lower:
+            return "Criar campanhas para otimizar o ticket médio do grupo destacado."
+        if "ltv" in insight_lower:
+            return "Desenvolver iniciativas para otimizar o LTV do grupo destacado."
+        if any(reg in insight_lower for reg in ["região", "sudeste", "centro-oeste", "norte", "sul", "nordeste"]):
+            return "Investir em campanhas direcionadas para a região destacada."
+        if any(seg in insight_lower for seg in ["segmento", "saas", "retailtech", "saúde"]):
+            return "Personalizar ofertas para o segmento identificado."
+        if any(porte in insight_lower for porte in ["porte", "médio", "pequeno", "grande"]):
+            return "Ajustar estratégias comerciais conforme o porte do cliente."
+        if any(dor in insight_lower for dor in ["dor", "performance", "financeiro"]):
+            return "Desenvolver soluções específicas para a dor identificada."
+        print("[DEBUG] Fallback genérico acionado para ação sugerida.")
+        return "Criar uma ação personalizada para este perfil visando aumentar LTV e ticket médio." 

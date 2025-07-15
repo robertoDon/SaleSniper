@@ -17,3 +17,4 @@ xlsxwriter
 holidays
 requests
 pillow
+huggingface_hub
