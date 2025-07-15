@@ -216,11 +216,7 @@ def _gerar_fallback(top_ltv: pd.Series, top_ticket: pd.Series) -> str:
     return "Não foi possível gerar insights com os dados disponíveis."
 
 def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
-    """
-    Gera insights em formato de texto usando a API do Ollama.
-    Implementa otimizações de performance e fallback robusto.
-    """
-    print("Iniciando geração de insights...")
+    print("[DEBUG] Iniciando geração de insights...")
     start_time = time.time()
     
     # Preparar dados de forma otimizada
@@ -262,7 +258,7 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
     top_ticket = df.nlargest(3, "correlacao_com_ticket")
     
     try:
-        print("Preparando textos para o prompt...")
+        print("[DEBUG] Preparando textos para o prompt...")
         # Preparar textos em paralelo
         correlacoes_texto = []
         with ThreadPoolExecutor(max_workers=4) as executor:
@@ -307,7 +303,7 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
             for future in futures:
                 correlacoes_texto.append(future.result())
         
-        print("Gerando insights iniciais...")
+        print("[DEBUG] Gerando insights iniciais...")
         # Identificar top insights para o prompt
         top_insights = []
         for _, row in top_ltv.iterrows():
@@ -334,26 +330,29 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
         
         # Gerar prompt otimizado
         prompt = _gerar_prompt(correlacoes_texto, top_insights)
-        print("Prompt gerado, chamando IA...")
+        print("[DEBUG] Prompt gerado, chamando IA...")
         
         # Chamar API do Ollama com cache
         try:
-            print("Chamando API do Ollama...")
+            print("[DEBUG] Chamando API do Ollama...")
             prompt_hash = _gerar_hash_prompt(prompt)
             response = _chamar_ollama_api_cached(prompt_hash, prompt)
+            print(f"[DEBUG] Resposta da IA: {response}")
             end_time = time.time()
             total_time = end_time - start_time
-            print(f"Processo completo finalizado em {total_time:.2f} segundos")
+            print(f"[DEBUG] Processo completo finalizado em {total_time:.2f} segundos")
             return response
             
         except Exception as e:
-            print(f"Erro ao chamar API: {str(e)}")
+            print(f"[DEBUG] Erro ao chamar API: {str(e)}")
             raise
             
     except Exception as e:
-        print(f"Erro ao gerar insights: {str(e)}")
+        print(f"[DEBUG] Erro ao gerar insights: {str(e)}")
         # Gerar fallback em caso de erro
-        return _gerar_fallback(top_ltv, top_ticket)
+        fallback = _gerar_fallback(top_ltv, top_ticket)
+        print(f"[DEBUG] Fallback acionado: {fallback}")
+        return fallback
 
 def gerar_insights_e_acoes_por_categoria(categoria: str, dados_categoria: Dict, correlacoes_gerais: pd.DataFrame) -> List[Dict[str, str]]:
     """
@@ -420,13 +419,11 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     import re
     import traceback
     import requests
-    print(f"Gerando ação sugerida para o insight: {insight_texto}...")
-
+    print(f"[DEBUG] Gerando ação sugerida para o insight: {insight_texto}...")
     # Prompt para a Hugging Face
     hf_prompt = (
         f"Dado o insight: '{insight_texto}', gere uma ação sugerida criativa, específica e contextualizada para um gestor de vendas SaaS. Responda em português, apenas com a ação sugerida, sem explicações extras."
     )
-
     # 1. Tenta Hugging Face Inference API
     try:
         hf_token = os.environ.get("HF_TOKEN", None)
@@ -434,6 +431,7 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
         headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
         payload = {"inputs": hf_prompt}
         response = requests.post(api_url, headers=headers, json=payload, timeout=60)
+        print(f"[DEBUG] Status code Hugging Face: {response.status_code}")
         if response.status_code == 200:
             result = response.json()
             texto = None
@@ -445,20 +443,20 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
                 texto = result['text']
             elif isinstance(result, str):
                 texto = result
+            print(f"[DEBUG] Resposta Hugging Face: {texto}")
             if texto:
-                print("[IA] Resposta gerada pela Hugging Face.")
+                print("[DEBUG] [IA] Resposta gerada pela Hugging Face.")
                 return texto.strip()
             else:
-                print(f"[IA] Resposta inesperada da Hugging Face: {result}")
+                print(f"[DEBUG] [IA] Resposta inesperada da Hugging Face: {result}")
         else:
-            print(f"Erro Hugging Face: {response.status_code} - {response.text}")
+            print(f"[DEBUG] Erro Hugging Face: {response.status_code} - {response.text}")
     except Exception as e:
-        print(f"Erro ao gerar ação com Hugging Face: {e}")
+        print(f"[DEBUG] Erro ao gerar ação com Hugging Face: {e}")
         print(traceback.format_exc())
-
     # 2. Fallback dinâmico baseado no insight (personalizado)
+    print("[DEBUG] Acionando fallback dinâmico para ação sugerida.")
     insight_lower = insight_texto.lower()
-    # Regex para extrair grupos
     match = re.search(r"([\wÀ-ÿ ]+) tem (ticket médio|ltv) ([\d\.,]+)% maior que ([\wÀ-ÿ ]+)", insight_texto, re.IGNORECASE)
     if match:
         grupo = match.group(1).strip()
@@ -469,7 +467,6 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
             return f"Foque campanhas de vendas no grupo {grupo} para aumentar ainda mais o ticket médio em relação a {grupo_base}."
         elif metrica.lower() == "ltv":
             return f"Invista em estratégias de retenção para clientes do grupo {grupo} visando elevar o LTV em relação a {grupo_base}."
-    # Outras regras
     if "ticket médio" in insight_lower:
         return "Criar campanhas para otimizar o ticket médio do grupo destacado."
     if "ltv" in insight_lower:
@@ -479,8 +476,8 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     if any(seg in insight_lower for seg in ["segmento", "saas", "retailtech", "saúde"]):
         return "Personalizar ofertas para o segmento identificado."
     if any(porte in insight_lower for porte in ["porte", "médio", "pequeno", "grande"]):
-        return "Ajustar estratégias comerciais conforme o porte do cliente." 
+        return "Ajustar estratégias comerciais conforme o porte do cliente."
     if any(dor in insight_lower for dor in ["dor", "performance", "financeiro"]):
         return "Desenvolver soluções específicas para a dor identificada."
-    # Fallback genérico
+    print("[DEBUG] Fallback genérico acionado para ação sugerida.")
     return "Criar uma ação personalizada para este perfil visando aumentar LTV e ticket médio." 
