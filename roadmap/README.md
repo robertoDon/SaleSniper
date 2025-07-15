@@ -1,75 +1,104 @@
-# Roadmap do Projeto – Previsão de Churn e Analytics SaaS
+# Roadmap do Projeto SaleSniper – Analytics SaaS com IA
 
-Este roadmap apresenta os próximos passos para o projeto, considerando dois caminhos possíveis:
-- **Enterprise:** Produto robusto para clientes externos (empresas).
-- **Interno:** Solução para uso dentro da própria empresa.
-
-O texto foi elaborado para ser facilmente compreendido por quem não tem conhecimento técnico profundo, explicando cada conceito no contexto em que aparece.
+Este roadmap apresenta o plano de evolução do SaleSniper, detalhando as etapas de validação, expansão e sugestões de novas funcionalidades avançadas. O texto é pensado para quem é da área de tecnologia, mas não é desenvolvedor, explicando conceitos e tecnologias de forma acessível.
 
 ---
 
-## 1. Curto Prazo (1-3 meses)
+## 1. Etapas de Evolução do Produto
 
-### Fundamentos e Qualidade
-- **Refino dos Modelos:** Vamos testar diferentes "receitas" matemáticas (chamadas algoritmos) para prever quem vai sair (churn). Alguns exemplos são XGBoost, LightGBM, Random Forest e redes neurais (estas últimas se inspiram no funcionamento do cérebro humano). O objetivo é encontrar o método mais preciso para o nosso caso.
-- **Validação Cruzada:** Usaremos uma técnica que garante que o modelo funciona bem em diferentes partes dos dados, evitando que ele apenas "decore" exemplos.
-- **Métricas de Avaliação:** Além de medir quantos acertos o modelo faz (acurácia), vamos olhar para outras medidas como recall (quantos churns reais o modelo detecta) e ROC-AUC, que é uma nota de 0 a 1 mostrando o quão bem o modelo separa clientes que vão sair dos que vão ficar. Quanto mais perto de 1, melhor.
-- **Engenharia de Dados:** Vamos automatizar a limpeza e validação dos dados, tratando valores estranhos ou faltantes para garantir que o modelo trabalhe com informações confiáveis.
-- **Interface e Usabilidade:** Melhoraremos a experiência do usuário, adicionando explicações e exemplos diretamente na tela, tornando o sistema mais amigável.
-- **Segurança e Usuários:** O login será aprimorado e vamos permitir diferentes níveis de acesso, para que cada pessoa veja apenas o que precisa.
-- **Testes:** Faremos testes automáticos para garantir que o sistema continua funcionando corretamente, mesmo após mudanças.
+### 1.1. Testes Internos (Período Fechado)
+- **Objetivo:** Garantir estabilidade, usabilidade e performance do MVP.
+- **Ações:**
+  - Testes intensivos pela equipe interna.
+  - Ajustes rápidos em bugs e melhorias de interface.
+  - Validação dos fluxos principais: upload de dados, geração de insights, dashboards e exportação de resultados.
+  - Teste do fluxo de autenticação e permissões de acesso.
+- **Tecnologias:**
+  - **Streamlit Cloud:** Plataforma para rodar o app na nuvem, facilitando acesso e compartilhamento.
+  - **Hugging Face (Inference API):** Serviço de IA para geração de textos e insights, sem necessidade de rodar modelos pesados localmente.
 
-### Decisão de Rumo
-- **Reunião de Stakeholders:** Será o momento de decidir se o foco do projeto será um produto para clientes externos (Enterprise) ou uma solução para uso interno.
+### 1.2. Testes com Clientes Selecionados (Beta Controlado)
+- **Objetivo:** Validar o produto em ambiente real, com dados e feedback de clientes parceiros.
+- **Ações:**
+  - Seleção de 2 a 5 clientes para acesso controlado.
+  - Coleta de feedback sobre usabilidade, clareza dos insights e utilidade das recomendações.
+  - Monitoramento de performance e eventuais gargalos.
+  - Ajustes baseados no uso real e sugestões dos clientes.
+- **Explicação:**
+  - **Beta Controlado:** Fase em que apenas alguns clientes testam o sistema, permitindo ajustes antes de abrir para todos.
 
----
+### 1.3. Testes Ampliados (Early Adopters)
+- **Objetivo:** Ampliar o uso para mais clientes, validando escalabilidade e robustez.
+- **Ações:**
+  - Liberação para um grupo maior de clientes interessados.
+  - Suporte dedicado para dúvidas e problemas.
+  - Coleta de métricas de uso e satisfação.
+  - Início da documentação pública e treinamento de usuários.
 
-## 2. Médio Prazo (3-12 meses)
-
-### Se for para Enterprise
-- **Escalabilidade e Arquitetura Modular:**
-  - O sistema será dividido em partes menores e independentes (microserviços), facilitando manutenção e crescimento.
-  - Teremos "portas digitais" (APIs) para que outros sistemas possam conversar com o nosso.
-  - Permitiremos que várias empresas usem o mesmo sistema, cada uma vendo só seus dados (multi-tenant).
-- **Deploy em Nuvem e CI/CD:**
-  - O sistema será hospedado em servidores online (nuvem), facilitando o acesso de qualquer lugar e o crescimento conforme a demanda.
-  - Usaremos processos automáticos para testar e publicar novas versões do sistema (CI/CD), tornando o processo mais rápido e seguro.
-- **Segurança e Compliance:**
-  - O sistema seguirá as leis de proteção de dados pessoais (como LGPD/GDPR), garantindo privacidade e consentimento dos usuários.
-  - Todas as ações serão registradas (auditoria), permitindo rastrear quem fez o quê.
-- **Customização e Integrações:**
-  - Cada cliente poderá personalizar o sistema conforme suas necessidades.
-  - O sistema poderá se conectar a outros sistemas já usados pelas empresas (como CRMs e ERPs).
-- **Analytics e Ações:**
-  - Os clientes terão dashboards customizáveis, geração automática de insights e notificações automáticas sobre riscos de churn.
-- **Comercialização:**
-  - Definiremos o modelo de venda, como assinatura mensal ou licença.
-
-### Se for para uso Interno
-- **Integração Profunda:**
-  - O sistema será conectado aos bancos de dados e sistemas internos da empresa, automatizando a importação de dados.
-- **Foco em Agilidade:**
-  - Ferramentas para análises rápidas e relatórios customizados estarão disponíveis para as equipes.
-- **Governança e Segurança:**
-  - O acesso será controlado por departamento e todas as ações ficarão registradas para garantir transparência.
-- **Cultura Data-Driven:**
-  - Faremos treinamentos e workshops para que as equipes usem os dados de forma estratégica.
-- **Evolução Contínua:**
-  - O sistema será aprimorado continuamente com base no feedback dos usuários internos.
+### 1.4. Liberação Geral (Go Live)
+- **Objetivo:** Disponibilizar o SaleSniper para o mercado.
+- **Ações:**
+  - Liberação para todos os clientes.
+  - Suporte e monitoramento contínuo.
+  - Início de campanhas de divulgação e onboarding.
+  - Evolução contínua baseada em feedback e análise de uso.
 
 ---
 
-## 3. Itens Transversais (para ambos os caminhos)
-- **Monitoramento:** Teremos painéis para acompanhar a saúde do sistema e receber alertas de falhas.
-- **Documentação:** Haverá manuais e explicações simples sobre como usar o sistema e suas integrações.
-- **Automação:** Testes e publicações serão automatizados para evitar erros humanos e agilizar o processo.
-- **Escalabilidade:** O sistema será planejado para crescer junto com o aumento de dados e usuários.
+## 2. Melhorias Funcionais e Novas Features Avançadas
+
+### 2.1. Projeção de Churn (Previsão de Cancelamento)
+- **Descrição:** Ferramenta que prevê quais clientes têm maior risco de sair, usando modelos matemáticos e IA.
+- **Valor:** Ajuda equipes de vendas e sucesso a agir antes da perda do cliente.
+- **Tecnologia:** Modelos de Machine Learning (ex: regressão, árvores de decisão, redes neurais).
+
+### 2.2. Detecção de Anomalias
+- **Descrição:** Identifica comportamentos fora do padrão nos dados (ex: picos de cancelamento, vendas atípicas).
+- **Valor:** Permite ação rápida em situações inesperadas.
+- **Tecnologia:** Algoritmos de detecção de outliers e séries temporais.
+
+### 2.3. Segmentação Automática de Clientes
+- **Descrição:** Agrupa clientes automaticamente por perfil, comportamento ou potencial de receita.
+- **Valor:** Facilita campanhas personalizadas e estratégias de retenção.
+- **Tecnologia:** Algoritmos de clusterização (ex: K-means, DBSCAN).
+
+### 2.4. Projeção de Receita e Cenários
+- **Descrição:** Simula diferentes cenários de crescimento, churn e vendas futuras.
+- **Valor:** Ajuda no planejamento estratégico e definição de metas.
+- **Tecnologia:** Modelos estatísticos e simulações Monte Carlo.
+
+### 2.5. Explicabilidade dos Modelos (Explainable AI)
+- **Descrição:** Mostra de forma simples por que a IA tomou determinada decisão ou sugeriu uma ação.
+- **Valor:** Aumenta a confiança dos usuários e facilita a adoção.
+- **Tecnologia:** Ferramentas como SHAP, LIME.
+
+### 2.6. Integração com CRMs e ERPs
+- **Descrição:** Permite importar/exportar dados automaticamente de sistemas já usados pelos clientes.
+- **Valor:** Reduz trabalho manual e aumenta a utilidade do SaleSniper.
+- **Tecnologia:** APIs REST, conectores prontos.
+
+### 2.7. Alertas Inteligentes e Notificações
+- **Descrição:** Envia alertas automáticos sobre riscos, oportunidades ou anomalias detectadas.
+- **Valor:** Proatividade para equipes de vendas e sucesso.
+- **Tecnologia:** Regras de negócio e triggers baseados em IA.
+
+---
+
+## 3. Explicação de Tecnologias e Frameworks
+
+- **Streamlit:** Framework Python para criar interfaces web de forma rápida, sem precisar ser especialista em front-end.
+- **Hugging Face:** Plataforma de IA que oferece modelos prontos para uso, acessíveis via API.
+- **Machine Learning:** Área da computação que cria "modelos" capazes de aprender padrões a partir de dados e fazer previsões.
+- **APIs:** "Portas digitais" que permitem que diferentes sistemas conversem entre si.
+- **Clusterização:** Técnica de agrupar dados semelhantes automaticamente.
+- **Explainable AI:** Conjunto de métodos para explicar decisões de modelos de IA de forma compreensível.
+- **Monte Carlo:** Método de simulação que usa sorteios aleatórios para prever cenários futuros.
 
 ---
 
 ## 4. Resumo Visual
 
-Veja o diagrama na imagem `roadmap.png` nesta pasta.
+O diagrama `roadmap.png` pode ser atualizado para refletir as novas etapas e features sugeridas.
 
 ---
 
