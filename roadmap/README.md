@@ -17,25 +17,19 @@ Este roadmap apresenta o plano de evolução do SaleSniper, detalhando as etapas
   - **Streamlit Cloud:** Plataforma para rodar o app na nuvem, facilitando acesso e compartilhamento.
   - **Hugging Face (Inference API):** Serviço de IA para geração de textos e insights, sem necessidade de rodar modelos pesados localmente.
 
-### 1.2. Testes com Clientes Selecionados (Beta Controlado)
-- **Objetivo:** Validar o produto em ambiente real, com dados e feedback de clientes parceiros.
+### 1.2. Testes com Clientes (Beta Controlado e Early Adopters)
+- **Objetivo:** Validar o produto em ambiente real, com dados e feedback de clientes parceiros e early adopters.
 - **Ações:**
-  - Seleção de 2 a 5 clientes para acesso controlado.
+  - Seleção de um grupo inicial de clientes para acesso controlado.
   - Coleta de feedback sobre usabilidade, clareza dos insights e utilidade das recomendações.
-  - Monitoramento de performance e eventuais gargalos.
-  - Ajustes baseados no uso real e sugestões dos clientes.
-- **Explicação:**
-  - **Beta Controlado:** Fase em que apenas alguns clientes testam o sistema, permitindo ajustes antes de abrir para todos.
-
-### 1.3. Testes Ampliados (Early Adopters)
-- **Objetivo:** Ampliar o uso para mais clientes, validando escalabilidade e robustez.
-- **Ações:**
-  - Liberação para um grupo maior de clientes interessados.
+  - Monitoramento de performance, eventuais gargalos e escalabilidade.
   - Suporte dedicado para dúvidas e problemas.
-  - Coleta de métricas de uso e satisfação.
+  - Ajustes baseados no uso real e sugestões dos clientes.
   - Início da documentação pública e treinamento de usuários.
+- **Explicação:**
+  - **Beta Controlado/Early Adopters:** Fase em que clientes selecionados testam o sistema, permitindo ajustes antes de abrir para todos.
 
-### 1.4. Liberação Geral (Go Live)
+### 1.3. Liberação Geral (Go Live)
 - **Objetivo:** Disponibilizar o SaleSniper para o mercado.
 - **Ações:**
   - Liberação para todos os clientes.
