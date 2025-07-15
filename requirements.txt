@@ -5,7 +5,7 @@ rich==13.7.1
 streamlit==1.31.1
 lifelines
 scikit-learn
-scikit-survival==0.10
+scikit-survival==0.22.0
 matplotlib
 seaborn
 openpyxl==3.1.2
