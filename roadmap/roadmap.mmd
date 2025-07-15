@@ -1,0 +1,38 @@
+flowchart TD
+    A["Início do Projeto"]
+    B["Testes Internos (Equipe)"]
+    C["Testes Internos com Dados Reais de Clientes e Beta Tester"]
+    D["Testes Ampliados (Early Adopters)"]
+    E["Liberação Geral (Go Live)"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+
+    E --> F1["Projeção de Churn"]
+    E --> F2["Detecção de Anomalias"]
+    E --> F3["Segmentação Automática"]
+    E --> F4["Projeção de Receita e Cenários"]
+    E --> F5["Explainable AI"]
+    E --> F6["Integração com CRMs/ERPs"]
+    E --> F7["Alertas Inteligentes"]
+
+    subgraph Tecnologias
+      T1["Streamlit Cloud"]
+      T2["Hugging Face API"]
+      T3["Machine Learning"]
+      T4["APIs REST"]
+      T5["Clusterização"]
+      T6["Monte Carlo"]
+    end
+
+    B --> T1
+    B --> T2
+    F1 --> T3
+    F2 --> T3
+    F3 --> T5
+    F4 --> T6
+    F5 --> T3
+    F6 --> T4
+    F7 --> T3 
