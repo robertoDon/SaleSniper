@@ -338,7 +338,7 @@ def gerar_insights_ia(correlacoes: Dict[str, pd.DataFrame]) -> str:
         
         # Chamada para Hugging Face
         hf_token = os.environ.get("HF_TOKEN", None)
-        api_url = "https://api-inference.huggingface.co/models/google/flan-t5-base"
+        api_url = "https://api-inference.huggingface.co/models/bigscience/bloomz-560m"
         headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
         payload = {"inputs": prompt}
         response = requests.post(api_url, headers=headers, json=payload, timeout=120)
@@ -441,7 +441,7 @@ def gerar_acao_sugerida_para_insight(insight_texto: str) -> str:
     # 1. Tenta Hugging Face Inference API
     try:
         hf_token = os.environ.get("HF_TOKEN", None)
-        api_url = "https://api-inference.huggingface.co/models/google/flan-t5-base"
+        api_url = "https://api-inference.huggingface.co/models/bigscience/bloomz-560m"
         headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
         payload = {"inputs": hf_prompt}
         response = requests.post(api_url, headers=headers, json=payload, timeout=60)
