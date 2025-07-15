@@ -52,6 +52,9 @@ Este roadmap apresenta o plano de evolução do SaleSniper, detalhando as etapas
 - **Descrição:** Ferramenta que prevê quais clientes têm maior risco de sair, usando modelos matemáticos e IA.
 - **Valor:** Ajuda equipes de vendas e sucesso a agir antes da perda do cliente.
 - **Tecnologia:** Modelos de Machine Learning (ex: regressão, árvores de decisão, redes neurais).
+- **Status Atual:**
+  - Já em uso: Modelos de sobrevivência (Weibull), Random Forest, e métricas de avaliação como ROC-AUC e recall.
+  - O sistema já realiza análise de churn com base em dados históricos dos clientes, utilizando essas técnicas para prever o risco de saída.
 
 ### 2.2. Detecção de Anomalias
 - **Descrição:** Identifica comportamentos fora do padrão nos dados (ex: picos de cancelamento, vendas atípicas).
