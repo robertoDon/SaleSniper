@@ -18,3 +18,4 @@ holidays
 requests
 pillow
 huggingface_hub
+plotly
