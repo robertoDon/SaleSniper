@@ -93,9 +93,8 @@ pagina = st.sidebar.radio(
     ["📊 Análise de ICP", 
      "🎯 Segmentação", 
      "📈 Metas & Projeções",
-     "🔮 Previsão de Churn"] + 
-    # TAM/SAM/SOM comentado para MVP inicial
-    # ["🎯 TAM/SAM/SOM"] +
+     "🔮 Previsão de Churn",
+     "🎯 TAM/SAM/SOM"] + 
     (["⚙️ Administração"] if st.session_state["usuario"] == "admin" else []),
     key="navegacao"
 )
@@ -113,9 +112,9 @@ elif pagina == "📈 Metas & Projeções":
 elif pagina == "🔮 Previsão de Churn":
     exibir_churn()
 
-# TAM/SAM/SOM comentado para MVP inicial
-# elif pagina == "🎯 TAM/SAM/SOM":
-#     exibir_tamsamsom()
+elif pagina == "🎯 TAM/SAM/SOM":
+    from components.tamsamsom import exibir_tamsamsom
+    exibir_tamsamsom()
 
 elif pagina == "⚙️ Administração" and st.session_state["usuario"] == "admin":
     st.title("Painel Administrativo")

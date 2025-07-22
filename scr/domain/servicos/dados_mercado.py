@@ -73,3 +73,19 @@ class DadosMercado:
         matriz = pd.DataFrame(resultado).T.fillna(0).astype(int)
         return matriz
 
+    def sugerir_cnaes_semelhantes(self, df_clientes: pd.DataFrame, df_mercado: pd.DataFrame) -> pd.DataFrame:
+        """
+        Sugere CNAEs semelhantes (3 dígitos) presentes no mercado, mas não na base de clientes.
+        Retorna DataFrame com CNAE, quantidade de empresas e região.
+        """
+        # Extrai os 3 primeiros dígitos dos CNAEs dos clientes
+        cnaes_clientes = df_clientes['cnae'].astype(str).str[:3].unique()
+        # Extrai os 3 primeiros dígitos dos CNAEs do mercado
+        df_mercado['cnae3'] = df_mercado['cnae'].astype(str).str[:3]
+        # Filtra CNAEs do mercado que não estão nos clientes
+        df_novos = df_mercado[~df_mercado['cnae3'].isin(cnaes_clientes)]
+        # Agrupa por CNAE3 e região
+        oportunidades = df_novos.groupby(['cnae3', 'regiao']).agg(qtd_empresas=('cnpj', 'count')).reset_index()
+        oportunidades = oportunidades.sort_values('qtd_empresas', ascending=False)
+        return oportunidades
+

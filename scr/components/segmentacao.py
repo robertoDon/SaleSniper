@@ -136,6 +136,10 @@ def exibir_segmentacao():
         "ticket_medio": "Valor mensal do contrato"
     }
     
+    # Adicionando opção de segmentação por CNAE se existir na base
+    if 'cnae' in df.columns:
+        descricoes_campos['cnae'] = 'CNAE (3 dígitos) do cliente'
+    
     # Criando lista de opções com descrições
     opcoes_campos = list(descricoes_campos.values())
     

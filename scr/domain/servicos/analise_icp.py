@@ -211,6 +211,10 @@ class AnaliseICP:
         """Calcula correlações entre variáveis de forma otimizada."""
         correlacoes = {}
         
+        # Garante que 'cnae' está em qualitativos se existir na base
+        if 'cnae' in df.columns and 'cnae' not in qualitativos:
+            qualitativos = qualitativos + ['cnae']
+        
         # Correlações numéricas diretas
         correlacoes['numericas'] = df[quantitativos].corr()
         
