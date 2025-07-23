@@ -7,7 +7,7 @@ class DadosMercado:
     def __init__(self, api_key: str = None):
         self.api_key = api_key
         self.endpoint = "https://api.econodata.com.br/v1/empresas"  # Exemplo real
-        self.caminho_receita = "data/cnpjs_receita_final.csv"
+        self.caminho_receita = "scr/data/cnpjs_receita_final.csv"
         self._cache_dados = {}  # Cache para dados já carregados
         
         # Descrições completas dos CNAEs (baseada na classificação oficial da Receita Federal)
