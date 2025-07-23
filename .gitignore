@@ -41,4 +41,27 @@ wheels/
 
 # Arquivos temporários
 *.tmp
-*.temp 
+*.temp
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos de cache
+.cache/
+.pytest_cache/
+
+# Arquivos de dados grandes para deploy
+scr/data/cnpjs_receita.csv
+scr/data/cnpjs_receita_final.csv
+
+# Arquivos de modelo grandes
+*.pkl
+*.h5
+*.model
+
+# Arquivos de configuração local
+.env
+.env.local 

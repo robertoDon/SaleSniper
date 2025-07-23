@@ -19,3 +19,4 @@ requests
 pillow
 huggingface_hub
 plotly
+watchdog==3.0.0
