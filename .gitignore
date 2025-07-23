@@ -1,7 +1,9 @@
 # Arquivos de dados grandes
 *.csv
-cnpjs_receita_final.csv
-scr/data/*.csv
+*.pkl
+*.zip
+*.xlsx
+*.xls
 
 # Ambiente virtual
 venv/
@@ -53,15 +55,28 @@ wheels/
 .cache/
 .pytest_cache/
 
-# Arquivos de dados grandes para deploy
+# Arquivos de dados específicos
 scr/data/cnpjs_receita.csv
 scr/data/cnpjs_receita_final.csv
+scr/data/clientes_historico.csv
+scr/data/modelo_final.pkl
+scr/data/features_weibull.pkl
+scr/domain/servicos/mock_mercado.csv
+tests/clientes_historico.csv
 
 # Arquivos de modelo grandes
-*.pkl
 *.h5
 *.model
 
 # Arquivos de configuração local
 .env
-.env.local 
+.env.local
+
+# Arquivos de documentação
+docs/_build/
+docs/.doctrees/
+
+# Arquivos de teste
+.pytest_cache/
+.coverage
+htmlcov/ 
