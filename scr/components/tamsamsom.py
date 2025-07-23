@@ -7,6 +7,11 @@ from plotly.subplots import make_subplots
 def exibir_tamsamsom():
     st.title("🎯 Análise de TAM / SAM / SOM por CNAE")
     
+    # Limpar cache se necessário
+    if st.button("🔄 Limpar Cache"):
+        st.cache_data.clear()
+        st.rerun()
+    
     # Explicação sobre TAM/SAM/SOM
     with st.expander("ℹ️ O que são TAM, SAM e SOM?"):
         st.markdown("""

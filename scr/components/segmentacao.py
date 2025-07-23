@@ -56,15 +56,16 @@ def calcular_ltv(df):
 def exibir_segmentacao():
     st.title("SaleSniper - Segmentação de Clientes")
     
+    # Limpar cache para forçar recálculo
+    if st.button("🔄 Limpar Cache e Recarregar"):
+        st.cache_data.clear()
+        if "icp_data" in st.session_state:
+            del st.session_state["icp_data"]
+        st.rerun()
+    
     if "icp_data" not in st.session_state or st.session_state["icp_data"] is None:
         st.warning("Por favor, primeiro carregue os dados na aba 'Análise de ICP'")
         return
-        
-    # Botão para recarregar dados
-    if st.button("🔄 Recarregar Dados"):
-        st.cache_data.clear()
-        del st.session_state["icp_data"]
-        st.rerun()
         
     sistema = st.session_state["icp_data"]["sistema"]
     df = sistema.df
