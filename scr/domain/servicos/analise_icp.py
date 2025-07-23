@@ -262,8 +262,25 @@ class AnaliseICP:
         if 'cnae' in df.columns and 'cnae' not in qualitativos:
             qualitativos = qualitativos + ['cnae']
         
+        # Calcular LTV se necessário para correlações numéricas
+        df_temp = df.copy()
+        if 'meses_ativo' not in df_temp.columns and 'data_contratacao' in df_temp.columns:
+            from datetime import datetime
+            hoje = datetime.now()
+            df_temp['meses_ativo'] = ((hoje - df_temp['data_contratacao']).dt.days / 30).astype(int)
+        elif 'meses_ativo' not in df_temp.columns:
+            df_temp['meses_ativo'] = 12
+        
+        df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
+        
+        # Filtrar apenas variáveis que existem no DataFrame
+        quantitativos_disponiveis = [var for var in quantitativos if var in df_temp.columns]
+        
         # Correlações numéricas diretas
-        correlacoes['numericas'] = df[quantitativos].corr()
+        if quantitativos_disponiveis:
+            correlacoes['numericas'] = df_temp[quantitativos_disponiveis].corr()
+        else:
+            correlacoes['numericas'] = pd.DataFrame()
         
         # Análise por categoria
         correlacoes['categorias'] = {}
