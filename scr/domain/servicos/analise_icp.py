@@ -46,7 +46,11 @@ class AnaliseICP:
             return self._cache[cache_key]
         
         try:
-            df_num = df[variaveis + ["ltv", "ticket_medio"]].copy()
+            # Calcular LTV automaticamente
+            df_temp = df.copy()
+            df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
+            df_num = df_temp[variaveis + ["ltv", "ticket_medio"]].copy()
+            
             for col in df_num.columns:
                 df_num[col] = pd.to_numeric(df_num[col], errors='coerce').fillna(0).astype('float32')
             
@@ -79,9 +83,13 @@ class AnaliseICP:
                 return self._cache[cache_key]
             
             correlacoes = []
+            # Calcular LTV automaticamente
+            df_temp = df.copy()
+            df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
+            
             # Garantir que valores numéricos estão otimizados
-            ltv = pd.to_numeric(df["ltv"], errors='coerce').fillna(0).astype('float32')
-            ticket = pd.to_numeric(df["ticket_medio"], errors='coerce').fillna(0).astype('float32')
+            ltv = pd.to_numeric(df_temp["ltv"], errors='coerce').fillna(0).astype('float32')
+            ticket = pd.to_numeric(df_temp["ticket_medio"], errors='coerce').fillna(0).astype('float32')
             
             # Processar cada variável sequencialmente para evitar erros de concorrência
             for var in variaveis:
@@ -123,8 +131,12 @@ class AnaliseICP:
             if "produtos" not in df.columns:
                 return []
             
+            # Calcular LTV automaticamente
+            df_temp = df.copy()
+            df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
+            
             # Criar DataFrame com produtos já separados
-            produtos_series = df["produtos"].fillna("").astype(str)
+            produtos_series = df_temp["produtos"].fillna("").astype(str)
             produtos_df = pd.DataFrame()
             
             # Processar produtos de forma segura
@@ -135,8 +147,8 @@ class AnaliseICP:
                         if produto:
                             novo_registro = pd.DataFrame({
                                 "produto": [produto],
-                                "ltv": [df.at[idx, "ltv"]],
-                                "ticket_medio": [df.at[idx, "ticket_medio"]]
+                                "ltv": [df_temp.at[idx, "ltv"]],
+                                "ticket_medio": [df_temp.at[idx, "ticket_medio"]]
                             })
                             produtos_df = pd.concat([produtos_df, novo_registro], ignore_index=True)
             
@@ -196,9 +208,11 @@ class AnaliseICP:
         # Calcular médias para esse perfil
         perfil = {
             'ticket_medio': perfil_filtrado['ticket_medio'].mean(),
-            'ltv': perfil_filtrado['ltv'].mean(),
             'meses_ativo': perfil_filtrado['meses_ativo'].mean()
         }
+        
+        # Calcular LTV automaticamente: ticket_medio * meses_ativo
+        perfil['ltv'] = perfil['ticket_medio'] * perfil['meses_ativo']
         
         # Adicionar características categóricas do perfil ideal
         for col in qualitativos:
@@ -226,8 +240,12 @@ class AnaliseICP:
             ticket_por_cat = df.groupby(cat, observed=True)['ticket_medio'].agg(['mean', 'median', 'count'])
             ticket_por_cat = ticket_por_cat.sort_values('mean', ascending=False)
             
+            # Calcular LTV automaticamente para análise
+            df_temp = df.copy()
+            df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
+            
             # Análise de impacto no LTV
-            ltv_por_cat = df.groupby(cat, observed=True)['ltv'].agg(['mean', 'median', 'count'])
+            ltv_por_cat = df_temp.groupby(cat, observed=True)['ltv'].agg(['mean', 'median', 'count'])
             ltv_por_cat = ltv_por_cat.sort_values('mean', ascending=False)
             
             correlacoes['categorias'][cat] = {
