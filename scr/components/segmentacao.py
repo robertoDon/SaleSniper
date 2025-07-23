@@ -26,13 +26,16 @@ def formatar_valor(valor):
 
 def calcular_ltv(df):
     """Calcula o LTV (Life-Time Value) para cada cliente"""
+    df = df.copy()  # Criar cópia para não modificar o original
+    
     # Verifica se temos as colunas necessárias
     if 'ticket_medio' not in df.columns:
         if 'valor_contrato' in df.columns:
             df['ticket_medio'] = df['valor_contrato']
         else:
-            st.error("Não foi possível calcular o LTV: coluna 'ticket_medio' ou 'valor_contrato' não encontrada")
-            return df
+            # Valor padrão se não encontrar
+            df['ticket_medio'] = 10000
+            st.warning("⚠️ Coluna 'ticket_medio' não encontrada. Usando valor padrão de R$ 10.000")
             
     # Calcular meses_ativo se não existir
     if 'meses_ativo' not in df.columns:
@@ -44,6 +47,7 @@ def calcular_ltv(df):
         else:
             # Valor padrão de 12 meses
             df['meses_ativo'] = 12
+            st.info("ℹ️ Coluna 'meses_ativo' não encontrada. Usando valor padrão de 12 meses")
         
     # Calcula o LTV
     df['ltv'] = df['ticket_medio'] * df['meses_ativo']
@@ -72,6 +76,8 @@ def exibir_segmentacao():
     # Calculando LTV se não existir
     if 'ltv' not in df.columns:
         df = calcular_ltv(df)
+        # Atualizar o DataFrame no sistema
+        sistema.df = df.copy()
     
     # Garantindo que temos ticket_medio
     if 'ticket_medio' not in df.columns and 'valor_contrato' in df.columns:
@@ -234,6 +240,11 @@ def exibir_segmentacao():
         - Ticket médio × Número de meses desde a contratação""")
 
     if campo:
+        # Garantir que o LTV existe se for o campo selecionado
+        if campo == "ltv" and "ltv" not in df.columns:
+            df = calcular_ltv(df)
+            sistema.df = df.copy()
+        
         # Usando função cacheada para segmentação
         if tipo_segmentacao == "Customizada por valor acumulado":
             seg = calcular_segmentacao(df, campo, "80/20", percentual_a)
