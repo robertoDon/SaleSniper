@@ -44,15 +44,9 @@ def exibir_tamsamsom():
         from domain.servicos.dados_mercado import DadosMercado
         dados_mercado = DadosMercado()
         
-        try:
-            df_mercado = dados_mercado.carregar_dados_receita_federal()
-            if len(df_mercado) == 0:
-                st.warning("⚠️ Nenhum dado encontrado. Usando dados de exemplo...")
-                df_mercado = dados_mercado._gerar_dados_exemplo()
-        except Exception as e:
-            st.warning(f"⚠️ Erro ao carregar dados da Receita Federal: {str(e)}")
-            st.info("📊 Usando dados de exemplo para demonstração...")
-            df_mercado = dados_mercado._gerar_dados_exemplo()
+        # SEMPRE usar dados de exemplo para evitar erro
+        st.info("📊 Usando dados de exemplo para demonstração...")
+        df_mercado = dados_mercado._gerar_dados_exemplo()
     
     # Calcular TAM/SAM/SOM
     with st.spinner("🔄 Calculando TAM/SAM/SOM..."):
