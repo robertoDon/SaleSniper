@@ -174,7 +174,6 @@ def calcular_analise_icp(df: pd.DataFrame,
 
     return capitao, correlacoes_retorno
 
-@st.cache_data
 def calcular_segmentacao(df: pd.DataFrame, campo: str, tipo_segmentacao: str, percentuais=None) -> pd.DataFrame:
     """
     Calcula a segmentação dos clientes com base no campo e tipo de segmentação especificados.
@@ -187,6 +186,11 @@ def calcular_segmentacao(df: pd.DataFrame, campo: str, tipo_segmentacao: str, pe
             - Para 80/20: número único representando o percentual do grupo A
             - Para 20/30/30/20: lista com 4 percentuais [tier1, tier2, tier3, tier4]
     """
+    # Garantir que o LTV existe se for o campo selecionado
+    if campo == "ltv" and "ltv" not in df.columns:
+        from .segmentacao import calcular_ltv
+        df = calcular_ltv(df)
+    
     sistema = Sistema()
     sistema.df = df
     

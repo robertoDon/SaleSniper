@@ -243,11 +243,11 @@ def exibir_segmentacao():
 
     if campo:
         # Garantir que o LTV existe se for o campo selecionado
-        if campo == "ltv" and "ltv" not in df.columns:
+        if campo == "ltv":
             df = calcular_ltv(df)
             sistema.df = df.copy()
         
-        # Usando função cacheada para segmentação
+        # Usando função para segmentação (sem cache para evitar problemas)
         if tipo_segmentacao == "Customizada por valor acumulado":
             seg = calcular_segmentacao(df, campo, "80/20", percentual_a)
         else:
