@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 def exibir_tamsamsom():
-    st.title("🎯 Análise de TAM / SAM / SOM por CNAE")
+    st.title("🎯 Análise de TAM / SAM / SOM por cnae")
     
     # Limpar cache se necessário
     if st.button("🔄 Limpar Cache"):
