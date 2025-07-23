@@ -34,9 +34,16 @@ def calcular_ltv(df):
             st.error("Não foi possível calcular o LTV: coluna 'ticket_medio' ou 'valor_contrato' não encontrada")
             return df
             
+    # Calcular meses_ativo se não existir
     if 'meses_ativo' not in df.columns:
-        st.error("Não foi possível calcular o LTV: coluna 'meses_ativo' não encontrada")
-        return df
+        if 'data_contratacao' in df.columns:
+            # Calcular baseado na data de contratação
+            df['data_contratacao'] = pd.to_datetime(df['data_contratacao'], errors='coerce')
+            hoje = pd.Timestamp.now()
+            df['meses_ativo'] = ((hoje - df['data_contratacao']).dt.days / 30).fillna(12).astype(int)
+        else:
+            # Valor padrão de 12 meses
+            df['meses_ativo'] = 12
         
     # Calcula o LTV
     df['ltv'] = df['ticket_medio'] * df['meses_ativo']

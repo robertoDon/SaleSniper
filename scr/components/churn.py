@@ -20,7 +20,14 @@ def exibir_churn():
         st.warning("Envie um arquivo CSV para continuar.")
         st.stop()
     
-    clientes = pd.read_csv(arquivo_clientes, parse_dates=['data_entrada', 'data_churn'])
+    # Ler CSV sem parse_dates para evitar erro se colunas não existirem
+    clientes = pd.read_csv(arquivo_clientes)
+    
+    # Converter colunas de data se existirem
+    colunas_data = ['data_entrada', 'data_churn', 'data_contratacao']
+    for col in colunas_data:
+        if col in clientes.columns:
+            clientes[col] = pd.to_datetime(clientes[col], errors='coerce')
     
     # Carregar modelo e features
     base_path = os.path.join(os.path.dirname(__file__), '../data')

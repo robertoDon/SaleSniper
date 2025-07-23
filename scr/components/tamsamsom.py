@@ -41,9 +41,6 @@ def exibir_tamsamsom():
         
         try:
             df_mercado = dados_mercado.carregar_dados_receita_federal()
-        except FileNotFoundError:
-            st.error("❌ Arquivo da Receita Federal não encontrado. Execute primeiro o script de geração da base.")
-            return
         except Exception as e:
             st.error(f"❌ Erro ao carregar dados da Receita Federal: {str(e)}")
             return
