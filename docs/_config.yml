@@ -1,0 +1,44 @@
+title: SaleSniper
+description: Analytics SaaS com IA
+url: https://salesniper.com.br
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "SaleSniper Team"
+
+# Exclude from processing
+exclude:
+  - README.md
+  - requirements.txt
+  - setup.sh
+  - run_app.sh
+  - criar_pacote.sh
+  - packages.txt
+  - .gitignore
+  - .streamlit/
+  - scr/
+  - tests/
+  - venv/
+  - diagrams/
+  - roadmap/
+  - .devcontainer/
+  - .DS_Store 
