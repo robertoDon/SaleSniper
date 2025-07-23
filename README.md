@@ -1,71 +1,223 @@
-# Dashboard Cliente Ideal
+# 🎯 SaleSniper - Análise Inteligente de ICP e Segmentação de Clientes
 
-Dashboard interativo para análise do Perfil de Cliente Ideal (ICP), segmentação de clientes e projeções de funil de vendas, com autenticação e insights de IA.
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🚀 Instalação e Execução
+> **Transforme seus dados em insights acionáveis e otimize suas estratégias de vendas**
 
-1. **Clone o repositório:**
+O SaleSniper é uma ferramenta avançada de análise de dados que ajuda empresas a identificar seu Perfil de Cliente Ideal (ICP), segmentar clientes de forma inteligente e otimizar estratégias de vendas através de insights baseados em IA.
+
+## 🚀 Funcionalidades Principais
+
+### 📊 Análise de ICP (Ideal Customer Profile)
+- Identificação automática do perfil de cliente ideal
+- Análise de correlações entre variáveis
+- Métricas de performance e insights
+- Geração automática de ações sugeridas com IA
+
+### 🎯 Segmentação Inteligente
+- Clustering automático de clientes
+- Segmentação por valor (Pareto 80/20)
+- Segmentação por quantidade (20/30/30/20)
+- Análise de comportamento e padrões
+
+### 📈 Análise TAM/SAM/SOM
+- Cálculo do Total Addressable Market (TAM)
+- Serviceable Available Market (SAM)
+- Serviceable Obtainable Market (SOM)
+- Análise por CNAE usando dados da Receita Federal
+
+### 🤖 Insights com Inteligência Artificial
+- Geração automática de insights
+- Sugestões de ações baseadas em dados
+- Análise preditiva de tendências
+- Recomendações personalizadas
+
+### 📋 Metas & Projeções
+- Cálculo de metas de vendas
+- Projeções de funil de vendas
+- Taxas de conversão otimizadas
+- Simulações de cenários
+
+### 📊 Previsão de Churn
+- Modelos preditivos de churn
+- Identificação de clientes em risco
+- Estratégias de retenção
+- Análise de lifetime value (LTV)
+
+## 🛠️ Stack Tecnológico
+
+- **Backend**: Python 3.9+
+- **Interface**: Streamlit
+- **Análise de Dados**: Pandas, NumPy
+- **Machine Learning**: Scikit-learn
+- **Visualização**: Plotly, Matplotlib
+- **IA**: Hugging Face, Ollama (opcional)
+- **Autenticação**: Sistema próprio com hash SHA-256
+
+## 📦 Instalação e Configuração
+
+### Pré-requisitos
+- Python 3.9 ou superior
+- Git
+- Navegador web atualizado
+
+### Passo a Passo
+
+1. **Clone o repositório**
    ```bash
-   git clone [URL_DO_REPOSITORIO]
-   cd [NOME_DO_DIRETORIO]
+   git clone https://github.com/robertoDon/SaleSniper.git
+   cd SaleSniper
    ```
-2. **Crie e ative o ambiente virtual:**
+
+2. **Crie e ative o ambiente virtual**
    ```bash
    python -m venv venv
-   source venv/bin/activate  # ou venv\Scripts\activate no Windows
+   source venv/bin/activate  # Linux/Mac
+   # ou
+   venv\Scripts\activate     # Windows
    ```
-3. **Instale as dependências:**
+
+3. **Instale as dependências**
    ```bash
    pip install -r requirements.txt
    ```
-4. **Configure o Ollama para IA (opcional):**
-   - Instale o Ollama: https://ollama.ai
-   - Baixe o modelo neural-chat:
-     ```bash
-     ollama pull neural-chat
-     ```
-5. **Execute o aplicativo:**
+
+4. **Configure a IA (opcional)**
+   ```bash
+   # Instale o Ollama
+   curl -fsSL https://ollama.ai/install.sh | sh
+   
+   # Baixe o modelo neural-chat
+   ollama pull neural-chat
+   ```
+
+5. **Execute o aplicativo**
    ```bash
    streamlit run scr/streamlit_app.py
    ```
 
-## 🧑‍💻 Como Usar
+6. **Acesse o sistema**
+   - Abra seu navegador em: http://localhost:8501
+   - Use as credenciais padrão ou crie um novo usuário
 
-1. Faça login com seu usuário e senha.
-2. Na aba "Análise de ICP", faça upload do arquivo Excel de clientes.
-3. Navegue pelas abas para acessar:
-   - Análise de ICP (perfil ideal, insights e ações sugeridas)
-   - Segmentação de clientes (por valor ou quantidade)
-   - Metas & Projeções (funil de vendas, metas, exportação de resultados)
-4. Exporte resultados em CSV, XLSX ou PDF.
+## 📖 Como Usar
 
-## 📊 Funcionalidades
+### 1. Login e Autenticação
+- Faça login com seu usuário e senha
+- Apenas administradores podem criar novos usuários
 
-- **Autenticação de usuários** (admin pode gerenciar usuários)
-- **Upload de dados de clientes via Excel**
-- **Análise automática do perfil de cliente ideal (ICP)**
-- **Geração de insights e ações sugeridas com IA**
-- **Segmentação customizável de clientes**
-- **Projeção de metas e funil de vendas**
-- **Exportação de resultados (CSV, XLSX, PDF)**
-- **Interface responsiva e intuitiva**
+### 2. Upload de Dados
+- Na aba "Análise de ICP", faça upload do arquivo Excel de clientes
+- Utilize o arquivo de exemplo: `/tests/clientes_teste.xlsx`
 
-## ⚙️ Requisitos
+### 3. Análise de ICP
+- Visualize o perfil ideal de cliente
+- Analise correlações entre variáveis
+- Receba insights e ações sugeridas
 
-- Python 3.10+
-- Streamlit
-- Pandas, Numpy, Scipy, Openpyxl
-- Ollama (opcional, para insights de IA)
+### 4. Segmentação
+- Divida clientes por valor ou quantidade
+- Visualize gráficos e métricas
+- Exporte resultados
 
-## 📁 Estrutura Básica
+### 5. Metas & Projeções
+- Configure metas de vendas
+- Calcule projeções de funil
+- Exporte relatórios
 
-- `scr/` — Código fonte principal
-- `core/` — Lógica central do sistema
-- `domain/` — Entidades e regras de negócio
-- `adapters/` — Importação de dados
-- `docs/` — Documentação detalhada
-- `tests/` — Arquivos de teste
+## 📊 Estrutura de Dados
 
-## 📝 Suporte
+### Arquivo Excel de Clientes
+O arquivo deve conter as seguintes colunas:
 
-Dúvidas ou problemas? Entre em contato com a equipe de TI ou consulte a documentação na pasta `docs/`.
+| Coluna | Tipo | Descrição |
+|--------|------|-----------|
+| `nome_cliente` | Texto | Nome da empresa |
+| `porte` | Texto | Pequeno, Médio, Grande |
+| `dores` | Texto | Principais dores/pain points |
+| `localizacao` | Texto | Estado (SP, RJ, etc.) |
+| `segmento` | Texto | Setor de atuação |
+| `faturamento` | Numérico | Faturamento anual |
+| `ticket_medio` | Numérico | Valor médio por contrato |
+| `meses_ativo` | Numérico | Tempo de relacionamento |
+| `cnae` | Texto | Código CNAE (opcional) |
+
+## 🔧 Configuração Avançada
+
+### Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+OLLAMA_HOST=localhost
+OLLAMA_PORT=11434
+OLLAMA_MODEL=neural-chat
+HF_TOKEN=seu_token_huggingface
+```
+
+### Personalização
+- Edite `scr/data/usuarios.json` para gerenciar usuários
+- Modifique `scr/services/faixas_ticket.py` para ajustar taxas
+- Personalize cores e layout em `scr/streamlit_app.py`
+
+## 📈 Exemplos de Uso
+
+### Análise de ICP
+```python
+# O sistema automaticamente identifica:
+# - Porte ideal: Grande
+# - Dores principais: Produtividade
+# - Localização: Sudeste
+# - Segmento: Tecnologia
+# - Ticket médio: R$ 75.000
+```
+
+### Segmentação 80/20
+```python
+# Resultado típico:
+# - Grupo A (20%): 80% do valor total
+# - Grupo B (80%): 20% do valor total
+```
+
+### TAM/SAM/SOM
+```python
+# Exemplo para CNAE 62 (TI):
+# - TAM: 1.2M empresas
+# - SAM: 300K empresas
+# - SOM: 50 empresas (seu market share)
+```
+
+## 🤝 Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 🆘 Suporte
+
+- **Documentação**: [Guia Rápido](GUIA_RAPIDO.md)
+- **Issues**: [GitHub Issues](https://github.com/robertoDon/SaleSniper/issues)
+- **Email**: Entre em contato através do GitHub
+
+## 🎯 Roadmap
+
+- [ ] Integração com APIs de CRM
+- [ ] Dashboard em tempo real
+- [ ] Análise de sentimento
+- [ ] Integração com Google Analytics
+- [ ] App mobile
+- [ ] API REST
+
+---
+
+<div align="center">
+  <p><strong>Desenvolvido com ❤️ para otimizar vendas</strong></p>
+  <p>⭐ Se este projeto te ajudou, considere dar uma estrela!</p>
+</div>
