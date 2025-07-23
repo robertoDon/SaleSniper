@@ -1,12 +1,14 @@
 import os
 import pandas as pd
 import requests
+from typing import Optional, List, Dict
 
 class DadosMercado:
     def __init__(self, api_key: str = None):
         self.api_key = api_key
         self.endpoint = "https://api.econodata.com.br/v1/empresas"  # Exemplo real
         self.caminho_receita = "data/cnpjs_receita_final.csv"
+        self._cache_dados = {}  # Cache para dados já carregados
         
         # Descrições completas dos CNAEs (baseada na classificação oficial da Receita Federal)
         self.descricoes_cnae = {
@@ -149,16 +151,59 @@ class DadosMercado:
         cnae_2dig = cnae_str[:2]
         return self.descricoes_cnae.get(cnae_2dig, 'Outros')
 
-    def carregar_dados_receita_federal(self) -> pd.DataFrame:
+    def carregar_dados_receita_federal(self, 
+                                     filtros: Optional[Dict] = None, 
+                                     chunk_size: int = 10000,
+                                     max_chunks: Optional[int] = None) -> pd.DataFrame:
         """
-        Carrega dados reais da Receita Federal.
-        Retorna DataFrame com colunas: cnpj, cnae, razao_social, uf, municipio, situacao
+        Carrega dados da Receita Federal de forma otimizada.
+        
+        Args:
+            filtros: Dicionário com filtros (ex: {'uf': ['SP', 'RJ'], 'cnae': ['62']})
+            chunk_size: Tamanho de cada chunk para processamento
+            max_chunks: Número máximo de chunks a processar (None = todos)
+        
+        Returns:
+            DataFrame com dados filtrados
         """
         if not os.path.exists(self.caminho_receita):
             raise FileNotFoundError(f"Arquivo da Receita Federal não encontrado: {self.caminho_receita}")
         
         print(f"Carregando dados da Receita Federal: {self.caminho_receita}")
-        df = pd.read_csv(self.caminho_receita, dtype=str)
+        
+        # Criar chave de cache baseada nos filtros
+        cache_key = str(filtros) + str(chunk_size) + str(max_chunks)
+        if cache_key in self._cache_dados:
+            print("📦 Usando dados do cache...")
+            return self._cache_dados[cache_key]
+        
+        chunks = []
+        chunk_count = 0
+        
+        # Ler arquivo em chunks
+        for chunk in pd.read_csv(self.caminho_receita, dtype=str, chunksize=chunk_size):
+            # Aplicar filtros se especificados
+            if filtros:
+                for coluna, valores in filtros.items():
+                    if coluna in chunk.columns:
+                        chunk = chunk[chunk[coluna].isin(valores)]
+            
+            if len(chunk) > 0:
+                chunks.append(chunk)
+                chunk_count += 1
+                
+                if max_chunks and chunk_count >= max_chunks:
+                    break
+                
+                if chunk_count % 10 == 0:
+                    print(f"📊 Processados {chunk_count} chunks...")
+        
+        if not chunks:
+            print("⚠️ Nenhum dado encontrado com os filtros especificados")
+            return pd.DataFrame()
+        
+        # Concatenar chunks
+        df = pd.concat(chunks, ignore_index=True)
         
         # Adicionar coluna regiao baseada na UF
         regioes = {
@@ -174,8 +219,43 @@ class DadosMercado:
         # Adicionar descrição do CNAE
         df['descricao_cnae'] = df['cnae'].apply(self.obter_descricao_cnae)
         
-        print(f"Dados carregados: {len(df):,} estabelecimentos ativos")
+        # Salvar no cache
+        self._cache_dados[cache_key] = df
+        
+        print(f"✅ Dados carregados: {len(df):,} estabelecimentos (de {chunk_count} chunks)")
         return df
+
+    def carregar_dados_por_regiao(self, regioes: List[str], chunk_size: int = 10000) -> pd.DataFrame:
+        """
+        Carrega dados apenas para regiões específicas.
+        """
+        # Mapear regiões para UFs
+        regiao_uf = {
+            'Sudeste': ['SP', 'RJ', 'MG', 'ES'],
+            'Sul': ['RS', 'SC', 'PR'],
+            'Centro-Oeste': ['GO', 'MT', 'MS', 'DF'],
+            'Nordeste': ['BA', 'PE', 'CE', 'MA', 'PB', 'RN', 'AL', 'SE', 'PI'],
+            'Norte': ['AM', 'PA', 'AC', 'RO', 'RR', 'AP', 'TO']
+        }
+        
+        ufs = []
+        for regiao in regioes:
+            if regiao in regiao_uf:
+                ufs.extend(regiao_uf[regiao])
+        
+        return self.carregar_dados_receita_federal(
+            filtros={'uf': ufs},
+            chunk_size=chunk_size
+        )
+
+    def carregar_dados_por_cnae(self, cnaes: List[str], chunk_size: int = 10000) -> pd.DataFrame:
+        """
+        Carrega dados apenas para CNAEs específicos.
+        """
+        return self.carregar_dados_receita_federal(
+            filtros={'cnae': cnaes},
+            chunk_size=chunk_size
+        )
 
     def carregar_dados_econodata(self, params: dict) -> pd.DataFrame:
         """
@@ -315,4 +395,11 @@ class DadosMercado:
         
         print(f"📈 Relatório gerado: {len(df_relatorio)} CNAEs de clientes analisados")
         return df_relatorio
+
+    def limpar_cache(self):
+        """
+        Limpa o cache de dados carregados.
+        """
+        self._cache_dados.clear()
+        print("🗑️ Cache limpo")
 
