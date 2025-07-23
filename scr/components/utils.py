@@ -84,23 +84,15 @@ def carregar_e_preprocessar_dados(df: pd.DataFrame) -> pd.DataFrame:
         df["cnpj"] = [f"{i:014d}" for i in range(len(df))]
     
     # Calcular meses_ativo se não existir
-    if "meses_ativo" not in df.columns:
-        if "data_contratacao" in df.columns:
-            # Calcular baseado na data de contratação
-            df["data_contratacao"] = pd.to_datetime(df["data_contratacao"], errors='coerce')
-            hoje = pd.Timestamp.now()
-            df["meses_ativo"] = ((hoje - df["data_contratacao"]).dt.days / 30).fillna(12).astype(int)
-        else:
-            # Valor padrão de 12 meses
-            df["meses_ativo"] = 12
+    if "meses_ativo" not in df.columns and "data_contratacao" in df.columns:
+        # Calcular baseado na data de contratação
+        df["data_contratacao"] = pd.to_datetime(df["data_contratacao"], errors='coerce')
+        hoje = pd.Timestamp.now()
+        df["meses_ativo"] = ((hoje - df["data_contratacao"]).dt.days / 30).fillna(12).astype(int)
     
     # Calcular LTV se não existir
-    if "ltv" not in df.columns:
-        if "ticket_medio" in df.columns and "meses_ativo" in df.columns:
-            df["ltv"] = df["ticket_medio"] * df["meses_ativo"]
-        else:
-            # Valor padrão baseado no faturamento
-            df["ltv"] = df.get("faturamento", 100000) * 0.3
+    if "ltv" not in df.columns and "ticket_medio" in df.columns and "meses_ativo" in df.columns:
+        df["ltv"] = df["ticket_medio"] * df["meses_ativo"]
     
     # Renomear colunas
     df = df.rename(columns={"nome_cliente": "nome"})

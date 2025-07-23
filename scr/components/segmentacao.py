@@ -29,25 +29,15 @@ def calcular_ltv(df):
     df = df.copy()  # Criar cópia para não modificar o original
     
     # Verifica se temos as colunas necessárias
-    if 'ticket_medio' not in df.columns:
-        if 'valor_contrato' in df.columns:
-            df['ticket_medio'] = df['valor_contrato']
-        else:
-            # Valor padrão se não encontrar
-            df['ticket_medio'] = 10000
-            st.warning("⚠️ Coluna 'ticket_medio' não encontrada. Usando valor padrão de R$ 10.000")
-            
+    if 'ticket_medio' not in df.columns and 'valor_contrato' in df.columns:
+        df['ticket_medio'] = df['valor_contrato']
+        
     # Calcular meses_ativo se não existir
-    if 'meses_ativo' not in df.columns:
-        if 'data_contratacao' in df.columns:
-            # Calcular baseado na data de contratação
-            df['data_contratacao'] = pd.to_datetime(df['data_contratacao'], errors='coerce')
-            hoje = pd.Timestamp.now()
-            df['meses_ativo'] = ((hoje - df['data_contratacao']).dt.days / 30).fillna(12).astype(int)
-        else:
-            # Valor padrão de 12 meses
-            df['meses_ativo'] = 12
-            st.info("ℹ️ Coluna 'meses_ativo' não encontrada. Usando valor padrão de 12 meses")
+    if 'meses_ativo' not in df.columns and 'data_contratacao' in df.columns:
+        # Calcular baseado na data de contratação
+        df['data_contratacao'] = pd.to_datetime(df['data_contratacao'], errors='coerce')
+        hoje = pd.Timestamp.now()
+        df['meses_ativo'] = ((hoje - df['data_contratacao']).dt.days / 30).fillna(12).astype(int)
         
     # Calcula o LTV
     df['ltv'] = df['ticket_medio'] * df['meses_ativo']
@@ -56,11 +46,9 @@ def calcular_ltv(df):
 def exibir_segmentacao():
     st.title("SaleSniper - Segmentação de Clientes")
     
-    # Limpar cache para forçar recálculo
-    if st.button("🔄 Limpar Cache e Recarregar"):
+    # Botão para limpar cache se necessário
+    if st.button("🔄 Limpar Cache"):
         st.cache_data.clear()
-        if "icp_data" in st.session_state:
-            del st.session_state["icp_data"]
         st.rerun()
     
     if "icp_data" not in st.session_state or st.session_state["icp_data"] is None:
@@ -74,12 +62,11 @@ def exibir_segmentacao():
     if 'nome' not in df.columns:
         df['nome'] = df.index.astype(str)
     
-    # FORÇAR CÁLCULO DE LTV - SEMPRE
-    df = calcular_ltv(df)
-    # Atualizar o DataFrame no sistema
-    sistema.df = df.copy()
-    # Forçar atualização da sessão
-    st.session_state["icp_data"]["sistema"] = sistema
+    # Calcular LTV se necessário
+    if "ltv" not in df.columns:
+        df = calcular_ltv(df)
+        sistema.df = df.copy()
+        st.session_state["icp_data"]["sistema"] = sistema
     
     # Garantindo que temos ticket_medio
     if 'ticket_medio' not in df.columns and 'valor_contrato' in df.columns:
@@ -242,12 +229,7 @@ def exibir_segmentacao():
         - Ticket médio × Número de meses desde a contratação""")
 
     if campo:
-        # Garantir que o LTV existe se for o campo selecionado
-        if campo == "ltv":
-            df = calcular_ltv(df)
-            sistema.df = df.copy()
-        
-        # Usando função para segmentação (sem cache para evitar problemas)
+        # Usando função para segmentação
         if tipo_segmentacao == "Customizada por valor acumulado":
             seg = calcular_segmentacao(df, campo, "80/20", percentual_a)
         else:
