@@ -1,0 +1,44 @@
+# Arquivos de dados grandes
+*.csv
+cnpjs_receita_final.csv
+scr/data/*.csv
+
+# Ambiente virtual
+venv/
+env/
+.venv/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribuição / empacotamento
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Arquivos de log
+*.log
+
+# Arquivos temporários
+*.tmp
+*.temp 

@@ -12,13 +12,17 @@ import json
 # Caminho do arquivo de clientes históricos
 csv_path = 'tests/clientes_historico.csv'  # ou 'scr/data/clientes_historico.csv'
 
+print('Lendo base de clientes históricos...')
 clientes = pd.read_csv(csv_path, parse_dates=['data_entrada', 'data_churn'])
+print(f'Base carregada: {len(clientes)} clientes')
 
 # Feature engineering
+print('Calculando duração e variável churned...')
 clientes['duracao'] = (clientes['data_churn'].fillna(pd.Timestamp('today')) - clientes['data_entrada']).dt.days
 clientes['churned'] = clientes['data_churn'].notnull().astype(int)
 
 # One-hot encoding igual ao app
+print('Fazendo one-hot encoding...')
 perfis = [
     'Básico Jovem', 'Básico Adulto', 'Básico Sênior',
     'Intermediário Jovem', 'Intermediário Adulto', 'Intermediário Sênior',
@@ -35,44 +39,41 @@ for r in regioes[1:]:
     clientes[f'regiao_{r}'] = (clientes['regiao'] == r).astype(int)
 
 num_features = ['idade', 'tempo_casa', 'score_engajamento']
+print('Normalizando variáveis numéricas...')
 clientes[num_features] = StandardScaler().fit_transform(clientes[num_features])
 
 # Features finais (iguais ao app)
+print('Montando features finais...')
 features = []
 features += [f'perfil_{p}' for p in perfis[1:]]
 features += [f'canal_aquisicao_{c}' for c in canais[1:]]
 features += [f'regiao_{r}' for r in regioes[1:]]
 features += num_features
+print(f'Features finais: {features}')
 
 X = clientes[features]
 y = clientes[['duracao', 'churned']]
 
 # Separar treino/teste
+print('Separando treino e teste...')
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print(f'Treino: {len(X_train)} | Teste: {len(X_test)}')
 
 # WeibullAFT
+print('Treinando modelo WeibullAFT...')
 train_weibull = X_train.copy()
 train_weibull['duracao'] = y_train['duracao']
 train_weibull['churned'] = y_train['churned']
 weibull = WeibullAFTFitter()
 weibull.fit(train_weibull, duration_col='duracao', event_col='churned')
-
-# Random Survival Forest (scikit-survival)
-def to_structured(y):
-    return np.array([(bool(e), t) for t, e in zip(y['duracao'], y['churned'])], dtype=[('event', '?'), ('time', '<f8')])
-
-rsf = RandomSurvivalForest(n_estimators=200, min_samples_split=10, min_samples_leaf=10, n_jobs=-1, random_state=42)
-rsf.fit(X_train, to_structured(y_train))
+print('Modelo WeibullAFT treinado.')
 
 # Avaliação: previsão de churn em até 12 meses (365 dias)
 def avaliar_modelo(model, X, y, tipo='weibull'):
     if tipo == 'weibull':
         y_pred_dias = model.predict_expectation(X)
     else:
-        # Para RSF, usar a expectativa de sobrevida
-        surv_funcs = model.predict_survival_function(X)
-        # Calcular expectativa de tempo até churn
-        y_pred_dias = np.array([np.trapz(fn.y, fn.x) for fn in surv_funcs])
+        return 0, 0
     y_pred_churn = (y_pred_dias < 365).astype(int)
     acc = accuracy_score(y['churned'], y_pred_churn)
     try:
@@ -82,19 +83,12 @@ def avaliar_modelo(model, X, y, tipo='weibull'):
     return acc, roc
 
 acc_w, roc_w = avaliar_modelo(weibull, X_test, y_test, tipo='weibull')
-acc_r, roc_r = avaliar_modelo(rsf, X_test, y_test, tipo='rsf')
 
-print('--- Avaliação dos Modelos ---')
+print('--- Avaliação do Modelo WeibullAFT ---')
 print(f'WeibullAFT:    Acurácia={acc_w:.2%}  ROC-AUC={roc_w:.2%}')
-print(f'RandomSurvivalForest: Acurácia={acc_r:.2%}  ROC-AUC={roc_r:.2%}')
 
-# Escolher melhor modelo (maior ROC-AUC)
-if roc_r > roc_w:
-    melhor_modelo = rsf
-    melhor_nome = 'RandomSurvivalForest'
-else:
-    melhor_modelo = weibull
-    melhor_nome = 'WeibullAFT'
+melhor_modelo = weibull
+melhor_nome = 'WeibullAFT'
 
 # Salvar modelo e features
 with open('scr/data/modelo_final.pkl', 'wb') as f:
@@ -109,8 +103,8 @@ print('Features salvas em scr/data/features_weibull.pkl')
 # Salvar métricas do melhor modelo
 metrics = {
     'modelo': melhor_nome,
-    'acuracia': float(acc_r if melhor_nome == 'RandomSurvivalForest' else acc_w),
-    'roc_auc': float(roc_r if melhor_nome == 'RandomSurvivalForest' else roc_w)
+    'acuracia': float(acc_w),
+    'roc_auc': float(roc_w)
 }
 with open('scr/data/churn_model_metrics.json', 'w') as f:
     json.dump(metrics, f, indent=2)
