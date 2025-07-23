@@ -46,8 +46,16 @@ class AnaliseICP:
             return self._cache[cache_key]
         
         try:
-            # Calcular LTV automaticamente
+            # Calcular meses ativos se não existir
             df_temp = df.copy()
+            if 'meses_ativo' not in df_temp.columns and 'data_contratacao' in df_temp.columns:
+                from datetime import datetime
+                hoje = datetime.now()
+                df_temp['meses_ativo'] = ((hoje - df_temp['data_contratacao']).dt.days / 30).astype(int)
+            elif 'meses_ativo' not in df_temp.columns:
+                df_temp['meses_ativo'] = 12
+            
+            # Calcular LTV automaticamente
             df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
             df_num = df_temp[variaveis + ["ltv", "ticket_medio"]].copy()
             
@@ -83,8 +91,16 @@ class AnaliseICP:
                 return self._cache[cache_key]
             
             correlacoes = []
-            # Calcular LTV automaticamente
+            # Calcular meses ativos se não existir
             df_temp = df.copy()
+            if 'meses_ativo' not in df_temp.columns and 'data_contratacao' in df_temp.columns:
+                from datetime import datetime
+                hoje = datetime.now()
+                df_temp['meses_ativo'] = ((hoje - df_temp['data_contratacao']).dt.days / 30).astype(int)
+            elif 'meses_ativo' not in df_temp.columns:
+                df_temp['meses_ativo'] = 12
+            
+            # Calcular LTV automaticamente
             df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
             
             # Garantir que valores numéricos estão otimizados
@@ -131,8 +147,16 @@ class AnaliseICP:
             if "produtos" not in df.columns:
                 return []
             
-            # Calcular LTV automaticamente
+            # Calcular meses ativos se não existir
             df_temp = df.copy()
+            if 'meses_ativo' not in df_temp.columns and 'data_contratacao' in df_temp.columns:
+                from datetime import datetime
+                hoje = datetime.now()
+                df_temp['meses_ativo'] = ((hoje - df_temp['data_contratacao']).dt.days / 30).astype(int)
+            elif 'meses_ativo' not in df_temp.columns:
+                df_temp['meses_ativo'] = 12
+            
+            # Calcular LTV automaticamente
             df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
             
             # Criar DataFrame com produtos já separados
@@ -205,6 +229,15 @@ class AnaliseICP:
             if col in df.columns:
                 perfil_filtrado = perfil_filtrado[perfil_filtrado[col] == cliente_ideal[col]]
         
+        # Calcular meses ativos se não existir
+        if 'meses_ativo' not in perfil_filtrado.columns and 'data_contratacao' in perfil_filtrado.columns:
+            from datetime import datetime
+            hoje = datetime.now()
+            perfil_filtrado['meses_ativo'] = ((hoje - perfil_filtrado['data_contratacao']).dt.days / 30).astype(int)
+        elif 'meses_ativo' not in perfil_filtrado.columns:
+            # Se não tiver data de contratação, usar valor padrão
+            perfil_filtrado['meses_ativo'] = 12
+        
         # Calcular médias para esse perfil
         perfil = {
             'ticket_medio': perfil_filtrado['ticket_medio'].mean(),
@@ -240,8 +273,16 @@ class AnaliseICP:
             ticket_por_cat = df.groupby(cat, observed=True)['ticket_medio'].agg(['mean', 'median', 'count'])
             ticket_por_cat = ticket_por_cat.sort_values('mean', ascending=False)
             
-            # Calcular LTV automaticamente para análise
+            # Calcular meses ativos se não existir
             df_temp = df.copy()
+            if 'meses_ativo' not in df_temp.columns and 'data_contratacao' in df_temp.columns:
+                from datetime import datetime
+                hoje = datetime.now()
+                df_temp['meses_ativo'] = ((hoje - df_temp['data_contratacao']).dt.days / 30).astype(int)
+            elif 'meses_ativo' not in df_temp.columns:
+                df_temp['meses_ativo'] = 12
+            
+            # Calcular LTV automaticamente para análise
             df_temp['ltv'] = df_temp['ticket_medio'] * df_temp['meses_ativo']
             
             # Análise de impacto no LTV
