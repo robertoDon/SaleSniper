@@ -1,0 +1,33 @@
+# Configuração do GitHub Pages
+title: SaleSniper
+description: Análise Inteligente de ICP e Segmentação de Clientes
+url: "https://robertoDon.github.io"
+baseurl: "/SaleSniper"
+
+# Configurações do Jekyll
+theme: jekyll-theme-cayman
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Configurações de SEO
+author:
+  name: Roberto Don
+  email: roberto@example.com
+
+# Configurações de navegação
+nav:
+  - title: Home
+    url: /
+  - title: Guia Rápido
+    url: /GUIA_RAPIDO.html
+  - title: Documentação
+    url: /docs/
+
+# Configurações de exibição
+show_downloads: true
+show_excerpts: true
+
+# Configurações de build
+markdown: kramdown
+highlighter: rouge 
