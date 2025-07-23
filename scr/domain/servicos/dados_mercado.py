@@ -170,6 +170,8 @@ class DadosMercado:
         if not os.path.exists(self.caminho_receita):
             print(f"⚠️ Arquivo da Receita Federal não encontrado: {self.caminho_receita}")
             print("📊 Usando dados de exemplo para demonstração...")
+            # Limpar cache para forçar uso de dados de exemplo
+            self._cache_dados.clear()
             return self._gerar_dados_exemplo()
         
         print(f"Carregando dados da Receita Federal: {self.caminho_receita}")

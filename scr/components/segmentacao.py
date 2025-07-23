@@ -73,11 +73,13 @@ def exibir_segmentacao():
     if 'nome' not in df.columns:
         df['nome'] = df.index.astype(str)
     
-    # Calculando LTV se não existir
-    if 'ltv' not in df.columns:
+    # Calculando LTV se não existir - FORÇAR RECÁLCULO
+    if 'ltv' not in df.columns or 'meses_ativo' not in df.columns or 'ticket_medio' not in df.columns:
         df = calcular_ltv(df)
         # Atualizar o DataFrame no sistema
         sistema.df = df.copy()
+        # Forçar atualização da sessão
+        st.session_state["icp_data"]["sistema"] = sistema
     
     # Garantindo que temos ticket_medio
     if 'ticket_medio' not in df.columns and 'valor_contrato' in df.columns:

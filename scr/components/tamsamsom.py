@@ -41,9 +41,13 @@ def exibir_tamsamsom():
         
         try:
             df_mercado = dados_mercado.carregar_dados_receita_federal()
+            if len(df_mercado) == 0:
+                st.warning("⚠️ Nenhum dado encontrado. Usando dados de exemplo...")
+                df_mercado = dados_mercado._gerar_dados_exemplo()
         except Exception as e:
-            st.error(f"❌ Erro ao carregar dados da Receita Federal: {str(e)}")
-            return
+            st.warning(f"⚠️ Erro ao carregar dados da Receita Federal: {str(e)}")
+            st.info("📊 Usando dados de exemplo para demonstração...")
+            df_mercado = dados_mercado._gerar_dados_exemplo()
     
     # Calcular TAM/SAM/SOM
     with st.spinner("🔄 Calculando TAM/SAM/SOM..."):
