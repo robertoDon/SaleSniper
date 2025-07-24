@@ -286,7 +286,7 @@ def exibir_valuation():
         
         with col1:
             st.metric("Múltiplos", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M")
-            with st.expander("ℹ️ Explicação", expanded=False):
+            with st.expander("❓ O que é valuation por múltiplos?", expanded=False):
                 st.markdown("""
                 **🔢 Método dos Múltiplos**
                 
@@ -304,7 +304,7 @@ def exibir_valuation():
         
         with col2:
             st.metric("DCF", f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M")
-            with st.expander("ℹ️ Explicação", expanded=False):
+            with st.expander("❓ O que é valuation DCF?", expanded=False):
                 st.markdown("""
                 **💰 Método DCF (Discounted Cash Flow)**
                 
@@ -322,7 +322,7 @@ def exibir_valuation():
         
         with col3:
             st.metric("Berkus", f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
-            with st.expander("ℹ️ Explicação", expanded=False):
+            with st.expander("❓ O que é valuation Berkus?", expanded=False):
                 st.markdown("""
                 **🚀 Método Berkus**
                 
@@ -344,7 +344,7 @@ def exibir_valuation():
         
         with col4:
             st.metric("Scorecard", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
-            with st.expander("ℹ️ Explicação", expanded=False):
+            with st.expander("❓ O que é valuation Scorecard?", expanded=False):
                 st.markdown("""
                 **📊 Método Scorecard**
                 
@@ -477,29 +477,94 @@ def exibir_valuation():
             scorecard_df = pd.DataFrame(scorecard_fatores, columns=["Fator", "Nível"])
             st.dataframe(scorecard_df, hide_index=True)
         
-        # Resumo final
-        st.markdown("### 📋 Resumo Executivo")
+        # Análise e recomendação
+        st.markdown("### 🤔 E aí, estou bem?")
         
-        resumo_df = valuation_service.exportar_para_dataframe(relatorio)
-        resumo_df = resumo_df[["Método", "Valuation (R$ M)", "Peso"]]
+        # Calcular métricas para análise
+        valuation_medio = relatorio['valuation_medio']
+        margem_ebitda = ebitda / receita_anual if receita_anual > 0 else 0
         
-        st.dataframe(formatar_dataframe_br(resumo_df), hide_index=True)
+        # Determinar se está bem para o mercado
+        if tamanho_empresa == "seed":
+            if valuation_medio >= 2000000:  # R$ 2M
+                status = "🟢 Muito bem posicionada!"
+                analise = "Sua empresa está com um valuation excelente para o estágio seed. Isso indica que você tem uma base sólida e potencial de crescimento significativo."
+            elif valuation_medio >= 1000000:  # R$ 1M
+                status = "🟡 Bem posicionada"
+                analise = "Sua empresa está bem posicionada no mercado. Há espaço para crescimento, mas a base está sólida."
+            else:
+                status = "🔴 Precisa de melhorias"
+                analise = "Sua empresa precisa de melhorias para se destacar no mercado. Foque em validar o produto e gerar receita."
+        elif tamanho_empresa == "startup":
+            if valuation_medio >= 10000000:  # R$ 10M
+                status = "🟢 Excelente posicionamento!"
+                analise = "Sua startup está com um valuation muito forte. Você tem um produto validado e crescimento consistente."
+            elif valuation_medio >= 5000000:  # R$ 5M
+                status = "🟡 Bem posicionada"
+                analise = "Sua startup está bem posicionada. Continue focando no crescimento e validação de mercado."
+            else:
+                status = "🔴 Precisa de melhorias"
+                analise = "Sua startup precisa de melhorias para se destacar. Foque em crescimento de receita e validação."
+        elif tamanho_empresa == "scaleup":
+            if valuation_medio >= 50000000:  # R$ 50M
+                status = "🟢 Posicionamento excepcional!"
+                analise = "Sua scaleup está com um valuation excepcional. Você tem um modelo de negócio validado e crescimento acelerado."
+            elif valuation_medio >= 25000000:  # R$ 25M
+                status = "🟡 Bem posicionada"
+                analise = "Sua scaleup está bem posicionada. Continue focando na expansão e otimização."
+            else:
+                status = "🔴 Precisa de melhorias"
+                analise = "Sua scaleup precisa de melhorias para se destacar. Foque em crescimento acelerado e eficiência."
+        else:  # estabelecida
+            if valuation_medio >= 100000000:  # R$ 100M
+                status = "🟢 Posicionamento sólido!"
+                analise = "Sua empresa estabelecida está com um valuation muito sólido. Você tem um negócio maduro e lucrativo."
+            elif valuation_medio >= 50000000:  # R$ 50M
+                status = "🟡 Bem posicionada"
+                analise = "Sua empresa está bem posicionada. Continue focando na otimização e expansão."
+            else:
+                status = "🔴 Precisa de melhorias"
+                analise = "Sua empresa precisa de melhorias para se destacar. Foque em eficiência e crescimento sustentável."
         
-        # Botões de exportação
-        st.markdown("### 📤 Exportar Resultados")
+        # Pontos de melhoria
+        melhorias = []
+        if margem_ebitda < 0.1:
+            melhorias.append("**Margem EBITDA baixa**: Foque em otimizar custos e aumentar eficiência operacional")
+        if receita_anual < 1000000:
+            melhorias.append("**Receita baixa**: Trabalhe no crescimento de vendas e expansão de mercado")
+        if tamanho_empresa in ["seed", "startup"] and not produto_lancado:
+            melhorias.append("**Produto não lançado**: Priorize o lançamento do produto para validar o mercado")
+        if tamanho_empresa in ["seed", "startup"] and not vendas_organicas:
+            melhorias.append("**Sem vendas orgânicas**: Desenvolva estratégias de aquisição de clientes")
         
-        # Relatório completo para exportação
-        relatorio_completo_df = valuation_service.exportar_relatorio_completo(relatorio)
+        if not melhorias:
+            melhorias.append("**Continue assim!**: Sua empresa está no caminho certo")
         
-        col1, col2 = st.columns(2)
+        # Recomendação do programa
+        if tamanho_empresa == "seed":
+            programa = "**Don for Seed**"
+            descricao_programa = "Programa especializado para empresas em estágio seed, focado em validação de produto e primeiras vendas."
+        elif tamanho_empresa == "startup":
+            programa = "**Don for Startup**"
+            descricao_programa = "Programa para startups em crescimento, focado em escalabilidade e validação de mercado."
+        elif tamanho_empresa == "scaleup":
+            programa = "**Don for Scale-up**"
+            descricao_programa = "Programa para scaleups, focado em crescimento acelerado e expansão de mercado."
+        else:
+            programa = "**Don for Enterprise**"
+            descricao_programa = "Programa para empresas estabelecidas, focado em otimização e expansão estratégica."
         
-        with col1:
-            st.markdown("**📊 Resumo Executivo:**")
-            exibir_botoes_exportacao(resumo_df, f"resumo_valuation_{nome_empresa.replace(' ', '_')}")
+        # Exibir análise
+        st.markdown(f"**{status}**")
+        st.markdown(analise)
         
-        with col2:
-            st.markdown("**📋 Relatório Completo:**")
-            exibir_botoes_exportacao(relatorio_completo_df, f"relatorio_completo_{nome_empresa.replace(' ', '_')}")
+        st.markdown("**📈 Pontos de Melhoria:**")
+        for melhoria in melhorias:
+            st.markdown(f"• {melhoria}")
+        
+        st.markdown("**💡 Recomendação:**")
+        st.markdown(f"Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.")
+        st.markdown(descricao_programa)
         
         # Salvar na sessão
         st.session_state["valuation_result"] = relatorio 
