@@ -137,19 +137,19 @@ def exibir_valuation():
         despesas_marketing = st.number_input("Despesas de Marketing (R$)", min_value=0.0, value=100000.0, step=10000.0)
         outros_custos = st.number_input("Outros Custos (R$)", min_value=0.0, value=50000.0, step=10000.0)
         
-        # Calcular EBITDA
+        # Calcular EBITDA (não mostrar aqui, apenas nos resultados)
         ebitda = receita_anual - custos_vendas - despesas_operacionais - despesas_adm - despesas_marketing - outros_custos
         ebitda = max(ebitda, 0)  # Não pode ser negativo
-        
-        st.markdown(f"**EBITDA Calculado: R$ {formatar_numero_br(ebitda)}**")
         
         lucro_liquido = st.number_input("Lucro Líquido (R$)", min_value=0.0, value=150000.0, step=10000.0)
     
     with col2:
-        margem_ebitda = st.slider("Margem EBITDA (%)", min_value=0.0, max_value=50.0, value=20.0, step=1.0) / 100
+        # Margem EBITDA será calculada e mostrada nos resultados
         crescimento_anual = st.slider("Crescimento Anual Esperado (%)", min_value=0.0, max_value=100.0, value=30.0, step=5.0) / 100
-        usuarios_ativos = st.number_input("Usuários Ativos", min_value=0, value=5000, step=100)
         n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
+        
+        # Removendo usuários ativos pois não temos ticket médio
+        # usuarios_ativos = st.number_input("Usuários Ativos", min_value=0, value=5000, step=100)
         
         # Métricas qualitativas para Berkus e Scorecard
         produto_lancado = st.checkbox("Produto Lançado", value=True)
@@ -187,6 +187,9 @@ def exibir_valuation():
             elif valor == "Médio": return 1.0
             else: return 1.3  # Alto
         
+        # Calcular margem EBITDA
+        margem_ebitda = ebitda / receita_anual if receita_anual > 0 else 0
+        
         # Preparar dados da empresa
         dados_empresa = {
             "nome_empresa": nome_empresa,
@@ -197,7 +200,6 @@ def exibir_valuation():
             "lucro_liquido": lucro_liquido,
             "margem_ebitda": margem_ebitda,
             "crescimento_anual": crescimento_anual,
-            "usuarios_ativos": usuarios_ativos,
             "n_vendedores": n_vendedores,
             "produto_lancado": produto_lancado,
             "parcerias_estrategicas": parcerias_estrategicas,
@@ -232,6 +234,14 @@ def exibir_valuation():
             st.metric("Berkus", f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
         with col4:
             st.metric("Scorecard", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
+        
+        # Mostrar EBITDA e margem calculados
+        st.markdown("### 📊 Métricas Financeiras Calculadas")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
+        with col2:
+            st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
         st.markdown(f"### 🎯 Valuation Médio Ponderado: **R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M**")
         

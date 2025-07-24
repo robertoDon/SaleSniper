@@ -124,7 +124,7 @@ class ValuationService:
             "anos_projecao": anos_projecao
         }
     
-    def calcular_berkus(self, receita_anual: float, usuarios_ativos: int, produto_lancado: bool,
+    def calcular_berkus(self, receita_anual: float, produto_lancado: bool,
                        parcerias_estrategicas: bool, vendas_organicas: bool, 
                        investe_trafego_pago: bool) -> Dict:
         """Calcula valuation usando o método Berkus (para startups)."""
@@ -136,10 +136,6 @@ class ValuationService:
         if produto_lancado:
             valor_base += 500000
             fatores_berkus.append({"fator": "Produto Lançado", "valor": 500000})
-        
-        if usuarios_ativos > 1000:
-            valor_base += 500000
-            fatores_berkus.append({"fator": "Base de Usuários", "valor": 500000})
         
         if vendas_organicas:
             valor_base += 500000
@@ -161,8 +157,7 @@ class ValuationService:
         
         return {
             "valor_total": valor_base,
-            "fatores": fatores_berkus,
-            "usuarios_ativos": usuarios_ativos
+            "fatores": fatores_berkus
         }
     
     def calcular_scorecard(self, receita_anual: float, setor: str, tamanho_mercado: float,
@@ -241,7 +236,6 @@ class ValuationService:
         
         berkus_result = self.calcular_berkus(
             dados_empresa["receita_anual"],
-            dados_empresa["usuarios_ativos"],
             dados_empresa["produto_lancado"],
             dados_empresa["parcerias_estrategicas"],
             dados_empresa["vendas_organicas"],
