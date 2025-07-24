@@ -270,17 +270,90 @@ def exibir_valuation():
         # Exibir resultados
         st.markdown("### 📊 Resultados do Valuation")
         
-        # Métricas principais
+        # Métricas principais com tooltips explicativos
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.metric("Múltiplos", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M")
+            if st.button("ℹ️", key="info_multiplos", help="Clique para ver explicação"):
+                st.info("""
+                **🔢 Método dos Múltiplos**
+                
+                **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de receita, EBITDA e lucro.
+                
+                **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
+                
+                **Por que este valor:** Baseado em múltiplos reais do mercado para empresas do setor {setor} em estágio {tamanho_empresa}.
+                
+                **Vantagens:** 
+                - Baseado em dados reais do mercado
+                - Fácil de entender e explicar
+                - Reflete o que investidores pagam por empresas similares
+                """)
+        
         with col2:
             st.metric("DCF", f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M")
+            if st.button("ℹ️", key="info_dcf", help="Clique para ver explicação"):
+                st.info("""
+                **💰 Método DCF (Discounted Cash Flow)**
+                
+                **Como funciona:** Calcula o valor presente dos fluxos de caixa futuros da empresa.
+                
+                **Fórmula:** Valor = Σ(Fluxo de Caixa Futuro / (1 + Taxa de Desconto)^ano) + Valor Terminal
+                
+                **Por que este valor:** Projeta crescimento de {crescimento_estimado}% ao ano com margem EBITDA de {margem_ebitda*100:.1f}%.
+                
+                **Vantagens:**
+                - Considera crescimento futuro
+                - Baseado em fundamentos da empresa
+                - Mais preciso para empresas com projeções claras
+                """)
+        
         with col3:
             st.metric("Berkus", f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
+            if st.button("ℹ️", key="info_berkus", help="Clique para ver explicação"):
+                st.info("""
+                **🚀 Método Berkus**
+                
+                **Como funciona:** Avalia startups em estágio inicial baseado em marcos qualitativos.
+                
+                **Critérios avaliados:**
+                - Produto lançado: R$ 500k
+                - Vendas orgânicas: R$ 500k
+                - Parcerias estratégicas: R$ 500k
+                - Investimento em tráfego pago: R$ 500k
+                
+                **Por que este valor:** Ideal para empresas em estágio {tamanho_empresa} que já atingiram marcos importantes.
+                
+                **Vantagens:**
+                - Ideal para startups em estágio inicial
+                - Fácil de aplicar
+                - Considera marcos importantes
+                """)
+        
         with col4:
             st.metric("Scorecard", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
+            if st.button("ℹ️", key="info_scorecard", help="Clique para ver explicação"):
+                st.info("""
+                **📊 Método Scorecard**
+                
+                **Como funciona:** Avalia qualitativamente diferentes aspectos da empresa e aplica multiplicadores.
+                
+                **Fatores avaliados:**
+                - Força da equipe
+                - Qualidade do produto
+                - Estratégia de vendas/marketing
+                - Saúde financeira
+                - Concorrência
+                - Inovação
+                
+                **Por que este valor:** Baseado na avaliação qualitativa dos 6 fatores principais da empresa.
+                
+                **Vantagens:**
+                - Considera aspectos qualitativos
+                - Flexível para diferentes tipos de empresa
+                - Abrangente
+                """)
         
         # Mostrar EBITDA e margem calculados
         st.markdown("### 📊 Métricas Financeiras Calculadas")
@@ -290,103 +363,38 @@ def exibir_valuation():
         with col2:
             st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
-        st.markdown(f"### 🎯 Valuation Médio Ponderado: **R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M**")
+        # Valuation médio ponderado com explicação
+        col_val, col_info = st.columns([3, 1])
+        
+        with col_val:
+            st.markdown(f"### 🎯 Valuation Médio Ponderado: **R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M**")
+        
+        with col_info:
+            if st.button("ℹ️", key="info_valuation_medio", help="Clique para ver explicação"):
+                st.info("""
+                **🎯 Valuation Médio Ponderado**
+                
+                **Como é calculado:** Combina os 4 métodos com pesos diferentes baseados no estágio da empresa.
+                
+                **Pesos utilizados:**
+                - Múltiplos: {relatorio['pesos_utilizados'][0]*100:.1f}%
+                - DCF: {relatorio['pesos_utilizados'][1]*100:.1f}%
+                - Berkus: {relatorio['pesos_utilizados'][2]*100:.1f}%
+                - Scorecard: {relatorio['pesos_utilizados'][3]*100:.1f}%
+                
+                **Por que estes pesos:** Empresas em estágio {tamanho_empresa} têm características específicas que tornam alguns métodos mais relevantes que outros.
+                
+                **Resultado:** Valor final que considera todos os aspectos da empresa de forma equilibrada.
+                """)
         
         # Layout em duas colunas
         col_esquerda, col_direita = st.columns(2)
         
         with col_esquerda:
-            # Explicação dos métodos
-            st.markdown("### 📚 Como Cada Método Funciona")
-            
-            with st.expander("🔢 Método dos Múltiplos"):
-                st.markdown("""
-                **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de receita, EBITDA e lucro.
-                
-                **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
-                
-                **Vantagens:** 
-                - Baseado em dados reais do mercado
-                - Fácil de entender e explicar
-                - Reflete o que investidores pagam por empresas similares
-                
-                **Limitações:**
-                - Depende de empresas comparáveis
-                - Não considera crescimento futuro
-                - Pode ser afetado por condições de mercado
-                """)
-            
-            with st.expander("💰 Método DCF (Discounted Cash Flow)"):
-                st.markdown("""
-                **Como funciona:** Calcula o valor presente dos fluxos de caixa futuros da empresa.
-                
-                **Fórmula:** Valor = Σ(Fluxo de Caixa Futuro / (1 + Taxa de Desconto)^ano) + Valor Terminal
-                
-                **Colunas da tabela DCF:**
-                - **Ano**: Período da projeção (1º, 2º, 3º, 4º, 5º ano)
-                - **Receita Projetada**: Crescimento da receita baseado na taxa estimada
-                - **EBITDA Projetado**: Lucro operacional (Receita × Margem EBITDA)
-                - **FCF Projetado**: Fluxo de Caixa Livre (EBITDA × 70%)
-                - **VP FCF**: Valor Presente do FCF (descontado pela taxa de desconto)
-                
-                **Vantagens:**
-                - Considera crescimento futuro
-                - Baseado em fundamentos da empresa
-                - Mais preciso para empresas com projeções claras
-                
-                **Limitações:**
-                - Requer estimativas de crescimento
-                - Sensível à taxa de desconto
-                - Difícil de projetar para startups
-                """)
+            st.markdown("### 📚 Dica: Clique nos ícones ℹ️ ao lado dos resultados para ver explicações detalhadas de cada método!")
         
         with col_direita:
-            with st.expander("🚀 Método Berkus"):
-                st.markdown("""
-                **Como funciona:** Avalia startups em estágio inicial baseado em marcos qualitativos.
-                
-                **Critérios avaliados:**
-                - Produto lançado: R$ 500k
-                - Vendas orgânicas: R$ 500k
-                - Parcerias estratégicas: R$ 500k
-                - Investimento em tráfego pago: R$ 500k
-                
-                **Vantagens:**
-                - Ideal para startups em estágio inicial
-                - Fácil de aplicar
-                - Considera marcos importantes
-                
-                **Limitações:**
-                - Limitado a startups
-                - Não considera receita atual
-                - Valores fixos podem não refletir realidade
-                """)
-            
-            with st.expander("📊 Método Scorecard"):
-                st.markdown("""
-                **Como funciona:** Avalia qualitativamente diferentes aspectos da empresa e aplica multiplicadores.
-                
-                **Fatores avaliados:**
-                - Força da equipe
-                - Tamanho da oportunidade
-                - Qualidade do produto
-                - Estratégia de vendas/marketing
-                - Saúde financeira
-                - Competição
-                - Timing de mercado
-                - Inovação
-                - Canais de distribuição
-                
-                **Vantagens:**
-                - Considera aspectos qualitativos
-                - Flexível para diferentes tipos de empresa
-                - Abrangente
-                
-                **Limitações:**
-                - Subjetivo
-                - Requer conhecimento do avaliador
-                - Pode ser inconsistente
-                """)
+            st.markdown("### 💡 Cada método tem suas vantagens e limitações. O valuation médio ponderado combina todos de forma equilibrada.")
         
         # Detalhamento dos métodos
         st.markdown("### 📈 Detalhamento por Método")
