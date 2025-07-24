@@ -294,158 +294,175 @@ def exibir_valuation():
         
         st.markdown(f"### 🎯 Valuation Médio Ponderado: **R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M**")
         
-        # Explicação dos métodos
-        st.markdown("### 📚 Como Cada Método Funciona")
+        # Layout em duas colunas
+        col_esquerda, col_direita = st.columns(2)
         
-        with st.expander("🔢 Método dos Múltiplos"):
-            st.markdown("""
-            **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de receita, EBITDA e lucro.
+        with col_esquerda:
+            # Explicação dos métodos
+            st.markdown("### 📚 Como Cada Método Funciona")
             
-            **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
+            with st.expander("🔢 Método dos Múltiplos"):
+                st.markdown("""
+                **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de receita, EBITDA e lucro.
+                
+                **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
+                
+                **Vantagens:** 
+                - Baseado em dados reais do mercado
+                - Fácil de entender e explicar
+                - Reflete o que investidores pagam por empresas similares
+                
+                **Limitações:**
+                - Depende de empresas comparáveis
+                - Não considera crescimento futuro
+                - Pode ser afetado por condições de mercado
+                """)
             
-            **Vantagens:** 
-            - Baseado em dados reais do mercado
-            - Fácil de entender e explicar
-            - Reflete o que investidores pagam por empresas similares
-            
-            **Limitações:**
-            - Depende de empresas comparáveis
-            - Não considera crescimento futuro
-            - Pode ser afetado por condições de mercado
-            """)
+            with st.expander("💰 Método DCF (Discounted Cash Flow)"):
+                st.markdown("""
+                **Como funciona:** Calcula o valor presente dos fluxos de caixa futuros da empresa.
+                
+                **Fórmula:** Valor = Σ(Fluxo de Caixa Futuro / (1 + Taxa de Desconto)^ano) + Valor Terminal
+                
+                **Colunas da tabela DCF:**
+                - **Ano**: Período da projeção (1º, 2º, 3º, 4º, 5º ano)
+                - **Receita Projetada**: Crescimento da receita baseado na taxa estimada
+                - **EBITDA Projetado**: Lucro operacional (Receita × Margem EBITDA)
+                - **FCF Projetado**: Fluxo de Caixa Livre (EBITDA × 70%)
+                - **VP FCF**: Valor Presente do FCF (descontado pela taxa de desconto)
+                
+                **Vantagens:**
+                - Considera crescimento futuro
+                - Baseado em fundamentos da empresa
+                - Mais preciso para empresas com projeções claras
+                
+                **Limitações:**
+                - Requer estimativas de crescimento
+                - Sensível à taxa de desconto
+                - Difícil de projetar para startups
+                """)
         
-        with st.expander("💰 Método DCF (Discounted Cash Flow)"):
-            st.markdown("""
-            **Como funciona:** Calcula o valor presente dos fluxos de caixa futuros da empresa.
+        with col_direita:
+            with st.expander("🚀 Método Berkus"):
+                st.markdown("""
+                **Como funciona:** Avalia startups em estágio inicial baseado em marcos qualitativos.
+                
+                **Critérios avaliados:**
+                - Produto lançado: R$ 500k
+                - Vendas orgânicas: R$ 500k
+                - Parcerias estratégicas: R$ 500k
+                - Investimento em tráfego pago: R$ 500k
+                
+                **Vantagens:**
+                - Ideal para startups em estágio inicial
+                - Fácil de aplicar
+                - Considera marcos importantes
+                
+                **Limitações:**
+                - Limitado a startups
+                - Não considera receita atual
+                - Valores fixos podem não refletir realidade
+                """)
             
-            **Fórmula:** Valor = Σ(Fluxo de Caixa Futuro / (1 + Taxa de Desconto)^ano) + Valor Terminal
-            
-            **Vantagens:**
-            - Considera crescimento futuro
-            - Baseado em fundamentos da empresa
-            - Mais preciso para empresas com projeções claras
-            
-            **Limitações:**
-            - Requer estimativas de crescimento
-            - Sensível à taxa de desconto
-            - Difícil de projetar para startups
-            """)
-        
-        with st.expander("🚀 Método Berkus"):
-            st.markdown("""
-            **Como funciona:** Avalia startups em estágio inicial baseado em marcos qualitativos.
-            
-            **Critérios avaliados:**
-            - Produto lançado: R$ 500k
-            - Vendas orgânicas: R$ 500k
-            - Parcerias estratégicas: R$ 500k
-            - Investimento em tráfego pago: R$ 500k
-            
-            **Vantagens:**
-            - Ideal para startups em estágio inicial
-            - Fácil de aplicar
-            - Considera marcos importantes
-            
-            **Limitações:**
-            - Limitado a startups
-            - Não considera receita atual
-            - Valores fixos podem não refletir realidade
-            """)
-        
-        with st.expander("📊 Método Scorecard"):
-            st.markdown("""
-            **Como funciona:** Avalia qualitativamente diferentes aspectos da empresa e aplica multiplicadores.
-            
-            **Fatores avaliados:**
-            - Força da equipe
-            - Tamanho da oportunidade
-            - Qualidade do produto
-            - Estratégia de vendas/marketing
-            - Saúde financeira
-            - Competição
-            - Timing de mercado
-            - Inovação
-            - Canais de distribuição
-            
-            **Vantagens:**
-            - Considera aspectos qualitativos
-            - Flexível para diferentes tipos de empresa
-            - Abrangente
-            
-            **Limitações:**
-            - Subjetivo
-            - Requer conhecimento do avaliador
-            - Pode ser inconsistente
-            """)
+            with st.expander("📊 Método Scorecard"):
+                st.markdown("""
+                **Como funciona:** Avalia qualitativamente diferentes aspectos da empresa e aplica multiplicadores.
+                
+                **Fatores avaliados:**
+                - Força da equipe
+                - Tamanho da oportunidade
+                - Qualidade do produto
+                - Estratégia de vendas/marketing
+                - Saúde financeira
+                - Competição
+                - Timing de mercado
+                - Inovação
+                - Canais de distribuição
+                
+                **Vantagens:**
+                - Considera aspectos qualitativos
+                - Flexível para diferentes tipos de empresa
+                - Abrangente
+                
+                **Limitações:**
+                - Subjetivo
+                - Requer conhecimento do avaliador
+                - Pode ser inconsistente
+                """)
         
         # Detalhamento dos métodos
         st.markdown("### 📈 Detalhamento por Método")
         
-        # Múltiplos
-        st.markdown("#### 🔢 Valuation por Múltiplos")
-        mult_df = pd.DataFrame({
-            "Método": ["Receita", "EBITDA", "Lucro Líquido"],
-            "Múltiplo": [
-                resultados['multiplos']['multiplos']['receita'],
-                resultados['multiplos']['multiplos']['ebitda'],
-                resultados['multiplos']['multiplos']['lucro']
-            ],
-            "Valor Base (R$)": [receita_anual, ebitda, lucro_liquido],
-            "Valuation (R$)": [
-                resultados['multiplos']['receita'],
-                resultados['multiplos']['ebitda'],
-                resultados['multiplos']['lucro']
-            ]
-        })
-        st.dataframe(formatar_dataframe_br(mult_df), hide_index=True)
+        # Layout em duas colunas para detalhamentos
+        col_det_esq, col_det_dir = st.columns(2)
         
-        # Mostrar multiplicadores utilizados
-        st.markdown("**Multiplicadores Utilizados:**")
-        mult = resultados['multiplos']['multiplos']
-        st.markdown(f"- **Receita**: {mult['receita']}x")
-        st.markdown(f"- **EBITDA**: {mult['ebitda']}x")
-        st.markdown(f"- **Lucro Líquido**: {mult['lucro']}x")
-        st.markdown(f"- **Setor**: {setor}")
-        st.markdown(f"- **Estágio**: {tamanho_empresa}")
+        with col_det_esq:
+            # Múltiplos
+            st.markdown("#### 🔢 Valuation por Múltiplos")
+            mult_df = pd.DataFrame({
+                "Método": ["Receita", "EBITDA", "Lucro Líquido"],
+                "Múltiplo": [
+                    resultados['multiplos']['multiplos']['receita'],
+                    resultados['multiplos']['multiplos']['ebitda'],
+                    resultados['multiplos']['multiplos']['lucro']
+                ],
+                "Valor Base (R$)": [receita_anual, ebitda, lucro_liquido],
+                "Valuation (R$)": [
+                    resultados['multiplos']['receita'],
+                    resultados['multiplos']['ebitda'],
+                    resultados['multiplos']['lucro']
+                ]
+            })
+            st.dataframe(formatar_dataframe_br(mult_df), hide_index=True)
+            
+            # Mostrar multiplicadores utilizados
+            st.markdown("**Multiplicadores Utilizados:**")
+            mult = resultados['multiplos']['multiplos']
+            st.markdown(f"- **Receita**: {mult['receita']}x")
+            st.markdown(f"- **EBITDA**: {mult['ebitda']}x")
+            st.markdown(f"- **Lucro Líquido**: {mult['lucro']}x")
+            st.markdown(f"- **Setor**: {setor}")
+            st.markdown(f"- **Estágio**: {tamanho_empresa}")
+            
+            # DCF
+            st.markdown("#### 💰 Valuation por DCF")
+            dcf_df = pd.DataFrame({
+                "Ano": range(1, len(resultados['dcf']['receitas_projetadas']) + 1),
+                "Receita Projetada (R$)": resultados['dcf']['receitas_projetadas'],
+                "EBITDA Projetado (R$)": resultados['dcf']['ebitda_projetado'],
+                "FCF Projetado (R$)": resultados['dcf']['fcf_projetado'],
+                "VP FCF (R$)": resultados['dcf']['vp_fcf']
+            })
+            st.dataframe(formatar_dataframe_br(dcf_df), hide_index=True)
+            
+            st.markdown(f"**Valor Terminal:** R$ {formatar_numero_br(resultados['dcf']['valor_terminal'])}")
+            st.markdown(f"**VP Valor Terminal:** R$ {formatar_numero_br(resultados['dcf']['vp_terminal'])}")
         
-        # DCF
-        st.markdown("#### 💰 Valuation por DCF")
-        dcf_df = pd.DataFrame({
-            "Ano": range(1, len(resultados['dcf']['receitas_projetadas']) + 1),
-            "Receita Projetada (R$)": resultados['dcf']['receitas_projetadas'],
-            "EBITDA Projetado (R$)": resultados['dcf']['ebitda_projetado'],
-            "FCF Projetado (R$)": resultados['dcf']['fcf_projetado'],
-            "VP FCF (R$)": resultados['dcf']['vp_fcf']
-        })
-        st.dataframe(formatar_dataframe_br(dcf_df), hide_index=True)
-        
-        st.markdown(f"**Valor Terminal:** R$ {formatar_numero_br(resultados['dcf']['valor_terminal'])}")
-        st.markdown(f"**VP Valor Terminal:** R$ {formatar_numero_br(resultados['dcf']['vp_terminal'])}")
-        
-        # Berkus
-        st.markdown("#### 🚀 Valuation por Berkus")
-        berkus_fatores = []
-        for fator in resultados['berkus']['fatores']:
-            berkus_fatores.append([fator['fator'], f"R$ {formatar_numero_br(fator['valor'])}"])
-        
-        berkus_df = pd.DataFrame(berkus_fatores, columns=["Fator", "Valor"])
-        st.dataframe(berkus_df, hide_index=True)
-        
-        # Scorecard
-        st.markdown("#### 📊 Valuation por Scorecard")
-        scorecard_fatores = []
-        for fator, valor in resultados['scorecard']['fatores'].items():
-            # Converter valor numérico para texto
-            if valor == 0.7:
-                valor_texto = "Baixo"
-            elif valor == 1.0:
-                valor_texto = "Médio"
-            else:
-                valor_texto = "Alto"
-            scorecard_fatores.append([fator, valor_texto])
-        
-        scorecard_df = pd.DataFrame(scorecard_fatores, columns=["Fator", "Nível"])
-        st.dataframe(scorecard_df, hide_index=True)
+        with col_det_dir:
+            # Berkus
+            st.markdown("#### 🚀 Valuation por Berkus")
+            berkus_fatores = []
+            for fator in resultados['berkus']['fatores']:
+                berkus_fatores.append([fator['fator'], f"R$ {formatar_numero_br(fator['valor'])}"])
+            
+            berkus_df = pd.DataFrame(berkus_fatores, columns=["Fator", "Valor"])
+            st.dataframe(berkus_df, hide_index=True)
+            
+            # Scorecard
+            st.markdown("#### 📊 Valuation por Scorecard")
+            scorecard_fatores = []
+            for fator, valor in resultados['scorecard']['fatores'].items():
+                # Converter valor numérico para texto
+                if valor == 0.7:
+                    valor_texto = "Baixo"
+                elif valor == 1.0:
+                    valor_texto = "Médio"
+                else:
+                    valor_texto = "Alto"
+                scorecard_fatores.append([fator, valor_texto])
+            
+            scorecard_df = pd.DataFrame(scorecard_fatores, columns=["Fator", "Nível"])
+            st.dataframe(scorecard_df, hide_index=True)
         
         # Resumo final
         st.markdown("### 📋 Resumo Executivo")
