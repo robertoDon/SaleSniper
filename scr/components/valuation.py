@@ -127,17 +127,8 @@ def exibir_valuation():
         tamanho_empresa = st.selectbox("Estágio da Empresa", [
             "seed", "startup", "scaleup", "estabelecida"
         ])
-        # Campo de receita anual com formatação
-        receita_input = st.text_input("Receita Anual (R$)", value="1.000.000", 
-                                     help="Ex: 1.000.000 para R$ 1 milhão")
-        
-        # Converter string formatada para número
-        try:
-            receita_anual = float(receita_input.replace(".", "").replace(",", "."))
-        except ValueError:
-            receita_anual = 1000000.0
-            st.error("Valor inválido. Usando valor padrão: R$ 1.000.000")
-        
+        receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0, 
+                                       help="Ex: 1.000.000 para R$ 1 milhão")
         st.caption(f"Valor atual: R$ {formatar_numero_br(receita_anual)}")
         
         # Opção para detalhar despesas
@@ -145,41 +136,25 @@ def exibir_valuation():
         
         if detalhar_despesas:
             st.markdown("**Detalhe suas despesas mensais por categoria:**")
-            # Campos detalhados com formatação
-            custos_input = st.text_input("Custos de Vendas (R$/mês)", value="25.000", help="Ex: 25.000")
-            try:
-                custos_vendas_mensal = float(custos_input.replace(".", "").replace(",", "."))
-            except ValueError:
-                custos_vendas_mensal = 25000.0
-                st.error("Valor inválido. Usando valor padrão: R$ 25.000")
+            custos_vendas_mensal = st.number_input("Custos de Vendas (R$/mês)", min_value=0.0, value=25000.0, step=1000.0, 
+                                                  help="Ex: 25.000")
+            st.caption(f"Valor atual: R$ {formatar_numero_br(custos_vendas_mensal)}/mês")
             
-            despesas_op_input = st.text_input("Despesas Operacionais (R$/mês)", value="16.667", help="Ex: 16.667")
-            try:
-                despesas_operacionais_mensal = float(despesas_op_input.replace(".", "").replace(",", "."))
-            except ValueError:
-                despesas_operacionais_mensal = 16667.0
-                st.error("Valor inválido. Usando valor padrão: R$ 16.667")
+            despesas_operacionais_mensal = st.number_input("Despesas Operacionais (R$/mês)", min_value=0.0, value=16667.0, step=1000.0, 
+                                                          help="Ex: 16.667")
+            st.caption(f"Valor atual: R$ {formatar_numero_br(despesas_operacionais_mensal)}/mês")
             
-            despesas_adm_input = st.text_input("Despesas Administrativas (R$/mês)", value="12.500", help="Ex: 12.500")
-            try:
-                despesas_adm_mensal = float(despesas_adm_input.replace(".", "").replace(",", "."))
-            except ValueError:
-                despesas_adm_mensal = 12500.0
-                st.error("Valor inválido. Usando valor padrão: R$ 12.500")
+            despesas_adm_mensal = st.number_input("Despesas Administrativas (R$/mês)", min_value=0.0, value=12500.0, step=1000.0, 
+                                                 help="Ex: 12.500")
+            st.caption(f"Valor atual: R$ {formatar_numero_br(despesas_adm_mensal)}/mês")
             
-            despesas_mkt_input = st.text_input("Despesas de Marketing (R$/mês)", value="8.333", help="Ex: 8.333")
-            try:
-                despesas_marketing_mensal = float(despesas_mkt_input.replace(".", "").replace(",", "."))
-            except ValueError:
-                despesas_marketing_mensal = 8333.0
-                st.error("Valor inválido. Usando valor padrão: R$ 8.333")
+            despesas_marketing_mensal = st.number_input("Despesas de Marketing (R$/mês)", min_value=0.0, value=8333.0, step=1000.0, 
+                                                       help="Ex: 8.333")
+            st.caption(f"Valor atual: R$ {formatar_numero_br(despesas_marketing_mensal)}/mês")
             
-            outros_input = st.text_input("Outros Custos (R$/mês)", value="4.167", help="Ex: 4.167")
-            try:
-                outros_custos_mensal = float(outros_input.replace(".", "").replace(",", "."))
-            except ValueError:
-                outros_custos_mensal = 4167.0
-                st.error("Valor inválido. Usando valor padrão: R$ 4.167")
+            outros_custos_mensal = st.number_input("Outros Custos (R$/mês)", min_value=0.0, value=4167.0, step=1000.0, 
+                                                  help="Ex: 4.167")
+            st.caption(f"Valor atual: R$ {formatar_numero_br(outros_custos_mensal)}/mês")
             
             # Calcular totais anuais
             custos_vendas = custos_vendas_mensal * 12
@@ -194,14 +169,9 @@ def exibir_valuation():
             st.markdown(f"**Total das Despesas: R$ {formatar_numero_br(despesas_totais_mensal)}/mês (R$ {formatar_numero_br(despesas_totais)}/ano)**")
         else:
             # Campo simples para despesas totais mensais (só aparece se não detalhar)
-            # Campo simples para despesas totais com formatação
-            despesas_totais_input = st.text_input("Despesas Totais (R$/mês)", value="66.667", 
-                                                help="Ex: 66.667 - Soma de todas as despesas mensais")
-            try:
-                despesas_totais_mensal = float(despesas_totais_input.replace(".", "").replace(",", "."))
-            except ValueError:
-                despesas_totais_mensal = 66667.0
-                st.error("Valor inválido. Usando valor padrão: R$ 66.667")
+            despesas_totais_mensal = st.number_input("Despesas Totais (R$/mês)", min_value=0.0, value=66667.0, step=1000.0, 
+                                                   help="Ex: 66.667 - Soma de todas as despesas mensais")
+            st.caption(f"Valor atual: R$ {formatar_numero_br(despesas_totais_mensal)}/mês")
             
             # Calcular total anual
             despesas_totais = despesas_totais_mensal * 12
