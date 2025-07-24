@@ -5,7 +5,7 @@ from components.dashboard import exibir_dashboard
 from components.segmentacao import exibir_segmentacao
 from components.metas_funil import exibir_calculadora
 from components.churn import exibir_churn
-# from components.valuation import exibir_valuation
+from components.valuation import exibir_valuation
 # Importação comentada para MVP inicial
 # from components.tamsamsom import exibir_tamsamsom
 import os
@@ -112,8 +112,7 @@ elif pagina == "📈 Metas & Projeções":
     exibir_calculadora()
 
 elif pagina == "💰 Valuation":
-    st.info("Funcionalidade de Valuation em manutenção. Em breve estará disponível!")
-    # exibir_valuation()
+    exibir_valuation()
 
 elif pagina == "🔮 Previsão de Churn":
     exibir_churn()
