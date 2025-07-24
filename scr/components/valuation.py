@@ -526,19 +526,62 @@ def exibir_valuation():
                 status = "🔴 Precisa de melhorias"
                 analise = "Sua empresa precisa de melhorias para se destacar. Foque em eficiência e crescimento sustentável."
         
-        # Pontos de melhoria
-        melhorias = []
-        if margem_ebitda < 0.1:
-            melhorias.append("**Margem EBITDA baixa**: Foque em otimizar custos e aumentar eficiência operacional")
-        if receita_anual < 1000000:
-            melhorias.append("**Receita baixa**: Trabalhe no crescimento de vendas e expansão de mercado")
-        if tamanho_empresa in ["seed", "startup"] and not produto_lancado:
-            melhorias.append("**Produto não lançado**: Priorize o lançamento do produto para validar o mercado")
-        if tamanho_empresa in ["seed", "startup"] and not vendas_organicas:
-            melhorias.append("**Sem vendas orgânicas**: Desenvolva estratégias de aquisição de clientes")
+        # Análise específica baseada nos dados do formulário
+        pontos_positivos = []
+        pontos_melhoria = []
         
-        if not melhorias:
-            melhorias.append("**Continue assim!**: Sua empresa está no caminho certo")
+        # Pontos positivos baseados nos dados
+        if produto_lancado:
+            pontos_positivos.append("**Produto já lançado**: Você tem um produto validado no mercado")
+        if vendas_organicas:
+            pontos_positivos.append("**Vendas orgânicas**: Você consegue gerar vendas sem investimento pesado")
+        if parcerias_estrategicas:
+            pontos_positivos.append("**Parcerias estratégicas**: Você tem alianças importantes no mercado")
+        if investe_trafego_pago:
+            pontos_positivos.append("**Investe em tráfego pago**: Você tem estratégia de aquisição ativa")
+        if margem_ebitda > 0.2:
+            pontos_positivos.append("**Margem EBITDA alta**: Sua operação é eficiente")
+        if receita_anual > 5000000:
+            pontos_positivos.append("**Receita sólida**: Você tem uma base financeira forte")
+        if n_vendedores > 3:
+            pontos_positivos.append("**Equipe de vendas**: Você tem capacidade de expansão")
+        
+        # Pontos de melhoria específicos
+        if not produto_lancado and tamanho_empresa in ["seed", "startup"]:
+            pontos_melhoria.append("**Produto não lançado**: Priorize o lançamento para validar o mercado e aumentar o valuation")
+        if not vendas_organicas and tamanho_empresa in ["seed", "startup"]:
+            pontos_melhoria.append("**Sem vendas orgânicas**: Desenvolva estratégias de aquisição natural de clientes")
+        if not parcerias_estrategicas:
+            pontos_melhoria.append("**Sem parcerias estratégicas**: Busque alianças que possam acelerar seu crescimento")
+        if not investe_trafego_pago:
+            pontos_melhoria.append("**Não investe em tráfego pago**: Considere estratégias de marketing digital para crescimento")
+        if margem_ebitda < 0.1:
+            pontos_melhoria.append(f"**Margem EBITDA baixa ({margem_ebitda*100:.1f}%)**: Otimize custos operacionais para aumentar lucratividade")
+        if receita_anual < 1000000:
+            pontos_melhoria.append(f"**Receita baixa (R$ {formatar_numero_br(receita_anual)})**: Foque em crescimento de vendas e expansão de mercado")
+        if n_vendedores < 2:
+            pontos_melhoria.append("**Equipe de vendas pequena**: Considere expandir a equipe para acelerar crescimento")
+        
+        # Garantir sempre 1 positivo e 2 melhorias
+        if not pontos_positivos:
+            pontos_positivos.append("**Potencial de crescimento**: Sua empresa tem espaço para evolução significativa")
+        
+        # Selecionar os 2 pontos de melhoria mais relevantes
+        if len(pontos_melhoria) > 2:
+            # Priorizar pontos mais críticos
+            prioridade = []
+            if not produto_lancado and tamanho_empresa in ["seed", "startup"]:
+                prioridade.append(pontos_melhoria[0])  # Produto não lançado
+            if margem_ebitda < 0.1:
+                prioridade.append([p for p in pontos_melhoria if "Margem EBITDA" in p][0])
+            if receita_anual < 1000000:
+                prioridade.append([p for p in pontos_melhoria if "Receita baixa" in p][0])
+            
+            # Completar com outros pontos se necessário
+            outros = [p for p in pontos_melhoria if p not in prioridade]
+            pontos_melhoria = prioridade + outros[:2-len(prioridade)]
+        elif len(pontos_melhoria) < 2:
+            pontos_melhoria.append("**Continue otimizando**: Mantenha o foco na melhoria contínua")
         
         # Recomendação do programa
         if tamanho_empresa == "seed":
@@ -558,8 +601,11 @@ def exibir_valuation():
         st.markdown(f"**{status}**")
         st.markdown(analise)
         
+        st.markdown("**✅ Ponto Positivo:**")
+        st.markdown(f"• {pontos_positivos[0]}")
+        
         st.markdown("**📈 Pontos de Melhoria:**")
-        for melhoria in melhorias:
+        for i, melhoria in enumerate(pontos_melhoria[:2]):
             st.markdown(f"• {melhoria}")
         
         st.markdown("**💡 Recomendação:**")
