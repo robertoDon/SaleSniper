@@ -52,10 +52,24 @@ class ValuationService:
             "estabelecida": [0.5, 0.4, 0.05, 0.05] # Múltiplos mais relevantes
         }
     
-    def calcular_ebitda(self, receita_anual: float, custos_vendas: float, despesas_operacionais: float, 
-                       despesas_adm: float, despesas_marketing: float, outros_custos: float = 0) -> float:
-        """Calcula o EBITDA baseado nos componentes."""
-        ebitda = receita_anual - custos_vendas - despesas_operacionais - despesas_adm - despesas_marketing - outros_custos
+    def calcular_ebitda(self, receita_anual: float, despesas_totais_anuais: float) -> float:
+        """Calcula o EBITDA baseado na receita anual e despesas totais anuais."""
+        ebitda = receita_anual - despesas_totais_anuais
+        return max(ebitda, 0)  # EBITDA não pode ser negativo
+    
+    def calcular_ebitda_detalhado(self, receita_anual: float, custos_vendas_mensal: float, 
+                                 despesas_operacionais_mensal: float, despesas_adm_mensal: float,
+                                 despesas_marketing_mensal: float, outros_custos_mensal: float = 0) -> float:
+        """Calcula o EBITDA baseado nos componentes mensais."""
+        # Converter para anuais
+        custos_vendas_anual = custos_vendas_mensal * 12
+        despesas_operacionais_anual = despesas_operacionais_mensal * 12
+        despesas_adm_anual = despesas_adm_mensal * 12
+        despesas_marketing_anual = despesas_marketing_mensal * 12
+        outros_custos_anual = outros_custos_mensal * 12
+        
+        despesas_totais = custos_vendas_anual + despesas_operacionais_anual + despesas_adm_anual + despesas_marketing_anual + outros_custos_anual
+        ebitda = receita_anual - despesas_totais
         return max(ebitda, 0)  # EBITDA não pode ser negativo
     
     def calcular_multiplos(self, receita_anual: float, ebitda: float, lucro_liquido: float, 

@@ -133,20 +133,31 @@ def exibir_valuation():
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
         if detalhar_despesas:
-            st.markdown("**Detalhe suas despesas por categoria:**")
-            custos_vendas = st.number_input("Custos de Vendas (R$)", min_value=0.0, value=300000.0, step=10000.0)
-            despesas_operacionais = st.number_input("Despesas Operacionais (R$)", min_value=0.0, value=200000.0, step=10000.0)
-            despesas_adm = st.number_input("Despesas Administrativas (R$)", min_value=0.0, value=150000.0, step=10000.0)
-            despesas_marketing = st.number_input("Despesas de Marketing (R$)", min_value=0.0, value=100000.0, step=10000.0)
-            outros_custos = st.number_input("Outros Custos (R$)", min_value=0.0, value=50000.0, step=10000.0)
+            st.markdown("**Detalhe suas despesas mensais por categoria:**")
+            custos_vendas_mensal = st.number_input("Custos de Vendas (R$/mês)", min_value=0.0, value=25000.0, step=1000.0)
+            despesas_operacionais_mensal = st.number_input("Despesas Operacionais (R$/mês)", min_value=0.0, value=16667.0, step=1000.0)
+            despesas_adm_mensal = st.number_input("Despesas Administrativas (R$/mês)", min_value=0.0, value=12500.0, step=1000.0)
+            despesas_marketing_mensal = st.number_input("Despesas de Marketing (R$/mês)", min_value=0.0, value=8333.0, step=1000.0)
+            outros_custos_mensal = st.number_input("Outros Custos (R$/mês)", min_value=0.0, value=4167.0, step=1000.0)
+            
+            # Calcular totais anuais
+            custos_vendas = custos_vendas_mensal * 12
+            despesas_operacionais = despesas_operacionais_mensal * 12
+            despesas_adm = despesas_adm_mensal * 12
+            despesas_marketing = despesas_marketing_mensal * 12
+            outros_custos = outros_custos_mensal * 12
             
             # Calcular total das despesas detalhadas
             despesas_totais = custos_vendas + despesas_operacionais + despesas_adm + despesas_marketing + outros_custos
-            st.markdown(f"**Total das Despesas: R$ {formatar_numero_br(despesas_totais)}**")
+            despesas_totais_mensal = despesas_totais / 12
+            st.markdown(f"**Total das Despesas: R$ {formatar_numero_br(despesas_totais_mensal)}/mês (R$ {formatar_numero_br(despesas_totais)}/ano)**")
         else:
-            # Campo simples para despesas totais (só aparece se não detalhar)
-            despesas_totais = st.number_input("Despesas Totais (R$)", min_value=0.0, value=800000.0, step=10000.0, 
-                                             help="Soma de todas as despesas da empresa (custos, marketing, administrativo, etc.)")
+            # Campo simples para despesas totais mensais (só aparece se não detalhar)
+            despesas_totais_mensal = st.number_input("Despesas Totais (R$/mês)", min_value=0.0, value=66667.0, step=1000.0, 
+                                                   help="Soma de todas as despesas mensais da empresa (custos, marketing, administrativo, etc.)")
+            
+            # Calcular total anual
+            despesas_totais = despesas_totais_mensal * 12
             
             # Se não detalhou, usar valores padrão proporcionais
             custos_vendas = despesas_totais * 0.375  # 37.5%
