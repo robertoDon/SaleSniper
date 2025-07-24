@@ -127,18 +127,24 @@ def exibir_valuation():
         tamanho_empresa = st.selectbox("Estágio da Empresa", [
             "seed", "startup", "scaleup", "estabelecida"
         ])
-        receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0)
+        receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0, 
+                                       help="Ex: 1.000.000 para R$ 1 milhão")
         
         # Opção para detalhar despesas
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
         if detalhar_despesas:
             st.markdown("**Detalhe suas despesas mensais por categoria:**")
-            custos_vendas_mensal = st.number_input("Custos de Vendas (R$/mês)", min_value=0.0, value=25000.0, step=1000.0)
-            despesas_operacionais_mensal = st.number_input("Despesas Operacionais (R$/mês)", min_value=0.0, value=16667.0, step=1000.0)
-            despesas_adm_mensal = st.number_input("Despesas Administrativas (R$/mês)", min_value=0.0, value=12500.0, step=1000.0)
-            despesas_marketing_mensal = st.number_input("Despesas de Marketing (R$/mês)", min_value=0.0, value=8333.0, step=1000.0)
-            outros_custos_mensal = st.number_input("Outros Custos (R$/mês)", min_value=0.0, value=4167.0, step=1000.0)
+            custos_vendas_mensal = st.number_input("Custos de Vendas (R$/mês)", min_value=0.0, value=25000.0, step=1000.0, 
+                                                  help="Ex: 25.000")
+            despesas_operacionais_mensal = st.number_input("Despesas Operacionais (R$/mês)", min_value=0.0, value=16667.0, step=1000.0, 
+                                                          help="Ex: 16.667")
+            despesas_adm_mensal = st.number_input("Despesas Administrativas (R$/mês)", min_value=0.0, value=12500.0, step=1000.0, 
+                                                 help="Ex: 12.500")
+            despesas_marketing_mensal = st.number_input("Despesas de Marketing (R$/mês)", min_value=0.0, value=8333.0, step=1000.0, 
+                                                       help="Ex: 8.333")
+            outros_custos_mensal = st.number_input("Outros Custos (R$/mês)", min_value=0.0, value=4167.0, step=1000.0, 
+                                                  help="Ex: 4.167")
             
             # Calcular totais anuais
             custos_vendas = custos_vendas_mensal * 12
@@ -154,7 +160,7 @@ def exibir_valuation():
         else:
             # Campo simples para despesas totais mensais (só aparece se não detalhar)
             despesas_totais_mensal = st.number_input("Despesas Totais (R$/mês)", min_value=0.0, value=66667.0, step=1000.0, 
-                                                   help="Soma de todas as despesas mensais da empresa (custos, marketing, administrativo, etc.)")
+                                                   help="Ex: 66.667 - Soma de todas as despesas mensais")
             
             # Calcular total anual
             despesas_totais = despesas_totais_mensal * 12
@@ -214,18 +220,13 @@ def exibir_valuation():
     
     with col1:
         equipe_score = st.selectbox("Força da Equipe", ["Baixo", "Médio", "Alto"], index=1)
-        tamanho_mercado = st.selectbox("Tamanho da Oportunidade", ["Baixo", "Médio", "Alto"], index=1)
         produto_score = st.selectbox("Qualidade do Produto", ["Baixo", "Médio", "Alto"], index=1)
+        vendas_marketing = st.selectbox("Estratégia de Vendas/Marketing", ["Baixo", "Médio", "Alto"], index=1)
     
     with col2:
-        vendas_marketing = st.selectbox("Estratégia de Vendas/Marketing", ["Baixo", "Médio", "Alto"], index=1)
         financas = st.selectbox("Saúde Financeira", ["Baixo", "Médio", "Alto"], index=1)
-        competicao = st.selectbox("Competição", ["Baixo", "Médio", "Alto"], index=1)
-    
-    with col3:
-        timing = st.selectbox("Timing de Mercado", ["Baixo", "Médio", "Alto"], index=1)
+        concorrencia = st.selectbox("Concorrência", ["Baixo", "Médio", "Alto"], index=1)
         inovacao = st.selectbox("Inovação", ["Baixo", "Médio", "Alto"], index=1)
-        channels = st.selectbox("Canais de Distribuição", ["Baixo", "Médio", "Alto"], index=1)
     
     # Botão para calcular
     if st.button("💰 Calcular Valuation", type="primary"):
@@ -255,14 +256,11 @@ def exibir_valuation():
             "vendas_organicas": vendas_organicas,
             "investe_trafego_pago": investe_trafego_pago,
             "equipe": converter_score(equipe_score),
-            "tamanho_mercado": converter_score(tamanho_mercado),
             "produto": converter_score(produto_score),
             "vendas_marketing": converter_score(vendas_marketing),
             "financas": converter_score(financas),
-            "competicao": converter_score(competicao),
-            "timing": converter_score(timing),
-            "inovacao": converter_score(inovacao),
-            "channels": converter_score(channels)
+            "concorrencia": converter_score(concorrencia),
+            "inovacao": converter_score(inovacao)
         }
         
         # Gerar relatório completo

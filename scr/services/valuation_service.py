@@ -187,10 +187,9 @@ class ValuationService:
             "fatores": fatores_berkus
         }
     
-    def calcular_scorecard(self, receita_anual: float, setor: str, tamanho_mercado: float,
+    def calcular_scorecard(self, receita_anual: float, setor: str,
                           equipe: float, produto: float, vendas_marketing: float,
-                          financas: float, competicao: float, timing: float,
-                          inovacao: float = 1.0, channels: float = 1.0) -> Dict:
+                          financas: float, concorrencia: float, inovacao: float) -> Dict:
         """Calcula valuation usando o método Scorecard."""
         
         # Valor médio de startups similares (ajustado para mercado brasileiro)
@@ -199,14 +198,11 @@ class ValuationService:
         # Fatores de ajuste
         fatores = {
             "Força da Equipe": equipe,
-            "Tamanho da Oportunidade": tamanho_mercado,
             "Qualidade do Produto": produto,
             "Estratégia de Vendas/Marketing": vendas_marketing,
             "Saúde Financeira": financas,
-            "Competição": competicao,
-            "Timing de Mercado": timing,
-            "Inovação": inovacao,
-            "Canais de Distribuição": channels
+            "Concorrência": concorrencia,
+            "Inovação": inovacao
         }
         
         # Calcular valor
@@ -272,15 +268,12 @@ class ValuationService:
         scorecard_result = self.calcular_scorecard(
             dados_empresa["receita_anual"],
             dados_empresa["setor"],
-            dados_empresa["tamanho_mercado"],
             dados_empresa["equipe"],
             dados_empresa["produto"],
             dados_empresa["vendas_marketing"],
             dados_empresa["financas"],
-            dados_empresa["competicao"],
-            dados_empresa["timing"],
-            dados_empresa.get("inovacao", 1.0),
-            dados_empresa.get("channels", 1.0)
+            dados_empresa["concorrencia"],
+            dados_empresa["inovacao"]
         )
         
         # Calcular valuation médio
@@ -341,10 +334,10 @@ class ValuationService:
         
         # Dados financeiros
         dados_completos.append(["DADOS FINANCEIROS", "", ""])
-        dados_completos.append(["Receita Anual (R$)", f"R$ {dados_empresa['receita_anual']:,.2f}", ""])
-        dados_completos.append(["EBITDA (R$)", f"R$ {dados_empresa['ebitda']:,.2f}", ""])
+        dados_completos.append(["Receita Anual (R$)", f"R$ {dados_empresa['receita_anual']:,.0f}", ""])
+        dados_completos.append(["EBITDA (R$)", f"R$ {dados_empresa['ebitda']:,.0f}", ""])
         dados_completos.append(["Margem EBITDA (%)", f"{dados_empresa['margem_ebitda']*100:.1f}%", ""])
-        dados_completos.append(["Lucro Líquido (R$)", f"R$ {dados_empresa['lucro_liquido']:,.2f}", ""])
+        dados_completos.append(["Lucro Líquido (R$)", f"R$ {dados_empresa['lucro_liquido']:,.0f}", ""])
         dados_completos.append(["Crescimento Estimado (%)", f"{dados_empresa['crescimento_anual']*100:.1f}%", ""])
         dados_completos.append(["Número de Vendedores", dados_empresa["n_vendedores"], ""])
         dados_completos.append(["", "", ""])
@@ -384,17 +377,17 @@ class ValuationService:
         
         # Resultados por método
         dados_completos.append(["RESULTADOS POR MÉTODO", "", ""])
-        dados_completos.append(["Múltiplos - Receita", f"R$ {resultados['multiplos']['receita']:,.2f}", f"{resultados['multiplos']['multiplos']['receita']}x"])
-        dados_completos.append(["Múltiplos - EBITDA", f"R$ {resultados['multiplos']['ebitda']:,.2f}", f"{resultados['multiplos']['multiplos']['ebitda']}x"])
-        dados_completos.append(["Múltiplos - Lucro", f"R$ {resultados['multiplos']['lucro']:,.2f}", f"{resultados['multiplos']['multiplos']['lucro']}x"])
-        dados_completos.append(["DCF", f"R$ {resultados['dcf']['valor_empresa']:,.2f}", ""])
-        dados_completos.append(["Berkus", f"R$ {resultados['berkus']['valor_total']:,.2f}", ""])
-        dados_completos.append(["Scorecard", f"R$ {resultados['scorecard']['valor_total']:,.2f}", ""])
+        dados_completos.append(["Múltiplos - Receita", f"R$ {resultados['multiplos']['receita']:,.0f}", f"{resultados['multiplos']['multiplos']['receita']}x"])
+        dados_completos.append(["Múltiplos - EBITDA", f"R$ {resultados['multiplos']['ebitda']:,.0f}", f"{resultados['multiplos']['multiplos']['ebitda']}x"])
+        dados_completos.append(["Múltiplos - Lucro", f"R$ {resultados['multiplos']['lucro']:,.0f}", f"{resultados['multiplos']['multiplos']['lucro']}x"])
+        dados_completos.append(["DCF", f"R$ {resultados['dcf']['valor_empresa']:,.0f}", ""])
+        dados_completos.append(["Berkus", f"R$ {resultados['berkus']['valor_total']:,.0f}", ""])
+        dados_completos.append(["Scorecard", f"R$ {resultados['scorecard']['valor_total']:,.0f}", ""])
         dados_completos.append(["", "", ""])
         
         # Valuation final
         dados_completos.append(["VALUATION FINAL", "", ""])
-        dados_completos.append(["Valuation Médio Ponderado", f"R$ {relatorio['valuation_medio']:,.2f}", ""])
+        dados_completos.append(["Valuation Médio Ponderado", f"R$ {relatorio['valuation_medio']:,.0f}", ""])
         dados_completos.append(["Valuation Médio Ponderado (M)", f"R$ {relatorio['valuation_medio']/1000000:.1f}M", ""])
         dados_completos.append(["", "", ""])
         
