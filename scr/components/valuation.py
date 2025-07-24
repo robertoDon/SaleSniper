@@ -128,43 +128,64 @@ def exibir_valuation():
             "startup", "scaleup", "estabelecida"
         ])
         receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0)
-        ebitda = st.number_input("EBITDA (R$)", min_value=0.0, value=200000.0, step=10000.0)
+        
+        # Campos para cálculo do EBITDA
+        st.markdown("### 💰 Cálculo do EBITDA")
+        custos_vendas = st.number_input("Custos de Vendas (R$)", min_value=0.0, value=300000.0, step=10000.0)
+        despesas_operacionais = st.number_input("Despesas Operacionais (R$)", min_value=0.0, value=200000.0, step=10000.0)
+        despesas_adm = st.number_input("Despesas Administrativas (R$)", min_value=0.0, value=150000.0, step=10000.0)
+        despesas_marketing = st.number_input("Despesas de Marketing (R$)", min_value=0.0, value=100000.0, step=10000.0)
+        outros_custos = st.number_input("Outros Custos (R$)", min_value=0.0, value=50000.0, step=10000.0)
+        
+        # Calcular EBITDA
+        ebitda = receita_anual - custos_vendas - despesas_operacionais - despesas_adm - despesas_marketing - outros_custos
+        ebitda = max(ebitda, 0)  # Não pode ser negativo
+        
+        st.markdown(f"**EBITDA Calculado: R$ {formatar_numero_br(ebitda)}**")
+        
         lucro_liquido = st.number_input("Lucro Líquido (R$)", min_value=0.0, value=150000.0, step=10000.0)
     
     with col2:
         margem_ebitda = st.slider("Margem EBITDA (%)", min_value=0.0, max_value=50.0, value=20.0, step=1.0) / 100
         crescimento_anual = st.slider("Crescimento Anual Esperado (%)", min_value=0.0, max_value=100.0, value=30.0, step=5.0) / 100
         usuarios_ativos = st.number_input("Usuários Ativos", min_value=0, value=5000, step=100)
+        n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
         
         # Métricas qualitativas para Berkus e Scorecard
         produto_lancado = st.checkbox("Produto Lançado", value=True)
         parcerias_estrategicas = st.checkbox("Parcerias Estratégicas", value=False)
         vendas_organicas = st.checkbox("Vendas Orgânicas", value=True)
-        equipe_qualificada = st.checkbox("Equipe Qualificada", value=True)
+        investe_trafego_pago = st.checkbox("Já investe em tráfego pago?", value=True)
     
     # Fatores para Scorecard
     st.markdown("### 🎯 Fatores Qualitativos (Scorecard)")
-    st.markdown("Avalie cada fator de 0.5 (muito baixo) a 1.5 (muito alto), onde 1.0 é neutro.")
+    st.markdown("Selecione o nível de cada fator:")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        equipe_score = st.slider("Força da Equipe", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-        tamanho_mercado = st.slider("Tamanho da Oportunidade", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-        produto_score = st.slider("Qualidade do Produto", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
+        equipe_score = st.selectbox("Força da Equipe", ["Baixo", "Médio", "Alto"], index=1)
+        tamanho_mercado = st.selectbox("Tamanho da Oportunidade", ["Baixo", "Médio", "Alto"], index=1)
+        produto_score = st.selectbox("Qualidade do Produto", ["Baixo", "Médio", "Alto"], index=1)
     
     with col2:
-        vendas_marketing = st.slider("Estratégia de Vendas/Marketing", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-        financas = st.slider("Saúde Financeira", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-        competicao = st.slider("Competição", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
+        vendas_marketing = st.selectbox("Estratégia de Vendas/Marketing", ["Baixo", "Médio", "Alto"], index=1)
+        financas = st.selectbox("Saúde Financeira", ["Baixo", "Médio", "Alto"], index=1)
+        competicao = st.selectbox("Competição", ["Baixo", "Médio", "Alto"], index=1)
     
     with col3:
-        timing = st.slider("Timing de Mercado", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-        inovacao = st.slider("Inovação", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
-        channels = st.slider("Canais de Distribuição", min_value=0.5, max_value=1.5, value=1.0, step=0.1)
+        timing = st.selectbox("Timing de Mercado", ["Baixo", "Médio", "Alto"], index=1)
+        inovacao = st.selectbox("Inovação", ["Baixo", "Médio", "Alto"], index=1)
+        channels = st.selectbox("Canais de Distribuição", ["Baixo", "Médio", "Alto"], index=1)
     
     # Botão para calcular
     if st.button("💰 Calcular Valuation", type="primary"):
+        
+        # Converter valores do scorecard para números
+        def converter_score(valor):
+            if valor == "Baixo": return 0.7
+            elif valor == "Médio": return 1.0
+            else: return 1.3  # Alto
         
         # Preparar dados da empresa
         dados_empresa = {
@@ -177,19 +198,20 @@ def exibir_valuation():
             "margem_ebitda": margem_ebitda,
             "crescimento_anual": crescimento_anual,
             "usuarios_ativos": usuarios_ativos,
+            "n_vendedores": n_vendedores,
             "produto_lancado": produto_lancado,
             "parcerias_estrategicas": parcerias_estrategicas,
             "vendas_organicas": vendas_organicas,
-            "equipe_qualificada": equipe_qualificada,
-            "equipe": equipe_score,
-            "tamanho_mercado": tamanho_mercado,
-            "produto": produto_score,
-            "vendas_marketing": vendas_marketing,
-            "financas": financas,
-            "competicao": competicao,
-            "timing": timing,
-            "inovacao": inovacao,
-            "channels": channels
+            "investe_trafego_pago": investe_trafego_pago,
+            "equipe": converter_score(equipe_score),
+            "tamanho_mercado": converter_score(tamanho_mercado),
+            "produto": converter_score(produto_score),
+            "vendas_marketing": converter_score(vendas_marketing),
+            "financas": converter_score(financas),
+            "competicao": converter_score(competicao),
+            "timing": converter_score(timing),
+            "inovacao": converter_score(inovacao),
+            "channels": converter_score(channels)
         }
         
         # Gerar relatório completo
@@ -234,6 +256,15 @@ def exibir_valuation():
         })
         st.dataframe(formatar_dataframe_br(mult_df), hide_index=True)
         
+        # Mostrar multiplicadores utilizados
+        st.markdown("**Multiplicadores Utilizados:**")
+        mult = resultados['multiplos']['multiplos']
+        st.markdown(f"- **Receita**: {mult['receita']}x")
+        st.markdown(f"- **EBITDA**: {mult['ebitda']}x")
+        st.markdown(f"- **Lucro Líquido**: {mult['lucro']}x")
+        st.markdown(f"- **Setor**: {setor}")
+        st.markdown(f"- **Estágio**: {tamanho_empresa}")
+        
         # DCF
         st.markdown("#### 💰 Valuation por DCF")
         dcf_df = pd.DataFrame({
@@ -261,9 +292,16 @@ def exibir_valuation():
         st.markdown("#### 📊 Valuation por Scorecard")
         scorecard_fatores = []
         for fator, valor in resultados['scorecard']['fatores'].items():
-            scorecard_fatores.append([fator, valor])
+            # Converter valor numérico para texto
+            if valor == 0.7:
+                valor_texto = "Baixo"
+            elif valor == 1.0:
+                valor_texto = "Médio"
+            else:
+                valor_texto = "Alto"
+            scorecard_fatores.append([fator, valor_texto])
         
-        scorecard_df = pd.DataFrame(scorecard_fatores, columns=["Fator", "Multiplicador"])
+        scorecard_df = pd.DataFrame(scorecard_fatores, columns=["Fator", "Nível"])
         st.dataframe(scorecard_df, hide_index=True)
         
         # Resumo final

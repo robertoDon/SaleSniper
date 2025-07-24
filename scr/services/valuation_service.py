@@ -47,6 +47,12 @@ class ValuationService:
             "estabelecida": [0.5, 0.4, 0.05, 0.05] # Múltiplos mais relevantes
         }
     
+    def calcular_ebitda(self, receita_anual: float, custos_vendas: float, despesas_operacionais: float, 
+                       despesas_adm: float, despesas_marketing: float, outros_custos: float = 0) -> float:
+        """Calcula o EBITDA baseado nos componentes."""
+        ebitda = receita_anual - custos_vendas - despesas_operacionais - despesas_adm - despesas_marketing - outros_custos
+        return max(ebitda, 0)  # EBITDA não pode ser negativo
+    
     def calcular_multiplos(self, receita_anual: float, ebitda: float, lucro_liquido: float, 
                           setor: str, tamanho_empresa: str) -> Dict:
         """Calcula valuation usando múltiplos de mercado."""
@@ -120,7 +126,7 @@ class ValuationService:
     
     def calcular_berkus(self, receita_anual: float, usuarios_ativos: int, produto_lancado: bool,
                        parcerias_estrategicas: bool, vendas_organicas: bool, 
-                       equipe_qualificada: bool) -> Dict:
+                       investe_trafego_pago: bool) -> Dict:
         """Calcula valuation usando o método Berkus (para startups)."""
         
         valor_base = 0
@@ -143,9 +149,9 @@ class ValuationService:
             valor_base += 500000
             fatores_berkus.append({"fator": "Parcerias Estratégicas", "valor": 500000})
         
-        if equipe_qualificada:
+        if investe_trafego_pago:
             valor_base += 500000
-            fatores_berkus.append({"fator": "Equipe Qualificada", "valor": 500000})
+            fatores_berkus.append({"fator": "Investe em Tráfego Pago", "valor": 500000})
         
         # Ajuste por receita (máximo de $2M)
         if receita_anual > 0:
@@ -239,7 +245,7 @@ class ValuationService:
             dados_empresa["produto_lancado"],
             dados_empresa["parcerias_estrategicas"],
             dados_empresa["vendas_organicas"],
-            dados_empresa["equipe_qualificada"]
+            dados_empresa["investe_trafego_pago"]
         )
         
         scorecard_result = self.calcular_scorecard(
