@@ -129,16 +129,34 @@ def exibir_valuation():
         ])
         receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0)
         
-        # Campos para cálculo do EBITDA
-        st.markdown("### 💰 Cálculo do EBITDA")
-        custos_vendas = st.number_input("Custos de Vendas (R$)", min_value=0.0, value=300000.0, step=10000.0)
-        despesas_operacionais = st.number_input("Despesas Operacionais (R$)", min_value=0.0, value=200000.0, step=10000.0)
-        despesas_adm = st.number_input("Despesas Administrativas (R$)", min_value=0.0, value=150000.0, step=10000.0)
-        despesas_marketing = st.number_input("Despesas de Marketing (R$)", min_value=0.0, value=100000.0, step=10000.0)
-        outros_custos = st.number_input("Outros Custos (R$)", min_value=0.0, value=50000.0, step=10000.0)
+        # Campo simples para despesas totais
+        despesas_totais = st.number_input("Despesas Totais (R$)", min_value=0.0, value=800000.0, step=10000.0, 
+                                         help="Soma de todas as despesas da empresa (custos, marketing, administrativo, etc.)")
         
-        # Calcular EBITDA (não mostrar aqui, apenas nos resultados)
-        ebitda = receita_anual - custos_vendas - despesas_operacionais - despesas_adm - despesas_marketing - outros_custos
+        # Aba expansível para detalhes (opcional)
+        detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
+        
+        if detalhar_despesas:
+            st.markdown("**Detalhe suas despesas por categoria:**")
+            custos_vendas = st.number_input("Custos de Vendas (R$)", min_value=0.0, value=300000.0, step=10000.0)
+            despesas_operacionais = st.number_input("Despesas Operacionais (R$)", min_value=0.0, value=200000.0, step=10000.0)
+            despesas_adm = st.number_input("Despesas Administrativas (R$)", min_value=0.0, value=150000.0, step=10000.0)
+            despesas_marketing = st.number_input("Despesas de Marketing (R$)", min_value=0.0, value=100000.0, step=10000.0)
+            outros_custos = st.number_input("Outros Custos (R$)", min_value=0.0, value=50000.0, step=10000.0)
+            
+            # Verificar se a soma dos detalhes bate com o total
+            soma_detalhes = custos_vendas + despesas_operacionais + despesas_adm + despesas_marketing + outros_custos
+            if abs(soma_detalhes - despesas_totais) > 1000:  # Tolerância de R$ 1.000
+                st.warning(f"⚠️ A soma dos detalhes (R$ {formatar_numero_br(soma_detalhes)}) não confere com o total informado (R$ {formatar_numero_br(despesas_totais)})")
+        else:
+            # Se não detalhou, usar valores padrão proporcionais
+            custos_vendas = despesas_totais * 0.375  # 37.5%
+            despesas_operacionais = despesas_totais * 0.25   # 25%
+            despesas_adm = despesas_totais * 0.1875  # 18.75%
+            despesas_marketing = despesas_totais * 0.125  # 12.5%
+            outros_custos = despesas_totais * 0.0625  # 6.25%
+        
+        ebitda = receita_anual - despesas_totais
         ebitda = max(ebitda, 0)  # Não pode ser negativo
         
         # Lucro líquido será estimado baseado no EBITDA (assumindo 70% do EBITDA)
@@ -261,6 +279,90 @@ def exibir_valuation():
             st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
         st.markdown(f"### 🎯 Valuation Médio Ponderado: **R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M**")
+        
+        # Explicação dos métodos
+        st.markdown("### 📚 Como Cada Método Funciona")
+        
+        with st.expander("🔢 Método dos Múltiplos"):
+            st.markdown("""
+            **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de receita, EBITDA e lucro.
+            
+            **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
+            
+            **Vantagens:** 
+            - Baseado em dados reais do mercado
+            - Fácil de entender e explicar
+            - Reflete o que investidores pagam por empresas similares
+            
+            **Limitações:**
+            - Depende de empresas comparáveis
+            - Não considera crescimento futuro
+            - Pode ser afetado por condições de mercado
+            """)
+        
+        with st.expander("💰 Método DCF (Discounted Cash Flow)"):
+            st.markdown("""
+            **Como funciona:** Calcula o valor presente dos fluxos de caixa futuros da empresa.
+            
+            **Fórmula:** Valor = Σ(Fluxo de Caixa Futuro / (1 + Taxa de Desconto)^ano) + Valor Terminal
+            
+            **Vantagens:**
+            - Considera crescimento futuro
+            - Baseado em fundamentos da empresa
+            - Mais preciso para empresas com projeções claras
+            
+            **Limitações:**
+            - Requer estimativas de crescimento
+            - Sensível à taxa de desconto
+            - Difícil de projetar para startups
+            """)
+        
+        with st.expander("🚀 Método Berkus"):
+            st.markdown("""
+            **Como funciona:** Avalia startups em estágio inicial baseado em marcos qualitativos.
+            
+            **Critérios avaliados:**
+            - Produto lançado: R$ 500k
+            - Vendas orgânicas: R$ 500k
+            - Parcerias estratégicas: R$ 500k
+            - Investimento em tráfego pago: R$ 500k
+            
+            **Vantagens:**
+            - Ideal para startups em estágio inicial
+            - Fácil de aplicar
+            - Considera marcos importantes
+            
+            **Limitações:**
+            - Limitado a startups
+            - Não considera receita atual
+            - Valores fixos podem não refletir realidade
+            """)
+        
+        with st.expander("📊 Método Scorecard"):
+            st.markdown("""
+            **Como funciona:** Avalia qualitativamente diferentes aspectos da empresa e aplica multiplicadores.
+            
+            **Fatores avaliados:**
+            - Força da equipe
+            - Tamanho da oportunidade
+            - Qualidade do produto
+            - Estratégia de vendas/marketing
+            - Saúde financeira
+            - Competição
+            - Timing de mercado
+            - Inovação
+            - Canais de distribuição
+            
+            **Vantagens:**
+            - Considera aspectos qualitativos
+            - Flexível para diferentes tipos de empresa
+            - Abrangente
+            
+            **Limitações:**
+            - Subjetivo
+            - Requer conhecimento do avaliador
+            - Pode ser inconsistente
+            """)
         
         # Detalhamento dos métodos
         st.markdown("### 📈 Detalhamento por Método")
