@@ -138,8 +138,6 @@ def exibir_valuation():
             receita_anual = 1000000.0
             st.error("Valor inválido. Usando valor padrão: R$ 1.000.000")
         
-        st.caption(f"Valor atual: R$ {formatar_numero_br(receita_anual)}")
-        
         # Opção para detalhar despesas
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
