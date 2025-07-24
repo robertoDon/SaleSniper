@@ -33,6 +33,11 @@ class ValuationService:
                 "scaleup": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
                 "estabelecida": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0}
             },
+            "Consultoria": {
+                "startup": {"receita": 3.0, "ebitda": 10.0, "lucro": 15.0},
+                "scaleup": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0},
+                "estabelecida": {"receita": 2.0, "ebitda": 6.0, "lucro": 10.0}
+            },
             "Outros": {
                 "startup": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
                 "scaleup": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0},

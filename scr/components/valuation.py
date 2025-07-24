@@ -122,7 +122,7 @@ def exibir_valuation():
     with col1:
         nome_empresa = st.text_input("Nome da Empresa", value="Minha Empresa")
         setor = st.selectbox("Setor", [
-            "SaaS", "E-commerce", "Fintech", "Healthtech", "Edtech", "Outros"
+            "SaaS", "E-commerce", "Fintech", "Healthtech", "Edtech", "Consultoria", "Outros"
         ])
         tamanho_empresa = st.selectbox("Estágio da Empresa", [
             "startup", "scaleup", "estabelecida"
@@ -141,15 +141,32 @@ def exibir_valuation():
         ebitda = receita_anual - custos_vendas - despesas_operacionais - despesas_adm - despesas_marketing - outros_custos
         ebitda = max(ebitda, 0)  # Não pode ser negativo
         
-        lucro_liquido = st.number_input("Lucro Líquido (R$)", min_value=0.0, value=150000.0, step=10000.0)
+        # Lucro líquido será estimado baseado no EBITDA (assumindo 70% do EBITDA)
+        lucro_liquido = ebitda * 0.7 if ebitda > 0 else 0
+        st.markdown(f"**Lucro Líquido Estimado: R$ {formatar_numero_br(lucro_liquido)}** (70% do EBITDA)")
     
     with col2:
-        # Margem EBITDA será calculada e mostrada nos resultados
-        crescimento_anual = st.slider("Crescimento Anual Esperado (%)", min_value=0.0, max_value=100.0, value=30.0, step=5.0) / 100
+        # Crescimento baseado no setor e estágio (estimativa automática)
         n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
         
-        # Removendo usuários ativos pois não temos ticket médio
-        # usuarios_ativos = st.number_input("Usuários Ativos", min_value=0, value=5000, step=100)
+        # Estimativa de crescimento baseada no setor e estágio
+        if setor == "SaaS" and tamanho_empresa == "startup":
+            crescimento_estimado = 50
+        elif setor == "SaaS" and tamanho_empresa == "scaleup":
+            crescimento_estimado = 30
+        elif setor == "SaaS" and tamanho_empresa == "estabelecida":
+            crescimento_estimado = 15
+        elif setor == "Consultoria" and tamanho_empresa == "startup":
+            crescimento_estimado = 40
+        elif setor == "Consultoria" and tamanho_empresa == "scaleup":
+            crescimento_estimado = 25
+        elif setor == "Consultoria" and tamanho_empresa == "estabelecida":
+            crescimento_estimado = 10
+        else:
+            crescimento_estimado = 20
+        
+        st.markdown(f"**Crescimento Estimado: {crescimento_estimado}%** (baseado no setor e estágio)")
+        crescimento_anual = crescimento_estimado / 100
         
         # Métricas qualitativas para Berkus e Scorecard
         produto_lancado = st.checkbox("Produto Lançado", value=True)
