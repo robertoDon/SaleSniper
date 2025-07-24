@@ -129,6 +129,7 @@ def exibir_valuation():
         ])
         receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0, 
                                        help="Ex: 1.000.000 para R$ 1 milhão")
+        st.caption(f"Valor padrão: R$ {formatar_numero_br(1000000)}")
         
         # Opção para detalhar despesas
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
@@ -137,14 +138,23 @@ def exibir_valuation():
             st.markdown("**Detalhe suas despesas mensais por categoria:**")
             custos_vendas_mensal = st.number_input("Custos de Vendas (R$/mês)", min_value=0.0, value=25000.0, step=1000.0, 
                                                   help="Ex: 25.000")
+            st.caption(f"Valor padrão: R$ {formatar_numero_br(25000)}/mês")
+            
             despesas_operacionais_mensal = st.number_input("Despesas Operacionais (R$/mês)", min_value=0.0, value=16667.0, step=1000.0, 
                                                           help="Ex: 16.667")
+            st.caption(f"Valor padrão: R$ {formatar_numero_br(16667)}/mês")
+            
             despesas_adm_mensal = st.number_input("Despesas Administrativas (R$/mês)", min_value=0.0, value=12500.0, step=1000.0, 
                                                  help="Ex: 12.500")
+            st.caption(f"Valor padrão: R$ {formatar_numero_br(12500)}/mês")
+            
             despesas_marketing_mensal = st.number_input("Despesas de Marketing (R$/mês)", min_value=0.0, value=8333.0, step=1000.0, 
                                                        help="Ex: 8.333")
+            st.caption(f"Valor padrão: R$ {formatar_numero_br(8333)}/mês")
+            
             outros_custos_mensal = st.number_input("Outros Custos (R$/mês)", min_value=0.0, value=4167.0, step=1000.0, 
                                                   help="Ex: 4.167")
+            st.caption(f"Valor padrão: R$ {formatar_numero_br(4167)}/mês")
             
             # Calcular totais anuais
             custos_vendas = custos_vendas_mensal * 12
@@ -161,6 +171,7 @@ def exibir_valuation():
             # Campo simples para despesas totais mensais (só aparece se não detalhar)
             despesas_totais_mensal = st.number_input("Despesas Totais (R$/mês)", min_value=0.0, value=66667.0, step=1000.0, 
                                                    help="Ex: 66.667 - Soma de todas as despesas mensais")
+            st.caption(f"Valor padrão: R$ {formatar_numero_br(66667)}/mês")
             
             # Calcular total anual
             despesas_totais = despesas_totais_mensal * 12
