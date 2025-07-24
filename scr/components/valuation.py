@@ -221,7 +221,7 @@ def exibir_valuation():
         produto_lancado = st.checkbox("Produto Lançado", value=True)
         parcerias_estrategicas = st.checkbox("Parcerias Estratégicas", value=False)
         vendas_organicas = st.checkbox("Vendas Orgânicas", value=True)
-        investe_trafego_pago = st.checkbox("Já investe em tráfego pago?", value=True)
+        investe_trafego_pago = st.checkbox("Invisto em tráfego pago", value=True)
     
     # Fatores para Scorecard
     st.markdown("### 🎯 Fatores Qualitativos (Scorecard)")
