@@ -112,7 +112,7 @@ elif pagina == "📈 Metas & Projeções":
     exibir_calculadora()
 
 elif pagina == "💰 Valuation":
-    exibir_valuation()
+    exibir_valuation()  # Funcionalidade de Valuation ativa
 
 elif pagina == "🔮 Previsão de Churn":
     exibir_churn()
