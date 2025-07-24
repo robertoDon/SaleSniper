@@ -129,11 +129,7 @@ def exibir_valuation():
         ])
         receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0)
         
-        # Campo simples para despesas totais
-        despesas_totais = st.number_input("Despesas Totais (R$)", min_value=0.0, value=800000.0, step=10000.0, 
-                                         help="Soma de todas as despesas da empresa (custos, marketing, administrativo, etc.)")
-        
-        # Aba expansível para detalhes (opcional)
+        # Opção para detalhar despesas
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
         if detalhar_despesas:
@@ -144,11 +140,14 @@ def exibir_valuation():
             despesas_marketing = st.number_input("Despesas de Marketing (R$)", min_value=0.0, value=100000.0, step=10000.0)
             outros_custos = st.number_input("Outros Custos (R$)", min_value=0.0, value=50000.0, step=10000.0)
             
-            # Verificar se a soma dos detalhes bate com o total
-            soma_detalhes = custos_vendas + despesas_operacionais + despesas_adm + despesas_marketing + outros_custos
-            if abs(soma_detalhes - despesas_totais) > 1000:  # Tolerância de R$ 1.000
-                st.warning(f"⚠️ A soma dos detalhes (R$ {formatar_numero_br(soma_detalhes)}) não confere com o total informado (R$ {formatar_numero_br(despesas_totais)})")
+            # Calcular total das despesas detalhadas
+            despesas_totais = custos_vendas + despesas_operacionais + despesas_adm + despesas_marketing + outros_custos
+            st.markdown(f"**Total das Despesas: R$ {formatar_numero_br(despesas_totais)}**")
         else:
+            # Campo simples para despesas totais (só aparece se não detalhar)
+            despesas_totais = st.number_input("Despesas Totais (R$)", min_value=0.0, value=800000.0, step=10000.0, 
+                                             help="Soma de todas as despesas da empresa (custos, marketing, administrativo, etc.)")
+            
             # Se não detalhou, usar valores padrão proporcionais
             custos_vendas = despesas_totais * 0.375  # 37.5%
             despesas_operacionais = despesas_totais * 0.25   # 25%
