@@ -5,6 +5,7 @@ from components.dashboard import exibir_dashboard
 from components.segmentacao import exibir_segmentacao
 from components.metas_funil import exibir_calculadora
 from components.churn import exibir_churn
+# from components.valuation import exibir_valuation
 # Importação comentada para MVP inicial
 # from components.tamsamsom import exibir_tamsamsom
 import os
@@ -93,6 +94,7 @@ pagina = st.sidebar.radio(
     ["📊 Análise de ICP", 
      "🎯 Segmentação", 
      "📈 Metas & Projeções",
+     "💰 Valuation",
      "🔮 Previsão de Churn",
      "🎯 TAM/SAM/SOM"] + 
     (["⚙️ Administração"] if st.session_state["usuario"] == "admin" else []),
@@ -108,6 +110,10 @@ elif pagina == "🎯 Segmentação":
 
 elif pagina == "📈 Metas & Projeções":
     exibir_calculadora()
+
+elif pagina == "💰 Valuation":
+    st.info("Funcionalidade de Valuation em manutenção. Em breve estará disponível!")
+    # exibir_valuation()
 
 elif pagina == "🔮 Previsão de Churn":
     exibir_churn()
