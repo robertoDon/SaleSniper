@@ -125,7 +125,7 @@ def exibir_valuation():
             "SaaS", "E-commerce", "Fintech", "Healthtech", "Edtech", "Consultoria", "Outros"
         ])
         tamanho_empresa = st.selectbox("Estágio da Empresa", [
-            "startup", "scaleup", "estabelecida"
+            "seed", "startup", "scaleup", "estabelecida"
         ])
         receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0)
         
@@ -178,12 +178,16 @@ def exibir_valuation():
         n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
         
         # Estimativa de crescimento baseada no setor e estágio
-        if setor == "SaaS" and tamanho_empresa == "startup":
+        if setor == "SaaS" and tamanho_empresa == "seed":
+            crescimento_estimado = 80
+        elif setor == "SaaS" and tamanho_empresa == "startup":
             crescimento_estimado = 50
         elif setor == "SaaS" and tamanho_empresa == "scaleup":
             crescimento_estimado = 30
         elif setor == "SaaS" and tamanho_empresa == "estabelecida":
             crescimento_estimado = 15
+        elif setor == "Consultoria" and tamanho_empresa == "seed":
+            crescimento_estimado = 60
         elif setor == "Consultoria" and tamanho_empresa == "startup":
             crescimento_estimado = 40
         elif setor == "Consultoria" and tamanho_empresa == "scaleup":
@@ -453,7 +457,19 @@ def exibir_valuation():
         
         # Botões de exportação
         st.markdown("### 📤 Exportar Resultados")
-        exibir_botoes_exportacao(resumo_df, f"valuation_{nome_empresa.replace(' ', '_')}")
+        
+        # Relatório completo para exportação
+        relatorio_completo_df = valuation_service.exportar_relatorio_completo(relatorio)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**📊 Resumo Executivo:**")
+            exibir_botoes_exportacao(resumo_df, f"resumo_valuation_{nome_empresa.replace(' ', '_')}")
+        
+        with col2:
+            st.markdown("**📋 Relatório Completo:**")
+            exibir_botoes_exportacao(relatorio_completo_df, f"relatorio_completo_{nome_empresa.replace(' ', '_')}")
         
         # Salvar na sessão
         st.session_state["valuation_result"] = relatorio 

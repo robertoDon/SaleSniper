@@ -6,39 +6,46 @@ class ValuationService:
     """Serviço para cálculos de valuation empresarial."""
     
     def __init__(self):
-        # Múltiplos de mercado por setor e estágio
+        # Múltiplos de mercado por setor e estágio (baseados em dados de mercado)
         self.multiplos_mercado = {
             "SaaS": {
+                "seed": {"receita": 12.0, "ebitda": 20.0, "lucro": 35.0},
                 "startup": {"receita": 8.0, "ebitda": 15.0, "lucro": 25.0},
                 "scaleup": {"receita": 6.0, "ebitda": 12.0, "lucro": 20.0},
                 "estabelecida": {"receita": 4.0, "ebitda": 8.0, "lucro": 15.0}
             },
             "E-commerce": {
+                "seed": {"receita": 4.0, "ebitda": 15.0, "lucro": 25.0},
                 "startup": {"receita": 2.5, "ebitda": 12.0, "lucro": 18.0},
                 "scaleup": {"receita": 2.0, "ebitda": 10.0, "lucro": 15.0},
                 "estabelecida": {"receita": 1.5, "ebitda": 8.0, "lucro": 12.0}
             },
             "Fintech": {
+                "seed": {"receita": 10.0, "ebitda": 25.0, "lucro": 40.0},
                 "startup": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
                 "scaleup": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
                 "estabelecida": {"receita": 3.5, "ebitda": 12.0, "lucro": 20.0}
             },
             "Healthtech": {
+                "seed": {"receita": 12.0, "ebitda": 30.0, "lucro": 50.0},
                 "startup": {"receita": 7.0, "ebitda": 20.0, "lucro": 35.0},
                 "scaleup": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
                 "estabelecida": {"receita": 4.5, "ebitda": 15.0, "lucro": 25.0}
             },
             "Edtech": {
+                "seed": {"receita": 8.0, "ebitda": 20.0, "lucro": 35.0},
                 "startup": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
                 "scaleup": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
                 "estabelecida": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0}
             },
             "Consultoria": {
+                "seed": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
                 "startup": {"receita": 3.0, "ebitda": 10.0, "lucro": 15.0},
                 "scaleup": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0},
                 "estabelecida": {"receita": 2.0, "ebitda": 6.0, "lucro": 10.0}
             },
             "Outros": {
+                "seed": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
                 "startup": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
                 "scaleup": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0},
                 "estabelecida": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0}
@@ -47,6 +54,7 @@ class ValuationService:
         
         # Pesos para valuation médio ponderado por estágio
         self.pesos_estagio = {
+            "seed": [0.1, 0.2, 0.5, 0.2],         # Berkus mais relevante
             "startup": [0.2, 0.3, 0.3, 0.2],      # Berkus e DCF mais relevantes
             "scaleup": [0.4, 0.4, 0.1, 0.1],      # Múltiplos e DCF mais relevantes
             "estabelecida": [0.5, 0.4, 0.05, 0.05] # Múltiplos mais relevantes
@@ -313,4 +321,92 @@ class ValuationService:
         
         df["Valuation (R$ M)"] = df["Valuation (R$)"] / 1000000
         
-        return df 
+        return df
+    
+    def exportar_relatorio_completo(self, relatorio: Dict) -> pd.DataFrame:
+        """Exporta relatório completo com todos os dados."""
+        
+        dados_empresa = relatorio["dados_empresa"]
+        resultados = relatorio["resultados"]
+        
+        # Criar lista de dados para o DataFrame
+        dados_completos = []
+        
+        # Informações da empresa
+        dados_completos.append(["INFORMAÇÕES DA EMPRESA", "", ""])
+        dados_completos.append(["Nome da Empresa", dados_empresa["nome_empresa"], ""])
+        dados_completos.append(["Setor", dados_empresa["setor"], ""])
+        dados_completos.append(["Estágio", dados_empresa["tamanho_empresa"], ""])
+        dados_completos.append(["", "", ""])
+        
+        # Dados financeiros
+        dados_completos.append(["DADOS FINANCEIROS", "", ""])
+        dados_completos.append(["Receita Anual (R$)", f"R$ {dados_empresa['receita_anual']:,.2f}", ""])
+        dados_completos.append(["EBITDA (R$)", f"R$ {dados_empresa['ebitda']:,.2f}", ""])
+        dados_completos.append(["Margem EBITDA (%)", f"{dados_empresa['margem_ebitda']*100:.1f}%", ""])
+        dados_completos.append(["Lucro Líquido (R$)", f"R$ {dados_empresa['lucro_liquido']:,.2f}", ""])
+        dados_completos.append(["Crescimento Estimado (%)", f"{dados_empresa['crescimento_anual']*100:.1f}%", ""])
+        dados_completos.append(["Número de Vendedores", dados_empresa["n_vendedores"], ""])
+        dados_completos.append(["", "", ""])
+        
+        # Fatores qualitativos
+        dados_completos.append(["FATORES QUALITATIVOS", "", ""])
+        dados_completos.append(["Produto Lançado", "Sim" if dados_empresa["produto_lancado"] else "Não", ""])
+        dados_completos.append(["Parcerias Estratégicas", "Sim" if dados_empresa["parcerias_estrategicas"] else "Não", ""])
+        dados_completos.append(["Vendas Orgânicas", "Sim" if dados_empresa["vendas_organicas"] else "Não", ""])
+        dados_completos.append(["Investe em Tráfego Pago", "Sim" if dados_empresa["investe_trafego_pago"] else "Não", ""])
+        dados_completos.append(["", "", ""])
+        
+        # Scorecard
+        dados_completos.append(["SCORECARD", "", ""])
+        scorecard_fatores = {
+            "Força da Equipe": dados_empresa["equipe"],
+            "Tamanho da Oportunidade": dados_empresa["tamanho_mercado"],
+            "Qualidade do Produto": dados_empresa["produto"],
+            "Estratégia de Vendas/Marketing": dados_empresa["vendas_marketing"],
+            "Saúde Financeira": dados_empresa["financas"],
+            "Competição": dados_empresa["competicao"],
+            "Timing de Mercado": dados_empresa["timing"],
+            "Inovação": dados_empresa.get("inovacao", 1.0),
+            "Canais de Distribuição": dados_empresa.get("channels", 1.0)
+        }
+        
+        for fator, valor in scorecard_fatores.items():
+            if valor == 0.7:
+                nivel = "Baixo"
+            elif valor == 1.0:
+                nivel = "Médio"
+            else:
+                nivel = "Alto"
+            dados_completos.append([fator, nivel, ""])
+        
+        dados_completos.append(["", "", ""])
+        
+        # Resultados por método
+        dados_completos.append(["RESULTADOS POR MÉTODO", "", ""])
+        dados_completos.append(["Múltiplos - Receita", f"R$ {resultados['multiplos']['receita']:,.2f}", f"{resultados['multiplos']['multiplos']['receita']}x"])
+        dados_completos.append(["Múltiplos - EBITDA", f"R$ {resultados['multiplos']['ebitda']:,.2f}", f"{resultados['multiplos']['multiplos']['ebitda']}x"])
+        dados_completos.append(["Múltiplos - Lucro", f"R$ {resultados['multiplos']['lucro']:,.2f}", f"{resultados['multiplos']['multiplos']['lucro']}x"])
+        dados_completos.append(["DCF", f"R$ {resultados['dcf']['valor_empresa']:,.2f}", ""])
+        dados_completos.append(["Berkus", f"R$ {resultados['berkus']['valor_total']:,.2f}", ""])
+        dados_completos.append(["Scorecard", f"R$ {resultados['scorecard']['valor_total']:,.2f}", ""])
+        dados_completos.append(["", "", ""])
+        
+        # Valuation final
+        dados_completos.append(["VALUATION FINAL", "", ""])
+        dados_completos.append(["Valuation Médio Ponderado", f"R$ {relatorio['valuation_medio']:,.2f}", ""])
+        dados_completos.append(["Valuation Médio Ponderado (M)", f"R$ {relatorio['valuation_medio']/1000000:.1f}M", ""])
+        dados_completos.append(["", "", ""])
+        
+        # Pesos utilizados
+        dados_completos.append(["PESOS UTILIZADOS", "", ""])
+        dados_completos.append(["Múltiplos", f"{relatorio['pesos_utilizados'][0]*100:.1f}%", ""])
+        dados_completos.append(["DCF", f"{relatorio['pesos_utilizados'][1]*100:.1f}%", ""])
+        dados_completos.append(["Berkus", f"{relatorio['pesos_utilizados'][2]*100:.1f}%", ""])
+        dados_completos.append(["Scorecard", f"{relatorio['pesos_utilizados'][3]*100:.1f}%", ""])
+        dados_completos.append(["", "", ""])
+        
+        # Data do cálculo
+        dados_completos.append(["DATA DO CÁLCULO", relatorio["data_calculo"].strftime("%d/%m/%Y %H:%M"), ""])
+        
+        return pd.DataFrame(dados_completos, columns=["Item", "Valor", "Detalhe"]) 
