@@ -119,10 +119,8 @@ def exibir_valuation():
     # Inicializar serviço de valuation
     valuation_service = ValuationService()
     
-    # Só mostrar formulário se não temos resultados ou se queremos recalcular
-    if "valuation_result" not in st.session_state or st.session_state["valuation_result"] is None:
         # Formulário de dados da empresa
-        st.markdown("### 📋 Dados da Empresa")
+    st.markdown("### 📋 Dados da Empresa")
     
     col1, col2 = st.columns(2)
     
