@@ -691,6 +691,7 @@ def exibir_valuation():
         # Salvar na sessão apenas se não existir ou se for diferente
         if "valuation_result" not in st.session_state or st.session_state["valuation_result"] != relatorio:
             st.session_state["valuation_result"] = relatorio
+            st.success("✅ Valuation calculado e salvo com sucesso!")
     else:
         # Se temos resultados, mostrar apenas os resultados sem o formulário
         st.markdown("### 📋 Dados da Empresa (Calculados)")
