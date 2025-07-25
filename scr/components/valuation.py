@@ -98,6 +98,11 @@ def exibir_botoes_exportacao(df: pd.DataFrame, nome_arquivo: str):
 
 
 def exibir_valuation():
+    # Verificar se é a primeira execução
+    if "valuation_initialized" not in st.session_state:
+        st.session_state["valuation_initialized"] = True
+        st.session_state["valuation_result"] = None
+    
     st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Valuation de Empresas</h1>", unsafe_allow_html=True)
     
     st.markdown("""
@@ -114,8 +119,10 @@ def exibir_valuation():
     # Inicializar serviço de valuation
     valuation_service = ValuationService()
     
-    # Formulário de dados da empresa
-    st.markdown("### 📋 Dados da Empresa")
+    # Só mostrar formulário se não temos resultados ou se queremos recalcular
+    if "valuation_result" not in st.session_state or st.session_state["valuation_result"] is None:
+        # Formulário de dados da empresa
+        st.markdown("### 📋 Dados da Empresa")
     
     col1, col2 = st.columns(2)
     
@@ -127,8 +134,8 @@ def exibir_valuation():
         tamanho_empresa = st.selectbox("Estágio da Empresa", [
             "seed", "startup", "scaleup", "estabelecida"
         ])
-        receita_anual = st.number_input("Receita Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0, 
-                                       help="Ex: 1.000.000 para R$ 1 milhão")
+        receita_anual = st.number_input("Faturamento Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0, 
+                                       help="Ex: 1.000.000 para R$ 1 milhão - Valor total faturado no ano")
         st.caption(f"Valor atual: R$ {formatar_numero_br(receita_anual)}")
         
         # Opção para detalhar despesas
@@ -230,14 +237,82 @@ def exibir_valuation():
     col1, col2, col3 = st.columns(3)
     
     with col1:
+        st.caption("**Força da Equipe**: Baixo = Equipe pequena/iniciante | Médio = Equipe experiente | Alto = Equipe especializada/executiva")
         equipe_score = st.selectbox("Força da Equipe", ["Baixo", "Médio", "Alto"], index=1)
+        
+        st.caption("**Qualidade do Produto**: Baixo = MVP básico | Médio = Produto funcional | Alto = Produto diferenciado/premium")
         produto_score = st.selectbox("Qualidade do Produto", ["Baixo", "Médio", "Alto"], index=1)
+        
+        st.caption("**Estratégia de Vendas/Marketing**: Baixo = Sem estratégia definida | Médio = Estratégia básica | Alto = Estratégia sofisticada")
         vendas_marketing = st.selectbox("Estratégia de Vendas/Marketing", ["Baixo", "Médio", "Alto"], index=1)
     
     with col2:
+        st.caption("**Saúde Financeira**: Baixo = Prejuízo/endividado | Médio = Equilibrado | Alto = Lucrativo/capital próprio")
         financas = st.selectbox("Saúde Financeira", ["Baixo", "Médio", "Alto"], index=1)
+        
+        st.caption("**Concorrência**: Baixo = Muitos concorrentes | Médio = Concorrência moderada | Alto = Poucos concorrentes")
         concorrencia = st.selectbox("Concorrência", ["Baixo", "Médio", "Alto"], index=1)
+        
+        st.caption("**Inovação**: Baixo = Produto comum | Médio = Alguma diferenciação | Alto = Tecnologia única/patente")
         inovacao = st.selectbox("Inovação", ["Baixo", "Médio", "Alto"], index=1)
+    
+    # Verificar se já temos resultados calculados
+    if "valuation_result" in st.session_state and st.session_state["valuation_result"] is not None:
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.success("✅ Valuation já calculado! Os resultados estão sendo exibidos abaixo.")
+        with col2:
+            if st.button("🔄 Novo Cálculo", type="secondary"):
+                st.session_state["valuation_result"] = None
+                st.rerun()
+        
+        # Usar resultados salvos
+        relatorio = st.session_state["valuation_result"]
+        resultados = relatorio["resultados"]
+        
+        # Recuperar dados do formulário da sessão
+        dados_empresa = relatorio["dados_empresa"]
+        nome_empresa = dados_empresa["nome_empresa"]
+        setor = dados_empresa["setor"]
+        tamanho_empresa = dados_empresa["tamanho_empresa"]
+        receita_anual = dados_empresa["receita_anual"]
+        ebitda = dados_empresa["ebitda"]
+        lucro_liquido = dados_empresa["lucro_liquido"]
+        margem_ebitda = dados_empresa["margem_ebitda"]
+        crescimento_anual = dados_empresa["crescimento_anual"]
+        n_vendedores = dados_empresa["n_vendedores"]
+        produto_lancado = dados_empresa["produto_lancado"]
+        parcerias_estrategicas = dados_empresa["parcerias_estrategicas"]
+        vendas_organicas = dados_empresa["vendas_organicas"]
+        investe_trafego_pago = dados_empresa["investe_trafego_pago"]
+        
+        # Recuperar scores
+        equipe_score = "Baixo" if dados_empresa["equipe"] == 0.7 else "Médio" if dados_empresa["equipe"] == 1.0 else "Alto"
+        produto_score = "Baixo" if dados_empresa["produto"] == 0.7 else "Médio" if dados_empresa["produto"] == 1.0 else "Alto"
+        vendas_marketing = "Baixo" if dados_empresa["vendas_marketing"] == 0.7 else "Médio" if dados_empresa["vendas_marketing"] == 1.0 else "Alto"
+        financas = "Baixo" if dados_empresa["financas"] == 0.7 else "Médio" if dados_empresa["financas"] == 1.0 else "Alto"
+        concorrencia = "Baixo" if dados_empresa["concorrencia"] == 0.7 else "Médio" if dados_empresa["concorrencia"] == 1.0 else "Alto"
+        inovacao = "Baixo" if dados_empresa["inovacao"] == 0.7 else "Médio" if dados_empresa["inovacao"] == 1.0 else "Alto"
+        
+        # Calcular crescimento estimado para exibição
+        if setor == "SaaS" and tamanho_empresa == "seed":
+            crescimento_estimado = 80
+        elif setor == "SaaS" and tamanho_empresa == "startup":
+            crescimento_estimado = 50
+        elif setor == "SaaS" and tamanho_empresa == "scaleup":
+            crescimento_estimado = 30
+        elif setor == "SaaS" and tamanho_empresa == "estabelecida":
+            crescimento_estimado = 15
+        elif setor == "Consultoria" and tamanho_empresa == "seed":
+            crescimento_estimado = 60
+        elif setor == "Consultoria" and tamanho_empresa == "startup":
+            crescimento_estimado = 40
+        elif setor == "Consultoria" and tamanho_empresa == "scaleup":
+            crescimento_estimado = 25
+        elif setor == "Consultoria" and tamanho_empresa == "estabelecida":
+            crescimento_estimado = 10
+        else:
+            crescimento_estimado = 20
     
     # Botão para calcular
     if st.button("💰 Calcular Valuation", type="primary"):
@@ -278,7 +353,8 @@ def exibir_valuation():
         relatorio = valuation_service.gerar_relatorio_completo(dados_empresa)
         resultados = relatorio["resultados"]
         
-        # Exibir resultados
+    # Exibir resultados (sempre que temos resultados)
+    if "valuation_result" in st.session_state and st.session_state["valuation_result"] is not None:
         st.markdown("### 📊 Resultados do Valuation")
         
         # Métricas principais com tooltips explicativos
@@ -290,7 +366,7 @@ def exibir_valuation():
                 st.markdown("""
                 **🔢 Método dos Múltiplos**
                 
-                **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de receita, EBITDA e lucro.
+                **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de faturamento, EBITDA e lucro.
                 
                 **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
                 
@@ -413,7 +489,7 @@ def exibir_valuation():
             # Múltiplos
             st.markdown("#### 🔢 Valuation por Múltiplos")
             mult_df = pd.DataFrame({
-                "Método": ["Receita", "EBITDA", "Lucro Líquido"],
+                "Método": ["Faturamento", "EBITDA", "Lucro Líquido"],
                 "Múltiplo": [
                     resultados['multiplos']['multiplos']['receita'],
                     resultados['multiplos']['multiplos']['ebitda'],
@@ -431,7 +507,7 @@ def exibir_valuation():
             # Mostrar multiplicadores utilizados
             st.markdown("**Multiplicadores Utilizados:**")
             mult = resultados['multiplos']['multiplos']
-            st.markdown(f"- **Receita**: {mult['receita']}x")
+            st.markdown(f"- **Faturamento**: {mult['receita']}x")
             st.markdown(f"- **EBITDA**: {mult['ebitda']}x")
             st.markdown(f"- **Lucro Líquido**: {mult['lucro']}x")
             st.markdown(f"- **Setor**: {setor}")
@@ -441,7 +517,7 @@ def exibir_valuation():
             st.markdown("#### 💰 Valuation por DCF")
             dcf_df = pd.DataFrame({
                 "Ano": range(1, len(resultados['dcf']['receitas_projetadas']) + 1),
-                "Receita Projetada (R$)": resultados['dcf']['receitas_projetadas'],
+                "Faturamento Projetado (R$)": resultados['dcf']['receitas_projetadas'],
                 "EBITDA Projetado (R$)": resultados['dcf']['ebitda_projetado'],
                 "FCF Projetado (R$)": resultados['dcf']['fcf_projetado'],
                 "VP FCF (R$)": resultados['dcf']['vp_fcf']
@@ -542,7 +618,7 @@ def exibir_valuation():
         if margem_ebitda > 0.2:
             pontos_positivos.append("**Margem EBITDA alta**: Sua operação é eficiente")
         if receita_anual > 5000000:
-            pontos_positivos.append("**Receita sólida**: Você tem uma base financeira forte")
+            pontos_positivos.append("**Faturamento sólido**: Você tem uma base financeira forte")
         if n_vendedores > 3:
             pontos_positivos.append("**Equipe de vendas**: Você tem capacidade de expansão")
         
@@ -558,7 +634,7 @@ def exibir_valuation():
         if margem_ebitda < 0.1:
             pontos_melhoria.append(f"**Margem EBITDA baixa ({margem_ebitda*100:.1f}%)**: Otimize custos operacionais para aumentar lucratividade")
         if receita_anual < 1000000:
-            pontos_melhoria.append(f"**Receita baixa (R$ {formatar_numero_br(receita_anual)})**: Foque em crescimento de vendas e expansão de mercado")
+            pontos_melhoria.append(f"**Faturamento baixo (R$ {formatar_numero_br(receita_anual)})**: Foque em crescimento de vendas e expansão de mercado")
         if n_vendedores < 2:
             pontos_melhoria.append("**Equipe de vendas pequena**: Considere expandir a equipe para acelerar crescimento")
         
@@ -612,5 +688,58 @@ def exibir_valuation():
         st.markdown(f"Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.")
         st.markdown(descricao_programa)
         
-        # Salvar na sessão
-        st.session_state["valuation_result"] = relatorio 
+        # Salvar na sessão apenas se não existir ou se for diferente
+        if "valuation_result" not in st.session_state or st.session_state["valuation_result"] != relatorio:
+            st.session_state["valuation_result"] = relatorio
+    else:
+        # Se temos resultados, mostrar apenas os resultados sem o formulário
+        st.markdown("### 📋 Dados da Empresa (Calculados)")
+        st.info("💡 Os dados foram calculados anteriormente. Use o botão 'Novo Cálculo' para alterar os parâmetros.")
+        
+        # Exibir resultados salvos
+        relatorio = st.session_state["valuation_result"]
+        resultados = relatorio["resultados"]
+        
+        # Recuperar dados do formulário da sessão
+        dados_empresa = relatorio["dados_empresa"]
+        nome_empresa = dados_empresa["nome_empresa"]
+        setor = dados_empresa["setor"]
+        tamanho_empresa = dados_empresa["tamanho_empresa"]
+        receita_anual = dados_empresa["receita_anual"]
+        ebitda = dados_empresa["ebitda"]
+        lucro_liquido = dados_empresa["lucro_liquido"]
+        margem_ebitda = dados_empresa["margem_ebitda"]
+        crescimento_anual = dados_empresa["crescimento_anual"]
+        n_vendedores = dados_empresa["n_vendedores"]
+        produto_lancado = dados_empresa["produto_lancado"]
+        parcerias_estrategicas = dados_empresa["parcerias_estrategicas"]
+        vendas_organicas = dados_empresa["vendas_organicas"]
+        investe_trafego_pago = dados_empresa["investe_trafego_pago"]
+        
+        # Recuperar scores
+        equipe_score = "Baixo" if dados_empresa["equipe"] == 0.7 else "Médio" if dados_empresa["equipe"] == 1.0 else "Alto"
+        produto_score = "Baixo" if dados_empresa["produto"] == 0.7 else "Médio" if dados_empresa["produto"] == 1.0 else "Alto"
+        vendas_marketing = "Baixo" if dados_empresa["vendas_marketing"] == 0.7 else "Médio" if dados_empresa["vendas_marketing"] == 1.0 else "Alto"
+        financas = "Baixo" if dados_empresa["financas"] == 0.7 else "Médio" if dados_empresa["financas"] == 1.0 else "Alto"
+        concorrencia = "Baixo" if dados_empresa["concorrencia"] == 0.7 else "Médio" if dados_empresa["concorrencia"] == 1.0 else "Alto"
+        inovacao = "Baixo" if dados_empresa["inovacao"] == 0.7 else "Médio" if dados_empresa["inovacao"] == 1.0 else "Alto"
+        
+        # Calcular crescimento estimado para exibição
+        if setor == "SaaS" and tamanho_empresa == "seed":
+            crescimento_estimado = 80
+        elif setor == "SaaS" and tamanho_empresa == "startup":
+            crescimento_estimado = 50
+        elif setor == "SaaS" and tamanho_empresa == "scaleup":
+            crescimento_estimado = 30
+        elif setor == "SaaS" and tamanho_empresa == "estabelecida":
+            crescimento_estimado = 15
+        elif setor == "Consultoria" and tamanho_empresa == "seed":
+            crescimento_estimado = 60
+        elif setor == "Consultoria" and tamanho_empresa == "startup":
+            crescimento_estimado = 40
+        elif setor == "Consultoria" and tamanho_empresa == "scaleup":
+            crescimento_estimado = 25
+        elif setor == "Consultoria" and tamanho_empresa == "estabelecida":
+            crescimento_estimado = 10
+        else:
+            crescimento_estimado = 20 

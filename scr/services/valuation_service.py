@@ -180,7 +180,7 @@ class ValuationService:
         if receita_anual > 0:
             valor_receita = min(receita_anual * 2, 2000000)
             valor_base += valor_receita
-            fatores_berkus.append({"fator": "Receita (2x)", "valor": valor_receita})
+            fatores_berkus.append({"fator": "Faturamento (2x)", "valor": valor_receita})
         
         return {
             "valor_total": valor_base,
@@ -210,10 +210,10 @@ class ValuationService:
         for fator, peso in fatores.items():
             valor *= peso
         
-        # Ajuste por receita
+        # Ajuste por faturamento
         valor_receita = 0
         if receita_anual > 0:
-            valor_receita = receita_anual * 3  # 3x receita
+            valor_receita = receita_anual * 3  # 3x faturamento
             valor = max(valor, valor_receita)
         
         return {
@@ -334,7 +334,7 @@ class ValuationService:
         
         # Dados financeiros
         dados_completos.append(["DADOS FINANCEIROS", "", ""])
-        dados_completos.append(["Receita Anual (R$)", f"R$ {dados_empresa['receita_anual']:,.0f}", ""])
+        dados_completos.append(["Faturamento Anual (R$)", f"R$ {dados_empresa['receita_anual']:,.0f}", ""])
         dados_completos.append(["EBITDA (R$)", f"R$ {dados_empresa['ebitda']:,.0f}", ""])
         dados_completos.append(["Margem EBITDA (%)", f"{dados_empresa['margem_ebitda']*100:.1f}%", ""])
         dados_completos.append(["Lucro Líquido (R$)", f"R$ {dados_empresa['lucro_liquido']:,.0f}", ""])
@@ -377,7 +377,7 @@ class ValuationService:
         
         # Resultados por método
         dados_completos.append(["RESULTADOS POR MÉTODO", "", ""])
-        dados_completos.append(["Múltiplos - Receita", f"R$ {resultados['multiplos']['receita']:,.0f}", f"{resultados['multiplos']['multiplos']['receita']}x"])
+        dados_completos.append(["Múltiplos - Faturamento", f"R$ {resultados['multiplos']['receita']:,.0f}", f"{resultados['multiplos']['multiplos']['receita']}x"])
         dados_completos.append(["Múltiplos - EBITDA", f"R$ {resultados['multiplos']['ebitda']:,.0f}", f"{resultados['multiplos']['multiplos']['ebitda']}x"])
         dados_completos.append(["Múltiplos - Lucro", f"R$ {resultados['multiplos']['lucro']:,.0f}", f"{resultados['multiplos']['multiplos']['lucro']}x"])
         dados_completos.append(["DCF", f"R$ {resultados['dcf']['valor_empresa']:,.0f}", ""])
