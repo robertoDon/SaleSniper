@@ -326,43 +326,7 @@ def exibir_valuation():
                                        help="Ex: 1.000.000 para R$ 1 milhão - Valor total faturado no ano")
         st.caption(f"Valor atual: R$ {formatar_numero_br(receita_anual)}")
         
-        n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
-        
-        # Métricas qualitativas para Berkus e Scorecard
-        produto_lancado = st.checkbox("Produto Lançado", value=True)
-        parcerias_estrategicas = st.checkbox("Parcerias Estratégicas", value=False)
-        vendas_organicas = st.checkbox("Vendas Orgânicas", value=True)
-        investe_trafego_pago = st.checkbox("Invisto em tráfego pago", value=True)
-    
-    with col2:
-        # Estimativa de crescimento baseada no setor e estágio
-        if setor == "SaaS" and tamanho_empresa == "ideacao":
-            crescimento_estimado = 100
-        elif setor == "SaaS" and tamanho_empresa == "validacao":
-            crescimento_estimado = 80
-        elif setor == "SaaS" and tamanho_empresa == "operacao":
-            crescimento_estimado = 50
-        elif setor == "SaaS" and tamanho_empresa == "tracao":
-            crescimento_estimado = 30
-        elif setor == "SaaS" and tamanho_empresa == "escala":
-            crescimento_estimado = 15
-        elif setor == "Consultoria" and tamanho_empresa == "ideacao":
-            crescimento_estimado = 80
-        elif setor == "Consultoria" and tamanho_empresa == "validacao":
-            crescimento_estimado = 60
-        elif setor == "Consultoria" and tamanho_empresa == "operacao":
-            crescimento_estimado = 40
-        elif setor == "Consultoria" and tamanho_empresa == "tracao":
-            crescimento_estimado = 25
-        elif setor == "Consultoria" and tamanho_empresa == "escala":
-            crescimento_estimado = 10
-        else:
-            crescimento_estimado = 30
-        
-        st.markdown(f"**Crescimento Estimado: {crescimento_estimado}%** (baseado no setor e estágio)")
-        crescimento_anual = crescimento_estimado / 100
-        
-        # Opção para detalhar despesas - MOVIDA PARA BAIXO
+        # Opção para detalhar despesas
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
         if detalhar_despesas:
@@ -413,6 +377,42 @@ def exibir_valuation():
             despesas_adm = despesas_totais * 0.1875  # 18.75%
             despesas_marketing = despesas_totais * 0.125  # 12.5%
             outros_custos = despesas_totais * 0.0625  # 6.25%
+    
+    with col2:
+        n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
+        
+        # Métricas qualitativas para Berkus e Scorecard
+        produto_lancado = st.checkbox("Produto Lançado", value=True)
+        parcerias_estrategicas = st.checkbox("Parcerias Estratégicas", value=False)
+        vendas_organicas = st.checkbox("Vendas Orgânicas", value=True)
+        investe_trafego_pago = st.checkbox("Invisto em tráfego pago", value=True)
+        
+        # Estimativa de crescimento baseada no setor e estágio
+        if setor == "SaaS" and tamanho_empresa == "ideacao":
+            crescimento_estimado = 100
+        elif setor == "SaaS" and tamanho_empresa == "validacao":
+            crescimento_estimado = 80
+        elif setor == "SaaS" and tamanho_empresa == "operacao":
+            crescimento_estimado = 50
+        elif setor == "SaaS" and tamanho_empresa == "tracao":
+            crescimento_estimado = 30
+        elif setor == "SaaS" and tamanho_empresa == "escala":
+            crescimento_estimado = 15
+        elif setor == "Consultoria" and tamanho_empresa == "ideacao":
+            crescimento_estimado = 80
+        elif setor == "Consultoria" and tamanho_empresa == "validacao":
+            crescimento_estimado = 60
+        elif setor == "Consultoria" and tamanho_empresa == "operacao":
+            crescimento_estimado = 40
+        elif setor == "Consultoria" and tamanho_empresa == "tracao":
+            crescimento_estimado = 25
+        elif setor == "Consultoria" and tamanho_empresa == "escala":
+            crescimento_estimado = 10
+        else:
+            crescimento_estimado = 30
+        
+        st.markdown(f"**Crescimento Estimado: {crescimento_estimado}%** (baseado no setor e estágio)")
+        crescimento_anual = crescimento_estimado / 100
         
         ebitda = receita_anual - despesas_totais
         ebitda = max(ebitda, 0)  # Não pode ser negativo
@@ -421,31 +421,32 @@ def exibir_valuation():
         lucro_liquido = ebitda * 0.7 if ebitda > 0 else 0
         st.markdown(f"**Lucro Líquido Estimado: R$ {formatar_numero_br(lucro_liquido)}** (70% do EBITDA)")
     
-    # Fatores para Scorecard - 3 COLUNAS
+    # Fatores para Scorecard - 3 COLUNAS COM 2 FATORES CADA
     st.markdown("### 🎯 Fatores Qualitativos (Scorecard)")
     st.markdown("Selecione o nível de cada fator:")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.caption("**Força da Equipe**: Baixo = Equipe pequena/iniciante | Médio = Equipe experiente | Alto = Equipe especializada/executiva")
         equipe_score = st.selectbox("Força da Equipe", ["Baixo", "Médio", "Alto"], index=1)
+        st.caption("Baixo = Equipe pequena/iniciante | Médio = Equipe experiente | Alto = Equipe especializada/executiva")
         
-        st.caption("**Qualidade do Produto**: Baixo = MVP básico | Médio = Produto funcional | Alto = Produto diferenciado/premium")
         produto_score = st.selectbox("Qualidade do Produto", ["Baixo", "Médio", "Alto"], index=1)
-        
-        st.caption("**Estratégia de Vendas/Marketing**: Baixo = Sem estratégia definida | Médio = Estratégia básica | Alto = Estratégia sofisticada")
-        vendas_marketing = st.selectbox("Estratégia de Vendas/Marketing", ["Baixo", "Médio", "Alto"], index=1)
+        st.caption("Baixo = MVP básico | Médio = Produto funcional | Alto = Produto diferenciado/premium")
     
     with col2:
-        st.caption("**Saúde Financeira**: Baixo = Prejuízo/endividado | Médio = Equilibrado | Alto = Lucrativo/capital próprio")
+        vendas_marketing = st.selectbox("Estratégia de Vendas/Marketing", ["Baixo", "Médio", "Alto"], index=1)
+        st.caption("Baixo = Sem estratégia definida | Médio = Estratégia básica | Alto = Estratégia sofisticada")
+        
         financas = st.selectbox("Saúde Financeira", ["Baixo", "Médio", "Alto"], index=1)
-        
-        st.caption("**Concorrência**: Baixo = Muitos concorrentes | Médio = Concorrência moderada | Alto = Poucos concorrentes")
+        st.caption("Baixo = Prejuízo/endividado | Médio = Equilibrado | Alto = Lucrativo/capital próprio")
+    
+    with col3:
         concorrencia = st.selectbox("Concorrência", ["Baixo", "Médio", "Alto"], index=1)
+        st.caption("Baixo = Muitos concorrentes | Médio = Concorrência moderada | Alto = Poucos concorrentes")
         
-        st.caption("**Inovação**: Baixo = Produto comum | Médio = Alguma diferenciação | Alto = Tecnologia única/patente")
         inovacao = st.selectbox("Inovação", ["Baixo", "Médio", "Alto"], index=1)
+        st.caption("Baixo = Produto comum | Médio = Alguma diferenciação | Alto = Tecnologia única/patente")
     
     # Verificar se já temos resultados calculados
     if "valuation_result" in st.session_state and st.session_state["valuation_result"] is not None:
@@ -582,15 +583,18 @@ def exibir_valuation():
                 """)
         
         with col2:
-            st.metric("DCF", f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M")
+            st.markdown("**DCF**")
+            st.markdown(f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M")
             st.caption("Ver relatório completo")
         
         with col3:
-            st.metric("Berkus", f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
+            st.markdown("**Berkus**")
+            st.markdown(f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
             st.caption("Ver relatório completo")
         
         with col4:
-            st.metric("Scorecard", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
+            st.markdown("**Scorecard**")
+            st.markdown(f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
             st.caption("Ver relatório completo")
         
         # Métricas Financeiras - MANTER COMO ESTÁ
@@ -785,7 +789,7 @@ def exibir_valuation():
         
         st.markdown(f"Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.")
         st.markdown(descricao_programa)
-        st.markdown(f"**Dica de negócio:** {dica_negocio}")
+        st.markdown(dica_negocio)
         
         # Botão de contato
         st.markdown("---")
