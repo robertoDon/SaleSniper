@@ -289,16 +289,16 @@ def exibir_valuation():
     st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Valuation de Empresas</h1>", unsafe_allow_html=True)
     
     st.markdown("""
-    ### Calculadora de Valuation Empresarial
+    <h3 style='text-align: center;'>Calculadora de Valuation Empresarial</h3>
     
-    Calcule o valor da sua empresa usando múltiplos de mercado baseados em empresas similares do seu setor.
-    """)
+    <p style='text-align: center;'>Calcule o valor da sua empresa usando múltiplos de mercado baseados em empresas similares do seu setor.</p>
+    """, unsafe_allow_html=True)
     
     # Inicializar serviço de valuation
     valuation_service = ValuationService()
     
     # Formulário de dados da empresa
-    st.markdown("### Dados da Empresa")
+    st.markdown("<h3 style='text-align: center;'>Dados da Empresa</h3>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -422,8 +422,8 @@ def exibir_valuation():
         st.markdown(f"**Lucro Líquido Estimado: R$ {formatar_numero_br(lucro_liquido)}** (70% do EBITDA)")
     
     # Fatores para Scorecard - 3 COLUNAS COM 2 FATORES CADA
-    st.markdown("### Fatores Qualitativos (Scorecard)")
-    st.markdown("Selecione o nível de cada fator:")
+    st.markdown("<h3 style='text-align: center;'>Fatores Qualitativos (Scorecard)</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>Selecione o nível de cada fator:</p>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
@@ -562,7 +562,7 @@ def exibir_valuation():
         st.markdown("### 📊 Resultados do Valuation")
         
         # APENAS MÚLTIPLOS
-        st.markdown("### Resultado do Valuation")
+        st.markdown("<h3 style='text-align: center;'>Resultado do Valuation</h3>", unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -584,7 +584,7 @@ def exibir_valuation():
                 """)
         
         # Métricas Financeiras - MANTER COMO ESTÁ
-        st.markdown("### Métricas Financeiras Calculadas")
+        st.markdown("<h3 style='text-align: center;'>Métricas Financeiras Calculadas</h3>", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
             st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
@@ -592,7 +592,7 @@ def exibir_valuation():
             st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
         # Multiplicadores Utilizados - MANTER COMO ESTÁ
-        st.markdown("### Multiplicadores Utilizados")
+        st.markdown("<h3 style='text-align: center;'>Multiplicadores Utilizados</h3>", unsafe_allow_html=True)
         mult = resultados['multiplos']['multiplos']
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -606,7 +606,7 @@ def exibir_valuation():
         
         # Botão para baixar relatório completo
         st.markdown("---")
-        st.markdown("### Relatório Completo")
+        st.markdown("<h3 style='text-align: center;'>Relatório Completo</h3>", unsafe_allow_html=True)
         
         # Centralizar todo o conteúdo
         col1, col2, col3 = st.columns([1, 3, 1])
@@ -629,7 +629,7 @@ def exibir_valuation():
         st.markdown("---")
         
         # Análise e recomendação - SEM EMOJIS
-        st.markdown("### E aí, estou bem?")
+        st.markdown("<h3 style='text-align: center;'>E aí, estou bem?</h3>", unsafe_allow_html=True)
         
         # Calcular métricas para análise
         valuation_medio = relatorio['valuation_medio']
