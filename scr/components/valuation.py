@@ -67,6 +67,190 @@ def exportar_para_pdf(df: pd.DataFrame, nome_arquivo: str):
     doc.build(elements)
     return output.getvalue()
 
+def gerar_relatorio_completo_pdf(relatorio: Dict, dados_empresa: Dict):
+    """Gera relatório completo em PDF com todos os detalhes."""
+    output = io.BytesIO()
+    doc = SimpleDocTemplate(output, pagesize=letter)
+    elements = []
+    
+    resultados = relatorio["resultados"]
+    
+    # Título
+    from reportlab.platypus import Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1  # Center
+    )
+    
+    elements.append(Paragraph(f"Relatório de Valuation - {dados_empresa['nome_empresa']}", title_style))
+    elements.append(Spacer(1, 20))
+    
+    # Informações da empresa
+    elements.append(Paragraph("Informações da Empresa", styles['Heading2']))
+    elements.append(Spacer(1, 12))
+    
+    info_empresa = [
+        ["Setor", dados_empresa['setor']],
+        ["Estágio", dados_empresa['tamanho_empresa']],
+        ["Receita Anual", f"R$ {formatar_numero_br(dados_empresa['receita_anual'])}"],
+        ["EBITDA", f"R$ {formatar_numero_br(dados_empresa['ebitda'])}"],
+        ["Margem EBITDA", f"{dados_empresa['margem_ebitda']*100:.1f}%"],
+        ["Crescimento Estimado", f"{dados_empresa['crescimento_anual']*100:.0f}%"]
+    ]
+    
+    info_table = Table(info_empresa, colWidths=[150, 200])
+    info_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(info_table)
+    elements.append(Spacer(1, 20))
+    
+    # Resultados de Valuation
+    elements.append(Paragraph("Resultados de Valuation", styles['Heading2']))
+    elements.append(Spacer(1, 12))
+    
+    # Tabela principal de resultados
+    dados_principais = [
+        ["Método", "Valuation (R$)", "Valuation (R$ M)"],
+        ["Múltiplos (Receita)", f"R$ {formatar_numero_br(resultados['multiplos']['receita'])}", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M"],
+        ["Múltiplos (EBITDA)", f"R$ {formatar_numero_br(resultados['multiplos']['ebitda'])}", f"R$ {formatar_numero_br(resultados['multiplos']['ebitda']/1000000, 1)}M"],
+        ["Múltiplos (Lucro)", f"R$ {formatar_numero_br(resultados['multiplos']['lucro'])}", f"R$ {formatar_numero_br(resultados['multiplos']['lucro']/1000000, 1)}M"],
+        ["DCF", f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa'])}", f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M"],
+        ["Berkus", f"R$ {formatar_numero_br(resultados['berkus']['valor_total'])}", f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M"],
+        ["Scorecard", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total'])}", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M"],
+        ["Médio Ponderado", f"R$ {formatar_numero_br(relatorio['valuation_medio'])}", f"R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M"]
+    ]
+    
+    main_table = Table(dados_principais, colWidths=[200, 150, 150])
+    main_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(main_table)
+    elements.append(Spacer(1, 20))
+    
+    # Multiplicadores utilizados
+    elements.append(Paragraph("Multiplicadores Utilizados", styles['Heading3']))
+    elements.append(Spacer(1, 12))
+    
+    mult = resultados['multiplos']['multiplos']
+    mult_data = [
+        ["Métrica", "Multiplicador"],
+        ["Faturamento", f"{mult['receita']}x"],
+        ["EBITDA", f"{mult['ebitda']}x"],
+        ["Lucro Líquido", f"{mult['lucro']}x"]
+    ]
+    
+    mult_table = Table(mult_data, colWidths=[200, 150])
+    mult_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(mult_table)
+    elements.append(Spacer(1, 20))
+    
+    # Análise DCF
+    elements.append(Paragraph("Análise DCF (Discounted Cash Flow)", styles['Heading3']))
+    elements.append(Spacer(1, 12))
+    
+    dcf_data = [
+        ["Ano", "Receita Projetada (R$)", "EBITDA Projetado (R$)", "FCF Projetado (R$)", "VP FCF (R$)"]
+    ]
+    
+    for i in range(len(resultados['dcf']['receitas_projetadas'])):
+        dcf_data.append([
+            str(i + 1),
+            f"R$ {formatar_numero_br(resultados['dcf']['receitas_projetadas'][i])}",
+            f"R$ {formatar_numero_br(resultados['dcf']['ebitda_projetado'][i])}",
+            f"R$ {formatar_numero_br(resultados['dcf']['fcf_projetado'][i])}",
+            f"R$ {formatar_numero_br(resultados['dcf']['vp_fcf'][i])}"
+        ])
+    
+    dcf_table = Table(dcf_data, colWidths=[50, 120, 120, 120, 120])
+    dcf_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(dcf_table)
+    elements.append(Spacer(1, 20))
+    
+    # Análise Berkus
+    elements.append(Paragraph("Análise Berkus", styles['Heading3']))
+    elements.append(Spacer(1, 12))
+    
+    berkus_data = [["Fator", "Valor (R$)"]]
+    for fator in resultados['berkus']['fatores']:
+        berkus_data.append([fator['fator'], f"R$ {formatar_numero_br(fator['valor'])}"])
+    
+    berkus_table = Table(berkus_data, colWidths=[300, 150])
+    berkus_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(berkus_table)
+    elements.append(Spacer(1, 20))
+    
+    # Análise Scorecard
+    elements.append(Paragraph("Análise Scorecard", styles['Heading3']))
+    elements.append(Spacer(1, 12))
+    
+    scorecard_data = [["Fator", "Nível"]]
+    for fator, valor in resultados['scorecard']['fatores'].items():
+        if valor == 0.7:
+            nivel = "Baixo"
+        elif valor == 1.0:
+            nivel = "Médio"
+        else:
+            nivel = "Alto"
+        scorecard_data.append([fator, nivel])
+    
+    scorecard_table = Table(scorecard_data, colWidths=[300, 150])
+    scorecard_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(scorecard_table)
+    
+    doc.build(elements)
+    return output.getvalue()
+
 def exibir_botoes_exportacao(df: pd.DataFrame, nome_arquivo: str):
     """Exibe botões para exportar DataFrame em diferentes formatos."""
     col1, col2, col3 = st.columns(3)
@@ -428,6 +612,26 @@ def exibir_valuation():
             st.metric("Lucro Líquido", f"{mult['lucro']}x")
         
         st.caption(f"Baseado em empresas do setor {setor} em estágio {tamanho_empresa}")
+        
+        # Botão para baixar relatório completo
+        st.markdown("---")
+        st.markdown("### 📄 Relatório Completo")
+        st.markdown("Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            # Adicionar informações detalhadas
+            st.download_button(
+                label="📥 Baixar Relatório Completo (PDF)",
+                data=gerar_relatorio_completo_pdf(relatorio, dados_empresa),
+                file_name=f"valuation_{nome_empresa}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                mime='application/pdf',
+                type="primary"
+            )
+            
+            st.caption("O relatório inclui: todos os métodos de valuation, projeções DCF, análise Berkus, scorecard detalhado e recomendações estratégicas.")
+        
+        st.markdown("---")
         
         # Análise e recomendação - SEM EMOJIS
         st.markdown("### E aí, estou bem?")
