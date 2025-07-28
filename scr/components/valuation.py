@@ -125,16 +125,64 @@ def exibir_valuation():
     with col1:
         nome_empresa = st.text_input("Nome da Empresa", value="Minha Empresa")
         setor = st.selectbox("Setor", [
-            "SaaS", "E-commerce", "Fintech", "Healthtech", "Edtech", "Consultoria", "Outros"
+            "SaaS", "Tecnologia", "E-commerce", "Consultoria", "Varejo", "Serviços", "Outros"
         ])
-        tamanho_empresa = st.selectbox("Estágio da Empresa", [
-            "seed", "startup", "scaleup", "estabelecida"
-        ])
+        
+        # Estágios da empresa com explicações
+        estagios_info = {
+            "ideacao": "Desenvolvendo ideia e conceito do produto/serviço",
+            "validacao": "Validando mercado e primeiros clientes",
+            "operacao": "Operação estável com receita recorrente",
+            "tracao": "Crescimento acelerado e validação de mercado",
+            "escala": "Expansão e otimização de operações"
+        }
+        
+        tamanho_empresa = st.selectbox("Estágio da Empresa", list(estagios_info.keys()))
+        
+        # Exibir explicação do estágio
+        st.caption(f"💡 {estagios_info[tamanho_empresa]}")
+        
         receita_anual = st.number_input("Faturamento Anual (R$)", min_value=0.0, value=1000000.0, step=10000.0, 
                                        help="Ex: 1.000.000 para R$ 1 milhão - Valor total faturado no ano")
         st.caption(f"Valor atual: R$ {formatar_numero_br(receita_anual)}")
         
-        # Opção para detalhar despesas
+        n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
+        
+        # Métricas qualitativas para Berkus e Scorecard
+        produto_lancado = st.checkbox("Produto Lançado", value=True)
+        parcerias_estrategicas = st.checkbox("Parcerias Estratégicas", value=False)
+        vendas_organicas = st.checkbox("Vendas Orgânicas", value=True)
+        investe_trafego_pago = st.checkbox("Invisto em tráfego pago", value=True)
+    
+    with col2:
+        # Estimativa de crescimento baseada no setor e estágio
+        if setor == "SaaS" and tamanho_empresa == "ideacao":
+            crescimento_estimado = 100
+        elif setor == "SaaS" and tamanho_empresa == "validacao":
+            crescimento_estimado = 80
+        elif setor == "SaaS" and tamanho_empresa == "operacao":
+            crescimento_estimado = 50
+        elif setor == "SaaS" and tamanho_empresa == "tracao":
+            crescimento_estimado = 30
+        elif setor == "SaaS" and tamanho_empresa == "escala":
+            crescimento_estimado = 15
+        elif setor == "Consultoria" and tamanho_empresa == "ideacao":
+            crescimento_estimado = 80
+        elif setor == "Consultoria" and tamanho_empresa == "validacao":
+            crescimento_estimado = 60
+        elif setor == "Consultoria" and tamanho_empresa == "operacao":
+            crescimento_estimado = 40
+        elif setor == "Consultoria" and tamanho_empresa == "tracao":
+            crescimento_estimado = 25
+        elif setor == "Consultoria" and tamanho_empresa == "escala":
+            crescimento_estimado = 10
+        else:
+            crescimento_estimado = 30
+        
+        st.markdown(f"**Crescimento Estimado: {crescimento_estimado}%** (baseado no setor e estágio)")
+        crescimento_anual = crescimento_estimado / 100
+        
+        # Opção para detalhar despesas - MOVIDA PARA BAIXO
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
         if detalhar_despesas:
@@ -193,40 +241,7 @@ def exibir_valuation():
         lucro_liquido = ebitda * 0.7 if ebitda > 0 else 0
         st.markdown(f"**Lucro Líquido Estimado: R$ {formatar_numero_br(lucro_liquido)}** (70% do EBITDA)")
     
-    with col2:
-        # Crescimento baseado no setor e estágio (estimativa automática)
-        n_vendedores = st.number_input("Número de Vendedores", min_value=0, value=5, step=1)
-        
-        # Estimativa de crescimento baseada no setor e estágio
-        if setor == "SaaS" and tamanho_empresa == "seed":
-            crescimento_estimado = 80
-        elif setor == "SaaS" and tamanho_empresa == "startup":
-            crescimento_estimado = 50
-        elif setor == "SaaS" and tamanho_empresa == "scaleup":
-            crescimento_estimado = 30
-        elif setor == "SaaS" and tamanho_empresa == "estabelecida":
-            crescimento_estimado = 15
-        elif setor == "Consultoria" and tamanho_empresa == "seed":
-            crescimento_estimado = 60
-        elif setor == "Consultoria" and tamanho_empresa == "startup":
-            crescimento_estimado = 40
-        elif setor == "Consultoria" and tamanho_empresa == "scaleup":
-            crescimento_estimado = 25
-        elif setor == "Consultoria" and tamanho_empresa == "estabelecida":
-            crescimento_estimado = 10
-        else:
-            crescimento_estimado = 20
-        
-        st.markdown(f"**Crescimento Estimado: {crescimento_estimado}%** (baseado no setor e estágio)")
-        crescimento_anual = crescimento_estimado / 100
-        
-        # Métricas qualitativas para Berkus e Scorecard
-        produto_lancado = st.checkbox("Produto Lançado", value=True)
-        parcerias_estrategicas = st.checkbox("Parcerias Estratégicas", value=False)
-        vendas_organicas = st.checkbox("Vendas Orgânicas", value=True)
-        investe_trafego_pago = st.checkbox("Invisto em tráfego pago", value=True)
-    
-    # Fatores para Scorecard
+    # Fatores para Scorecard - 3 COLUNAS
     st.markdown("### 🎯 Fatores Qualitativos (Scorecard)")
     st.markdown("Selecione o nível de cada fator:")
     
@@ -291,24 +306,28 @@ def exibir_valuation():
         inovacao = "Baixo" if dados_empresa["inovacao"] == 0.7 else "Médio" if dados_empresa["inovacao"] == 1.0 else "Alto"
         
         # Calcular crescimento estimado para exibição
-        if setor == "SaaS" and tamanho_empresa == "seed":
+        if setor == "SaaS" and tamanho_empresa == "ideacao":
+            crescimento_estimado = 100
+        elif setor == "SaaS" and tamanho_empresa == "validacao":
             crescimento_estimado = 80
-        elif setor == "SaaS" and tamanho_empresa == "startup":
+        elif setor == "SaaS" and tamanho_empresa == "operacao":
             crescimento_estimado = 50
-        elif setor == "SaaS" and tamanho_empresa == "scaleup":
+        elif setor == "SaaS" and tamanho_empresa == "tracao":
             crescimento_estimado = 30
-        elif setor == "SaaS" and tamanho_empresa == "estabelecida":
+        elif setor == "SaaS" and tamanho_empresa == "escala":
             crescimento_estimado = 15
-        elif setor == "Consultoria" and tamanho_empresa == "seed":
+        elif setor == "Consultoria" and tamanho_empresa == "ideacao":
+            crescimento_estimado = 80
+        elif setor == "Consultoria" and tamanho_empresa == "validacao":
             crescimento_estimado = 60
-        elif setor == "Consultoria" and tamanho_empresa == "startup":
+        elif setor == "Consultoria" and tamanho_empresa == "operacao":
             crescimento_estimado = 40
-        elif setor == "Consultoria" and tamanho_empresa == "scaleup":
+        elif setor == "Consultoria" and tamanho_empresa == "tracao":
             crescimento_estimado = 25
-        elif setor == "Consultoria" and tamanho_empresa == "estabelecida":
+        elif setor == "Consultoria" and tamanho_empresa == "escala":
             crescimento_estimado = 10
         else:
-            crescimento_estimado = 20
+            crescimento_estimado = 30
     
     # Botão para calcular
     if st.button("💰 Calcular Valuation", type="primary"):
@@ -356,7 +375,7 @@ def exibir_valuation():
         # Exibir resultados após o cálculo
         st.markdown("### 📊 Resultados do Valuation")
         
-        # Métricas principais com tooltips explicativos
+        # APENAS MÚLTIPLOS - Simplificado
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
@@ -379,69 +398,17 @@ def exibir_valuation():
         
         with col2:
             st.metric("DCF", f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M")
-            with st.expander("❓ O que é valuation DCF?", expanded=False):
-                st.markdown("""
-                **💰 Método DCF (Discounted Cash Flow)**
-                
-                **Como funciona:** Calcula o valor presente dos fluxos de caixa futuros da empresa.
-                
-                **Fórmula:** Valor = Σ(Fluxo de Caixa Futuro / (1 + Taxa de Desconto)^ano) + Valor Terminal
-                
-                **Por que este valor:** Projeta crescimento de {crescimento_estimado}% ao ano com margem EBITDA de {margem_ebitda*100:.1f}%.
-                
-                **Vantagens:**
-                - Considera crescimento futuro
-                - Baseado em fundamentos da empresa
-                - Mais preciso para empresas com projeções claras
-                """)
+            st.caption("Ver relatório completo")
         
         with col3:
             st.metric("Berkus", f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
-            with st.expander("❓ O que é valuation Berkus?", expanded=False):
-                st.markdown("""
-                **🚀 Método Berkus**
-                
-                **Como funciona:** Avalia startups em estágio inicial baseado em marcos qualitativos.
-                
-                **Critérios avaliados:**
-                - Produto lançado: R$ 500k
-                - Vendas orgânicas: R$ 500k
-                - Parcerias estratégicas: R$ 500k
-                - Investimento em tráfego pago: R$ 500k
-                
-                **Por que este valor:** Ideal para empresas em estágio {tamanho_empresa} que já atingiram marcos importantes.
-                
-                **Vantagens:**
-                - Ideal para startups em estágio inicial
-                - Fácil de aplicar
-                - Considera marcos importantes
-                """)
+            st.caption("Ver relatório completo")
         
         with col4:
             st.metric("Scorecard", f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
-            with st.expander("❓ O que é valuation Scorecard?", expanded=False):
-                st.markdown("""
-                **📊 Método Scorecard**
-                
-                **Como funciona:** Avalia qualitativamente diferentes aspectos da empresa e aplica multiplicadores.
-                
-                **Fatores avaliados:**
-                - Força da equipe
-                - Qualidade do produto
-                - Estratégia de vendas/marketing
-                - Saúde financeira
-                - Concorrência
-                - Inovação
-                
-                **Por que este valor:** Baseado na avaliação qualitativa dos 6 fatores principais da empresa.
-                
-                **Vantagens:**
-                - Considera aspectos qualitativos
-                - Flexível para diferentes tipos de empresa
-                - Abrangente
-                """)
+            st.caption("Ver relatório completo")
         
-        # Mostrar EBITDA e margem calculados
+        # Métricas Financeiras - MANTER COMO ESTÁ
         st.markdown("### 📊 Métricas Financeiras Calculadas")
         col1, col2 = st.columns(2)
         with col1:
@@ -449,159 +416,82 @@ def exibir_valuation():
         with col2:
             st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
-        # Valuation médio ponderado com explicação
-        col_val, col_info = st.columns([3, 1])
+        # Multiplicadores Utilizados - MANTER COMO ESTÁ
+        st.markdown("### 📈 Multiplicadores Utilizados")
+        mult = resultados['multiplos']['multiplos']
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Faturamento", f"{mult['receita']}x")
+        with col2:
+            st.metric("EBITDA", f"{mult['ebitda']}x")
+        with col3:
+            st.metric("Lucro Líquido", f"{mult['lucro']}x")
         
-        with col_val:
-            st.markdown(f"### 🎯 Valuation Médio Ponderado: **R$ {formatar_numero_br(relatorio['valuation_medio']/1000000, 1)}M**")
+        st.caption(f"Baseado em empresas do setor {setor} em estágio {tamanho_empresa}")
         
-        with col_info:
-            with st.expander("ℹ️ Como foi calculado", expanded=False):
-                st.markdown(f"""
-                **🎯 Valuation Médio Ponderado**
-                
-                **Como é calculado:** Combina os 4 métodos com pesos diferentes baseados no estágio da empresa.
-                
-                **Pesos utilizados:**
-                - Múltiplos: {relatorio['pesos_utilizados'][0]*100:.1f}%
-                - DCF: {relatorio['pesos_utilizados'][1]*100:.1f}%
-                - Berkus: {relatorio['pesos_utilizados'][2]*100:.1f}%
-                - Scorecard: {relatorio['pesos_utilizados'][3]*100:.1f}%
-                
-                **Por que estes pesos:** Empresas em estágio {tamanho_empresa} têm características específicas que tornam alguns métodos mais relevantes que outros.
-                
-                **Resultado:** Valor final que considera todos os aspectos da empresa de forma equilibrada.
-                """)
-        
-        # Layout em duas colunas
-        col_esquerda, col_direita = st.columns(2)
-        
-        # Detalhamento dos métodos
-        st.markdown("### 📈 Detalhamento por Método")
-        
-        # Layout em duas colunas para detalhamentos
-        col_det_esq, col_det_dir = st.columns(2)
-        
-        with col_det_esq:
-            # Múltiplos
-            st.markdown("#### 🔢 Valuation por Múltiplos")
-            mult_df = pd.DataFrame({
-                "Método": ["Faturamento", "EBITDA", "Lucro Líquido"],
-                "Múltiplo": [
-                    resultados['multiplos']['multiplos']['receita'],
-                    resultados['multiplos']['multiplos']['ebitda'],
-                    resultados['multiplos']['multiplos']['lucro']
-                ],
-                "Valor Base (R$)": [receita_anual, ebitda, lucro_liquido],
-                "Valuation (R$)": [
-                    resultados['multiplos']['receita'],
-                    resultados['multiplos']['ebitda'],
-                    resultados['multiplos']['lucro']
-                ]
-            })
-            st.dataframe(formatar_dataframe_br(mult_df), hide_index=True)
-            
-            # Mostrar multiplicadores utilizados
-            st.markdown("**Multiplicadores Utilizados:**")
-            mult = resultados['multiplos']['multiplos']
-            st.markdown(f"- **Faturamento**: {mult['receita']}x")
-            st.markdown(f"- **EBITDA**: {mult['ebitda']}x")
-            st.markdown(f"- **Lucro Líquido**: {mult['lucro']}x")
-            st.markdown(f"- **Setor**: {setor}")
-            st.markdown(f"- **Estágio**: {tamanho_empresa}")
-            
-            # DCF
-            st.markdown("#### 💰 Valuation por DCF")
-            dcf_df = pd.DataFrame({
-                "Ano": range(1, len(resultados['dcf']['receitas_projetadas']) + 1),
-                "Faturamento Projetado (R$)": resultados['dcf']['receitas_projetadas'],
-                "EBITDA Projetado (R$)": resultados['dcf']['ebitda_projetado'],
-                "FCF Projetado (R$)": resultados['dcf']['fcf_projetado'],
-                "VP FCF (R$)": resultados['dcf']['vp_fcf']
-            })
-            st.dataframe(formatar_dataframe_br(dcf_df), hide_index=True)
-            
-            st.markdown(f"**Valor Terminal:** R$ {formatar_numero_br(resultados['dcf']['valor_terminal'])}")
-            st.markdown(f"**VP Valor Terminal:** R$ {formatar_numero_br(resultados['dcf']['vp_terminal'])}")
-        
-        with col_det_dir:
-            # Berkus
-            st.markdown("#### 🚀 Valuation por Berkus")
-            berkus_fatores = []
-            for fator in resultados['berkus']['fatores']:
-                berkus_fatores.append([fator['fator'], f"R$ {formatar_numero_br(fator['valor'])}"])
-            
-            berkus_df = pd.DataFrame(berkus_fatores, columns=["Fator", "Valor"])
-            st.dataframe(berkus_df, hide_index=True)
-            
-            # Scorecard
-            st.markdown("#### 📊 Valuation por Scorecard")
-            scorecard_fatores = []
-            for fator, valor in resultados['scorecard']['fatores'].items():
-                # Converter valor numérico para texto
-                if valor == 0.7:
-                    valor_texto = "Baixo"
-                elif valor == 1.0:
-                    valor_texto = "Médio"
-                else:
-                    valor_texto = "Alto"
-                scorecard_fatores.append([fator, valor_texto])
-            
-            scorecard_df = pd.DataFrame(scorecard_fatores, columns=["Fator", "Nível"])
-            st.dataframe(scorecard_df, hide_index=True)
-        
-        # Análise e recomendação
-        st.markdown("### 🤔 E aí, estou bem?")
+        # Análise e recomendação - SEM EMOJIS
+        st.markdown("### E aí, estou bem?")
         
         # Calcular métricas para análise
         valuation_medio = relatorio['valuation_medio']
         margem_ebitda = ebitda / receita_anual if receita_anual > 0 else 0
         
         # Determinar se está bem para o mercado
-        if tamanho_empresa == "seed":
+        if tamanho_empresa == "ideacao":
             if valuation_medio >= 2000000:  # R$ 2M
-                status = "🟢 Muito bem posicionada!"
-                analise = "Sua empresa está com um valuation excelente para o estágio seed. Isso indica que você tem uma base sólida e potencial de crescimento significativo."
+                status = "Muito bem posicionada!"
+                analise = "Sua empresa está com um valuation excelente para o estágio de ideação. Isso indica que você tem uma base sólida e potencial de crescimento significativo."
             elif valuation_medio >= 1000000:  # R$ 1M
-                status = "🟡 Bem posicionada"
+                status = "Bem posicionada"
                 analise = "Sua empresa está bem posicionada no mercado. Há espaço para crescimento, mas a base está sólida."
             else:
-                status = "🔴 Precisa de melhorias"
+                status = "Precisa de melhorias"
                 analise = "Sua empresa precisa de melhorias para se destacar no mercado. Foque em validar o produto e gerar receita."
-        elif tamanho_empresa == "startup":
-            if valuation_medio >= 10000000:  # R$ 10M
-                status = "🟢 Excelente posicionamento!"
-                analise = "Sua startup está com um valuation muito forte. Você tem um produto validado e crescimento consistente."
-            elif valuation_medio >= 5000000:  # R$ 5M
-                status = "🟡 Bem posicionada"
-                analise = "Sua startup está bem posicionada. Continue focando no crescimento e validação de mercado."
+        elif tamanho_empresa == "validacao":
+            if valuation_medio >= 5000000:  # R$ 5M
+                status = "Excelente posicionamento!"
+                analise = "Sua empresa está com um valuation muito forte para o estágio de validação. Você tem um produto validado e crescimento consistente."
+            elif valuation_medio >= 2500000:  # R$ 2.5M
+                status = "Bem posicionada"
+                analise = "Sua empresa está bem posicionada. Continue focando na validação de mercado."
             else:
-                status = "🔴 Precisa de melhorias"
-                analise = "Sua startup precisa de melhorias para se destacar. Foque em crescimento de receita e validação."
-        elif tamanho_empresa == "scaleup":
+                status = "Precisa de melhorias"
+                analise = "Sua empresa precisa de melhorias para se destacar. Foque em validação de mercado e primeiros clientes."
+        elif tamanho_empresa == "operacao":
+            if valuation_medio >= 15000000:  # R$ 15M
+                status = "Posicionamento excepcional!"
+                analise = "Sua empresa está com um valuation excepcional para o estágio de operação. Você tem um modelo de negócio validado e operação estável."
+            elif valuation_medio >= 7500000:  # R$ 7.5M
+                status = "Bem posicionada"
+                analise = "Sua empresa está bem posicionada. Continue focando na otimização da operação."
+            else:
+                status = "Precisa de melhorias"
+                analise = "Sua empresa precisa de melhorias para se destacar. Foque em estabilizar a operação e aumentar receita."
+        elif tamanho_empresa == "tracao":
             if valuation_medio >= 50000000:  # R$ 50M
-                status = "🟢 Posicionamento excepcional!"
-                analise = "Sua scaleup está com um valuation excepcional. Você tem um modelo de negócio validado e crescimento acelerado."
+                status = "Posicionamento excepcional!"
+                analise = "Sua empresa está com um valuation excepcional para o estágio de tração. Você tem crescimento acelerado e validação de mercado."
             elif valuation_medio >= 25000000:  # R$ 25M
-                status = "🟡 Bem posicionada"
-                analise = "Sua scaleup está bem posicionada. Continue focando na expansão e otimização."
+                status = "Bem posicionada"
+                analise = "Sua empresa está bem posicionada. Continue focando no crescimento acelerado."
             else:
-                status = "🔴 Precisa de melhorias"
-                analise = "Sua scaleup precisa de melhorias para se destacar. Foque em crescimento acelerado e eficiência."
-        else:  # estabelecida
+                status = "Precisa de melhorias"
+                analise = "Sua empresa precisa de melhorias para se destacar. Foque em crescimento acelerado e validação."
+        else:  # escala
             if valuation_medio >= 100000000:  # R$ 100M
-                status = "🟢 Posicionamento sólido!"
+                status = "Posicionamento sólido!"
                 analise = "Sua empresa estabelecida está com um valuation muito sólido. Você tem um negócio maduro e lucrativo."
             elif valuation_medio >= 50000000:  # R$ 50M
-                status = "🟡 Bem posicionada"
+                status = "Bem posicionada"
                 analise = "Sua empresa está bem posicionada. Continue focando na otimização e expansão."
             else:
-                status = "🔴 Precisa de melhorias"
+                status = "Precisa de melhorias"
                 analise = "Sua empresa precisa de melhorias para se destacar. Foque em eficiência e crescimento sustentável."
         
         # Análise específica baseada nos dados do formulário
         pontos_positivos = []
-        pontos_melhoria = []
+        pontos_alerta = []
+        pontos_negativos = []
         
         # Pontos positivos baseados nos dados
         if produto_lancado:
@@ -619,68 +509,85 @@ def exibir_valuation():
         if n_vendedores > 3:
             pontos_positivos.append("**Equipe de vendas**: Você tem capacidade de expansão")
         
-        # Pontos de melhoria específicos
-        if not produto_lancado and tamanho_empresa in ["seed", "startup"]:
-            pontos_melhoria.append("**Produto não lançado**: Priorize o lançamento para validar o mercado e aumentar o valuation")
-        if not vendas_organicas and tamanho_empresa in ["seed", "startup"]:
-            pontos_melhoria.append("**Sem vendas orgânicas**: Desenvolva estratégias de aquisição natural de clientes")
-        if not parcerias_estrategicas:
-            pontos_melhoria.append("**Sem parcerias estratégicas**: Busque alianças que possam acelerar seu crescimento")
-        if not investe_trafego_pago:
-            pontos_melhoria.append("**Não investe em tráfego pago**: Considere estratégias de marketing digital para crescimento")
-        if margem_ebitda < 0.1:
-            pontos_melhoria.append(f"**Margem EBITDA baixa ({margem_ebitda*100:.1f}%)**: Otimize custos operacionais para aumentar lucratividade")
-        if receita_anual < 1000000:
-            pontos_melhoria.append(f"**Faturamento baixo (R$ {formatar_numero_br(receita_anual)})**: Foque em crescimento de vendas e expansão de mercado")
-        if n_vendedores < 2:
-            pontos_melhoria.append("**Equipe de vendas pequena**: Considere expandir a equipe para acelerar crescimento")
+        # Pontos de alerta (meio termo)
+        if margem_ebitda >= 0.1 and margem_ebitda <= 0.2:
+            pontos_alerta.append("**Margem EBITDA moderada**: Há espaço para otimização de custos")
+        if receita_anual >= 1000000 and receita_anual <= 5000000:
+            pontos_alerta.append("**Faturamento em crescimento**: Continue focando na expansão")
+        if n_vendedores >= 2 and n_vendedores <= 3:
+            pontos_alerta.append("**Equipe de vendas pequena**: Considere expandir para acelerar crescimento")
         
-        # Garantir sempre 1 positivo e 2 melhorias
+        # Pontos negativos específicos
+        if not produto_lancado and tamanho_empresa in ["ideacao", "validacao"]:
+            pontos_negativos.append("**Produto não lançado**: Priorize o lançamento para validar o mercado e aumentar o valuation")
+        if not vendas_organicas and tamanho_empresa in ["ideacao", "validacao"]:
+            pontos_negativos.append("**Sem vendas orgânicas**: Desenvolva estratégias de aquisição natural de clientes")
+        if not parcerias_estrategicas:
+            pontos_negativos.append("**Sem parcerias estratégicas**: Busque alianças que possam acelerar seu crescimento")
+        if not investe_trafego_pago:
+            pontos_negativos.append("**Não investe em tráfego pago**: Considere estratégias de marketing digital para crescimento")
+        if margem_ebitda < 0.1:
+            pontos_negativos.append(f"**Margem EBITDA baixa ({margem_ebitda*100:.1f}%)**: Otimize custos operacionais para aumentar lucratividade")
+        if receita_anual < 1000000:
+            pontos_negativos.append(f"**Faturamento baixo (R$ {formatar_numero_br(receita_anual)})**: Foque em crescimento de vendas e expansão de mercado")
+        if n_vendedores < 2:
+            pontos_negativos.append("**Equipe de vendas pequena**: Considere expandir a equipe para acelerar crescimento")
+        
+        # Garantir sempre pelo menos 1 de cada
         if not pontos_positivos:
             pontos_positivos.append("**Potencial de crescimento**: Sua empresa tem espaço para evolução significativa")
-        
-        # Selecionar os 2 pontos de melhoria mais relevantes
-        if len(pontos_melhoria) > 2:
-            # Priorizar pontos mais críticos
-            prioridade = []
-            if not produto_lancado and tamanho_empresa in ["seed", "startup"]:
-                prioridade.append(pontos_melhoria[0])  # Produto não lançado
-            if margem_ebitda < 0.1:
-                prioridade.append([p for p in pontos_melhoria if "Margem EBITDA" in p][0])
-            if receita_anual < 1000000:
-                prioridade.append([p for p in pontos_melhoria if "Receita baixa" in p][0])
-            
-            # Completar com outros pontos se necessário
-            outros = [p for p in pontos_melhoria if p not in prioridade]
-            pontos_melhoria = prioridade + outros[:2-len(prioridade)]
-        elif len(pontos_melhoria) < 2:
-            pontos_melhoria.append("**Continue otimizando**: Mantenha o foco na melhoria contínua")
-        
-        # Recomendação do programa
-        if tamanho_empresa == "seed":
-            programa = "**Don for Seed**"
-            descricao_programa = "Programa especializado para empresas em estágio seed, focado em validação de produto e primeiras vendas."
-        elif tamanho_empresa == "startup":
-            programa = "**Don for Startup**"
-            descricao_programa = "Programa para startups em crescimento, focado em escalabilidade e validação de mercado."
-        elif tamanho_empresa == "scaleup":
-            programa = "**Don for Scale-up**"
-            descricao_programa = "Programa para scaleups, focado em crescimento acelerado e expansão de mercado."
-        else:
-            programa = "**Don for Enterprise**"
-            descricao_programa = "Programa para empresas estabelecidas, focado em otimização e expansão estratégica."
+        if not pontos_alerta:
+            pontos_alerta.append("**Continue otimizando**: Mantenha o foco na melhoria contínua")
+        if not pontos_negativos:
+            pontos_negativos.append("**Atenção aos detalhes**: Foque na otimização de processos e eficiência")
         
         # Exibir análise
         st.markdown(f"**{status}**")
         st.markdown(analise)
         
-        st.markdown("**✅ Ponto Positivo:**")
+        st.markdown("**Ponto Positivo:**")
         st.markdown(f"• {pontos_positivos[0]}")
         
-        st.markdown("**📈 Pontos de Melhoria:**")
-        for i, melhoria in enumerate(pontos_melhoria[:2]):
-            st.markdown(f"• {melhoria}")
+        st.markdown("**Ponto Alerta:**")
+        st.markdown(f"• {pontos_alerta[0]}")
         
-        st.markdown("**💡 Recomendação:**")
+        st.markdown("**Ponto Negativo:**")
+        st.markdown(f"• {pontos_negativos[0]}")
+        
+        # Recomendação de produto Don
+        st.markdown("**Recomendação de produto Don:**")
+        
+        if tamanho_empresa == "ideacao":
+            programa = "**Don for Ideação**"
+            descricao_programa = "Programa especializado para empresas em estágio de ideação, focado em desenvolvimento de conceito e validação inicial."
+            dica_negocio = "Foque em validar sua ideia com o mercado antes de investir pesado em desenvolvimento."
+        elif tamanho_empresa == "validacao":
+            programa = "**Don for Validação**"
+            descricao_programa = "Programa para empresas em validação, focado em primeiros clientes e validação de mercado."
+            dica_negocio = "Priorize encontrar seus primeiros clientes e validar o produto-market fit."
+        elif tamanho_empresa == "operacao":
+            programa = "**Don for Operação**"
+            descricao_programa = "Programa para empresas em operação estável, focado em otimização e crescimento sustentável."
+            dica_negocio = "Foque em estabilizar processos e aumentar a eficiência operacional."
+        elif tamanho_empresa == "tracao":
+            programa = "**Don for Tração**"
+            descricao_programa = "Programa para empresas em tração, focado em crescimento acelerado e expansão de mercado."
+            dica_negocio = "Acelere o crescimento focando em estratégias de aquisição e expansão."
+        else:  # escala
+            programa = "**Don for Escala**"
+            descricao_programa = "Programa para empresas em escala, focado em otimização e expansão estratégica."
+            dica_negocio = "Otimize processos e busque expansão estratégica para maximizar resultados."
+        
         st.markdown(f"Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.")
         st.markdown(descricao_programa)
+        st.markdown(f"**Dica de negócio:** {dica_negocio}")
+        
+        # Botão de contato
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.link_button(
+                "Entre em contato conosco",
+                "https://api.whatsapp.com/send/?phone=554892254155&text&type=phone_number&app_absent=0",
+                type="primary"
+            )
