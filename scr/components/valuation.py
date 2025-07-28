@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import locale
 import io
+from typing import Dict
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
