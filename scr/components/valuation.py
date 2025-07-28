@@ -289,7 +289,7 @@ def exibir_valuation():
     st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Valuation de Empresas</h1>", unsafe_allow_html=True)
     
     st.markdown("""
-    ### 📊 Calculadora de Valuation Empresarial
+    ### Calculadora de Valuation Empresarial
     
     Calcule o valor da sua empresa usando múltiplos de mercado baseados em empresas similares do seu setor.
     """)
@@ -298,7 +298,7 @@ def exibir_valuation():
     valuation_service = ValuationService()
     
     # Formulário de dados da empresa
-    st.markdown("### 📋 Dados da Empresa")
+    st.markdown("### Dados da Empresa")
     
     col1, col2 = st.columns(2)
     
@@ -326,7 +326,12 @@ def exibir_valuation():
                                        help="Ex: 1.000.000 para R$ 1 milhão - Valor total faturado no ano")
         st.caption(f"Valor atual: R$ {formatar_numero_br(receita_anual)}")
         
-        # Opção para detalhar despesas
+        # Campo simples para despesas totais mensais
+        despesas_totais_mensal = st.number_input("Despesas Totais (R$/mês)", min_value=0.0, value=66667.0, step=1000.0, 
+                                               help="Ex: 66.667 - Soma de todas as despesas mensais")
+        st.caption(f"Valor atual: R$ {formatar_numero_br(despesas_totais_mensal)}/mês")
+        
+        # Opção para detalhar despesas - MOVIDA PARA BAIXO
         detalhar_despesas = st.checkbox("🔍 Detalhar Despesas (Opcional)")
         
         if detalhar_despesas:
@@ -363,11 +368,6 @@ def exibir_valuation():
             despesas_totais_mensal = despesas_totais / 12
             st.markdown(f"**Total das Despesas: R$ {formatar_numero_br(despesas_totais_mensal)}/mês (R$ {formatar_numero_br(despesas_totais)}/ano)**")
         else:
-            # Campo simples para despesas totais mensais (só aparece se não detalhar)
-            despesas_totais_mensal = st.number_input("Despesas Totais (R$/mês)", min_value=0.0, value=66667.0, step=1000.0, 
-                                                   help="Ex: 66.667 - Soma de todas as despesas mensais")
-            st.caption(f"Valor atual: R$ {formatar_numero_br(despesas_totais_mensal)}/mês")
-            
             # Calcular total anual
             despesas_totais = despesas_totais_mensal * 12
             
@@ -422,7 +422,7 @@ def exibir_valuation():
         st.markdown(f"**Lucro Líquido Estimado: R$ {formatar_numero_br(lucro_liquido)}** (70% do EBITDA)")
     
     # Fatores para Scorecard - 3 COLUNAS COM 2 FATORES CADA
-    st.markdown("### 🎯 Fatores Qualitativos (Scorecard)")
+    st.markdown("### Fatores Qualitativos (Scorecard)")
     st.markdown("Selecione o nível de cada fator:")
     
     col1, col2, col3 = st.columns(3)
@@ -561,11 +561,12 @@ def exibir_valuation():
         # Exibir resultados após o cálculo
         st.markdown("### 📊 Resultados do Valuation")
         
-        # APENAS MÚLTIPLOS - Simplificado
-        col1, col2, col3, col4 = st.columns(4)
+        # APENAS MÚLTIPLOS
+        st.markdown("### Resultado do Valuation")
         
-        with col1:
-            st.metric("Múltiplos", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.metric("Valuation por Múltiplos", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M")
             with st.expander("❓ O que é valuation por múltiplos?", expanded=False):
                 st.markdown("""
                 **🔢 Método dos Múltiplos**
@@ -582,23 +583,8 @@ def exibir_valuation():
                 - Reflete o que investidores pagam por empresas similares
                 """)
         
-        with col2:
-            st.markdown("**DCF**")
-            st.markdown(f"R$ {formatar_numero_br(resultados['dcf']['valor_empresa']/1000000, 1)}M")
-            st.caption("Ver relatório completo")
-        
-        with col3:
-            st.markdown("**Berkus**")
-            st.markdown(f"R$ {formatar_numero_br(resultados['berkus']['valor_total']/1000000, 1)}M")
-            st.caption("Ver relatório completo")
-        
-        with col4:
-            st.markdown("**Scorecard**")
-            st.markdown(f"R$ {formatar_numero_br(resultados['scorecard']['valor_total']/1000000, 1)}M")
-            st.caption("Ver relatório completo")
-        
         # Métricas Financeiras - MANTER COMO ESTÁ
-        st.markdown("### 📊 Métricas Financeiras Calculadas")
+        st.markdown("### Métricas Financeiras Calculadas")
         col1, col2 = st.columns(2)
         with col1:
             st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
@@ -606,7 +592,7 @@ def exibir_valuation():
             st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
         # Multiplicadores Utilizados - MANTER COMO ESTÁ
-        st.markdown("### 📈 Multiplicadores Utilizados")
+        st.markdown("### Multiplicadores Utilizados")
         mult = resultados['multiplos']['multiplos']
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -620,19 +606,23 @@ def exibir_valuation():
         
         # Botão para baixar relatório completo
         st.markdown("---")
-        st.markdown("### 📄 Relatório Completo")
-        st.markdown("Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:")
+        st.markdown("### Relatório Completo")
         
-        col1, col2, col3 = st.columns([1, 2, 1])
+        # Centralizar todo o conteúdo
+        col1, col2, col3 = st.columns([1, 3, 1])
         with col2:
-            # Adicionar informações detalhadas
-            st.download_button(
-                label="📥 Baixar Relatório Completo (PDF)",
-                data=gerar_relatorio_completo_pdf(relatorio, dados_empresa),
-                file_name=f"valuation_{nome_empresa}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                mime='application/pdf',
-                type="primary"
-            )
+            st.markdown("Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:")
+            
+            # Centralizar o botão
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+            with col_btn2:
+                st.download_button(
+                    label="Baixar Relatório Completo (PDF)",
+                    data=gerar_relatorio_completo_pdf(relatorio, dados_empresa),
+                    file_name=f"valuation_{nome_empresa}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                    mime='application/pdf',
+                    type="primary"
+                )
             
             st.caption("O relatório inclui: todos os métodos de valuation, projeções DCF, análise Berkus, scorecard detalhado e recomendações estratégicas.")
         
@@ -795,6 +785,22 @@ def exibir_valuation():
         st.markdown("---")
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
+            st.markdown("""
+            <style>
+            .stButton > button {
+                background-color: #FF8C00;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                font-weight: bold;
+            }
+            .stButton > button:hover {
+                background-color: #E67E00;
+                color: white;
+            }
+            </style>
+            """, unsafe_allow_html=True)
             st.link_button(
                 "Entre em contato conosco",
                 "https://api.whatsapp.com/send/?phone=554892254155&text&type=phone_number&app_absent=0",
