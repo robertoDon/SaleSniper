@@ -106,12 +106,7 @@ def exibir_valuation():
     st.markdown("""
     ### 📊 Calculadora de Valuation Empresarial
     
-    Esta ferramenta utiliza os métodos mais estabelecidos do mercado para calcular o valuation de sua empresa:
-    
-    - **Múltiplos de Mercado**: Comparação com empresas similares
-    - **DCF (Discounted Cash Flow)**: Valor presente dos fluxos futuros
-    - **Método Berkus**: Para empresas em estágio inicial
-    - **Scorecard**: Avaliação qualitativa e quantitativa
+    Calcule o valor da sua empresa usando múltiplos de mercado baseados em empresas similares do seu setor.
     """)
     
     # Inicializar serviço de valuation
