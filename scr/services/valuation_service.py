@@ -9,55 +9,63 @@ class ValuationService:
         # Múltiplos de mercado por setor e estágio (baseados em dados de mercado)
         self.multiplos_mercado = {
             "SaaS": {
-                "seed": {"receita": 12.0, "ebitda": 20.0, "lucro": 35.0},
-                "startup": {"receita": 8.0, "ebitda": 15.0, "lucro": 25.0},
-                "scaleup": {"receita": 6.0, "ebitda": 12.0, "lucro": 20.0},
-                "estabelecida": {"receita": 4.0, "ebitda": 8.0, "lucro": 15.0}
+                "ideacao": {"receita": 15.0, "ebitda": 25.0, "lucro": 40.0},
+                "validacao": {"receita": 12.0, "ebitda": 20.0, "lucro": 35.0},
+                "operacao": {"receita": 8.0, "ebitda": 15.0, "lucro": 25.0},
+                "tracao": {"receita": 6.0, "ebitda": 12.0, "lucro": 20.0},
+                "escala": {"receita": 4.0, "ebitda": 8.0, "lucro": 15.0}
+            },
+            "Tecnologia": {
+                "ideacao": {"receita": 12.0, "ebitda": 20.0, "lucro": 35.0},
+                "validacao": {"receita": 10.0, "ebitda": 18.0, "lucro": 30.0},
+                "operacao": {"receita": 7.0, "ebitda": 15.0, "lucro": 25.0},
+                "tracao": {"receita": 5.0, "ebitda": 12.0, "lucro": 20.0},
+                "escala": {"receita": 3.5, "ebitda": 10.0, "lucro": 18.0}
             },
             "E-commerce": {
-                "seed": {"receita": 4.0, "ebitda": 15.0, "lucro": 25.0},
-                "startup": {"receita": 2.5, "ebitda": 12.0, "lucro": 18.0},
-                "scaleup": {"receita": 2.0, "ebitda": 10.0, "lucro": 15.0},
-                "estabelecida": {"receita": 1.5, "ebitda": 8.0, "lucro": 12.0}
-            },
-            "Fintech": {
-                "seed": {"receita": 10.0, "ebitda": 25.0, "lucro": 40.0},
-                "startup": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
-                "scaleup": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
-                "estabelecida": {"receita": 3.5, "ebitda": 12.0, "lucro": 20.0}
-            },
-            "Healthtech": {
-                "seed": {"receita": 12.0, "ebitda": 30.0, "lucro": 50.0},
-                "startup": {"receita": 7.0, "ebitda": 20.0, "lucro": 35.0},
-                "scaleup": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
-                "estabelecida": {"receita": 4.5, "ebitda": 15.0, "lucro": 25.0}
-            },
-            "Edtech": {
-                "seed": {"receita": 8.0, "ebitda": 20.0, "lucro": 35.0},
-                "startup": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
-                "scaleup": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
-                "estabelecida": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0}
+                "ideacao": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
+                "validacao": {"receita": 4.0, "ebitda": 15.0, "lucro": 25.0},
+                "operacao": {"receita": 2.5, "ebitda": 12.0, "lucro": 18.0},
+                "tracao": {"receita": 2.0, "ebitda": 10.0, "lucro": 15.0},
+                "escala": {"receita": 1.5, "ebitda": 8.0, "lucro": 12.0}
             },
             "Consultoria": {
-                "seed": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
-                "startup": {"receita": 3.0, "ebitda": 10.0, "lucro": 15.0},
-                "scaleup": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0},
-                "estabelecida": {"receita": 2.0, "ebitda": 6.0, "lucro": 10.0}
+                "ideacao": {"receita": 8.0, "ebitda": 20.0, "lucro": 30.0},
+                "validacao": {"receita": 5.0, "ebitda": 15.0, "lucro": 25.0},
+                "operacao": {"receita": 3.0, "ebitda": 10.0, "lucro": 15.0},
+                "tracao": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0},
+                "escala": {"receita": 2.0, "ebitda": 6.0, "lucro": 10.0}
+            },
+            "Varejo": {
+                "ideacao": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
+                "validacao": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0},
+                "operacao": {"receita": 2.0, "ebitda": 8.0, "lucro": 12.0},
+                "tracao": {"receita": 1.5, "ebitda": 6.0, "lucro": 10.0},
+                "escala": {"receita": 1.2, "ebitda": 5.0, "lucro": 8.0}
+            },
+            "Serviços": {
+                "ideacao": {"receita": 6.0, "ebitda": 15.0, "lucro": 25.0},
+                "validacao": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
+                "operacao": {"receita": 2.5, "ebitda": 10.0, "lucro": 15.0},
+                "tracao": {"receita": 2.0, "ebitda": 8.0, "lucro": 12.0},
+                "escala": {"receita": 1.5, "ebitda": 6.0, "lucro": 10.0}
             },
             "Outros": {
-                "seed": {"receita": 6.0, "ebitda": 18.0, "lucro": 30.0},
-                "startup": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
-                "scaleup": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0},
-                "estabelecida": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0}
+                "ideacao": {"receita": 8.0, "ebitda": 18.0, "lucro": 30.0},
+                "validacao": {"receita": 6.0, "ebitda": 15.0, "lucro": 25.0},
+                "operacao": {"receita": 4.0, "ebitda": 12.0, "lucro": 20.0},
+                "tracao": {"receita": 3.0, "ebitda": 10.0, "lucro": 16.0},
+                "escala": {"receita": 2.5, "ebitda": 8.0, "lucro": 12.0}
             }
         }
         
         # Pesos para valuation médio ponderado por estágio
         self.pesos_estagio = {
-            "seed": [0.1, 0.2, 0.5, 0.2],         # Berkus mais relevante
-            "startup": [0.2, 0.3, 0.3, 0.2],      # Berkus e DCF mais relevantes
-            "scaleup": [0.4, 0.4, 0.1, 0.1],      # Múltiplos e DCF mais relevantes
-            "estabelecida": [0.5, 0.4, 0.05, 0.05] # Múltiplos mais relevantes
+            "ideacao": [0.1, 0.2, 0.5, 0.2],         # Berkus mais relevante
+            "validacao": [0.2, 0.3, 0.3, 0.2],       # Berkus e DCF mais relevantes
+            "operacao": [0.3, 0.4, 0.2, 0.1],        # DCF mais relevante
+            "tracao": [0.4, 0.4, 0.1, 0.1],          # Múltiplos e DCF mais relevantes
+            "escala": [0.5, 0.4, 0.05, 0.05]         # Múltiplos mais relevantes
         }
     
     def calcular_ebitda(self, receita_anual: float, despesas_totais_anuais: float) -> float:
@@ -86,7 +94,7 @@ class ValuationService:
         
         # Obter múltiplos para o setor e tamanho
         multiplos = self.multiplos_mercado.get(setor, self.multiplos_mercado["Outros"])
-        mult = multiplos.get(tamanho_empresa, multiplos["startup"])
+        mult = multiplos.get(tamanho_empresa, multiplos["operacao"])
         
         # Calcular valuations
         valuation_receita = receita_anual * mult["receita"]
@@ -154,7 +162,7 @@ class ValuationService:
     def calcular_berkus(self, receita_anual: float, produto_lancado: bool,
                        parcerias_estrategicas: bool, vendas_organicas: bool, 
                        investe_trafego_pago: bool) -> Dict:
-        """Calcula valuation usando o método Berkus (para startups)."""
+        """Calcula valuation usando o método Berkus (para empresas em estágio inicial)."""
         
         valor_base = 0
         fatores_berkus = []
@@ -192,7 +200,7 @@ class ValuationService:
                           financas: float, concorrencia: float, inovacao: float) -> Dict:
         """Calcula valuation usando o método Scorecard."""
         
-        # Valor médio de startups similares (ajustado para mercado brasileiro)
+        # Valor médio de empresas similares (ajustado para mercado brasileiro)
         valor_medio = 2000000  # R$ 2M
         
         # Fatores de ajuste
@@ -234,7 +242,7 @@ class ValuationService:
             resultados["scorecard"]["valor_total"]
         ]
         
-        pesos = self.pesos_estagio.get(tamanho_empresa, self.pesos_estagio["startup"])
+        pesos = self.pesos_estagio.get(tamanho_empresa, self.pesos_estagio["operacao"])
         valuation_medio = sum(v * p for v, p in zip(valuations, pesos))
         
         return valuation_medio
@@ -292,7 +300,7 @@ class ValuationService:
             "dados_empresa": dados_empresa,
             "resultados": resultados,
             "valuation_medio": valuation_medio,
-            "pesos_utilizados": self.pesos_estagio[dados_empresa["tamanho_empresa"]]
+            "pesos_utilizados": self.pesos_estagio.get(dados_empresa["tamanho_empresa"], self.pesos_estagio["operacao"])
         }
     
     def exportar_para_dataframe(self, relatorio: Dict) -> pd.DataFrame:

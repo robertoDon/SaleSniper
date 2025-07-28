@@ -110,7 +110,7 @@ def exibir_valuation():
     
     - **Múltiplos de Mercado**: Comparação com empresas similares
     - **DCF (Discounted Cash Flow)**: Valor presente dos fluxos futuros
-    - **Método Berkus**: Para startups em estágio inicial
+    - **Método Berkus**: Para empresas em estágio inicial
     - **Scorecard**: Avaliação qualitativa e quantitativa
     """)
     
@@ -298,12 +298,17 @@ def exibir_valuation():
         investe_trafego_pago = dados_empresa["investe_trafego_pago"]
         
         # Recuperar scores
-        equipe_score = "Baixo" if dados_empresa["equipe"] == 0.7 else "Médio" if dados_empresa["equipe"] == 1.0 else "Alto"
-        produto_score = "Baixo" if dados_empresa["produto"] == 0.7 else "Médio" if dados_empresa["produto"] == 1.0 else "Alto"
-        vendas_marketing = "Baixo" if dados_empresa["vendas_marketing"] == 0.7 else "Médio" if dados_empresa["vendas_marketing"] == 1.0 else "Alto"
-        financas = "Baixo" if dados_empresa["financas"] == 0.7 else "Médio" if dados_empresa["financas"] == 1.0 else "Alto"
-        concorrencia = "Baixo" if dados_empresa["concorrencia"] == 0.7 else "Médio" if dados_empresa["concorrencia"] == 1.0 else "Alto"
-        inovacao = "Baixo" if dados_empresa["inovacao"] == 0.7 else "Médio" if dados_empresa["inovacao"] == 1.0 else "Alto"
+        def converter_score_reverso(valor):
+            if valor == 0.7: return "Baixo"
+            elif valor == 1.0: return "Médio"
+            else: return "Alto"  # 1.3
+        
+        equipe_score = converter_score_reverso(dados_empresa["equipe"])
+        produto_score = converter_score_reverso(dados_empresa["produto"])
+        vendas_marketing = converter_score_reverso(dados_empresa["vendas_marketing"])
+        financas = converter_score_reverso(dados_empresa["financas"])
+        concorrencia = converter_score_reverso(dados_empresa["concorrencia"])
+        inovacao = converter_score_reverso(dados_empresa["inovacao"])
         
         # Calcular crescimento estimado para exibição
         if setor == "SaaS" and tamanho_empresa == "ideacao":
@@ -480,7 +485,7 @@ def exibir_valuation():
         else:  # escala
             if valuation_medio >= 100000000:  # R$ 100M
                 status = "Posicionamento sólido!"
-                analise = "Sua empresa estabelecida está com um valuation muito sólido. Você tem um negócio maduro e lucrativo."
+                analise = "Sua empresa em escala está com um valuation muito sólido. Você tem um negócio maduro e lucrativo."
             elif valuation_medio >= 50000000:  # R$ 50M
                 status = "Bem posicionada"
                 analise = "Sua empresa está bem posicionada. Continue focando na otimização e expansão."
