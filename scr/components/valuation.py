@@ -286,7 +286,7 @@ def exibir_valuation():
         st.session_state["valuation_initialized"] = True
         st.session_state["valuation_result"] = None
     
-    st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Valuation de Empresas</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: #FF8C00; text-align: center;'>SaleSniper - Valuation de Empresas</h1>", unsafe_allow_html=True)
     
     st.markdown("""
     <h3 style='text-align: center;'>Calculadora de Valuation Empresarial</h3>
@@ -515,296 +515,245 @@ def exibir_valuation():
         else:
             crescimento_estimado = 30
     
-    # Botão para calcular
-    if st.button("💰 Calcular Valuation", type="primary"):
-        
-        # Converter valores do scorecard para números
-        def converter_score(valor):
-            if valor == "Baixo": return 0.7
-            elif valor == "Médio": return 1.0
-            else: return 1.3  # Alto
-        
-        # Calcular margem EBITDA
-        margem_ebitda = ebitda / receita_anual if receita_anual > 0 else 0
-        
-        # Preparar dados da empresa
-        dados_empresa = {
-            "nome_empresa": nome_empresa,
-            "setor": setor,
-            "tamanho_empresa": tamanho_empresa,
-            "receita_anual": receita_anual,
-            "ebitda": ebitda,
-            "lucro_liquido": lucro_liquido,
-            "margem_ebitda": margem_ebitda,
-            "crescimento_anual": crescimento_anual,
-            "n_vendedores": n_vendedores,
-            "produto_lancado": produto_lancado,
-            "parcerias_estrategicas": parcerias_estrategicas,
-            "vendas_organicas": vendas_organicas,
-            "investe_trafego_pago": investe_trafego_pago,
-            "equipe": converter_score(equipe_score),
-            "produto": converter_score(produto_score),
-            "vendas_marketing": converter_score(vendas_marketing),
-            "financas": converter_score(financas),
-            "concorrencia": converter_score(concorrencia),
-            "inovacao": converter_score(inovacao)
-        }
-        
-        # Gerar relatório completo
-        relatorio = valuation_service.gerar_relatorio_completo(dados_empresa)
-        resultados = relatorio["resultados"]
-        
-        # Salvar na sessão
-        st.session_state["valuation_result"] = relatorio
-        st.success("✅ Valuation calculado com sucesso!")
-        
-        # Exibir resultados após o cálculo
-        # APENAS MÚLTIPLOS
-        st.markdown("<h3 style='text-align: center;'>Resultado do Valuation</h3>", unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.metric("Valuation por Múltiplos", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M")
-            with st.expander("❓ O que é valuation por múltiplos?", expanded=False):
-                st.markdown("""
-                **🔢 Método dos Múltiplos**
-                
-                **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de faturamento, EBITDA e lucro.
-                
-                **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
-                
-                **Por que este valor:** Baseado em múltiplos reais do mercado para empresas do setor {setor} em estágio {tamanho_empresa}.
-                
-                **Vantagens:** 
-                - Baseado em dados reais do mercado
-                - Fácil de entender e explicar
-                - Reflete o que investidores pagam por empresas similares
-                """)
-        
-        # Métricas Financeiras - MANTER COMO ESTÁ
-        st.markdown("<h3 style='text-align: center;'>Métricas Financeiras Calculadas</h3>", unsafe_allow_html=True)
-        
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col2:
-            st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
-        with col3:
-            st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
-        
-        # Multiplicadores Utilizados - MANTER COMO ESTÁ
-        st.markdown("<h3 style='text-align: center;'>Multiplicadores Utilizados</h3>", unsafe_allow_html=True)
-        mult = resultados['multiplos']['multiplos']
-        
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col1:
-            st.metric("Faturamento", f"{mult['receita']}x")
-        with col2:
-            st.metric("EBITDA", f"{mult['ebitda']}x")
-        with col3:
-            st.metric("Lucro Líquido", f"{mult['lucro']}x")
-        
-        st.markdown(f"<p style='text-align: center;'>Baseado em empresas do setor {setor} em estágio {tamanho_empresa}</p>", unsafe_allow_html=True)
-        
-        # Botão para baixar relatório completo
-        st.markdown("---")
-        st.markdown("<h3 style='text-align: center;'>Relatório Completo</h3>", unsafe_allow_html=True)
-        
-        # Centralizar todo o conteúdo
-        col1, col2, col3 = st.columns([1, 3, 1])
-        with col2:
-            st.markdown("<p style='text-align: center;'>Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:</p>", unsafe_allow_html=True)
+    # Botão para calcular - centralizado
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("💰 Calcular Valuation", type="primary"):
             
-            # Centralizar o botão
-            col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
-            with col_btn2:
-                st.download_button(
-                    label="Baixar Relatório Completo (PDF)",
-                    data=gerar_relatorio_completo_pdf(relatorio, dados_empresa),
-                    file_name=f"valuation_{nome_empresa}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                    mime='application/pdf',
+            # Converter valores do scorecard para números
+            def converter_score(valor):
+                if valor == "Baixo": return 0.7
+                elif valor == "Médio": return 1.0
+                else: return 1.3  # Alto
+            
+            # Calcular margem EBITDA
+            margem_ebitda = ebitda / receita_anual if receita_anual > 0 else 0
+            
+            # Preparar dados da empresa
+            dados_empresa = {
+                "nome_empresa": nome_empresa,
+                "setor": setor,
+                "tamanho_empresa": tamanho_empresa,
+                "receita_anual": receita_anual,
+                "ebitda": ebitda,
+                "lucro_liquido": lucro_liquido,
+                "margem_ebitda": margem_ebitda,
+                "crescimento_anual": crescimento_anual,
+                "n_vendedores": n_vendedores,
+                "produto_lancado": produto_lancado,
+                "parcerias_estrategicas": parcerias_estrategicas,
+                "vendas_organicas": vendas_organicas,
+                "investe_trafego_pago": investe_trafego_pago,
+                "equipe": converter_score(equipe_score),
+                "produto": converter_score(produto_score),
+                "vendas_marketing": converter_score(vendas_marketing),
+                "financas": converter_score(financas),
+                "concorrencia": converter_score(concorrencia),
+                "inovacao": converter_score(inovacao)
+            }
+            
+            # Gerar relatório completo
+            relatorio = valuation_service.gerar_relatorio_completo(dados_empresa)
+            resultados = relatorio["resultados"]
+            
+            # Salvar na sessão
+            st.session_state["valuation_result"] = relatorio
+            st.success("✅ Valuation calculado com sucesso!")
+            
+            # Exibir resultados após o cálculo
+            # APENAS MÚLTIPLOS
+            st.markdown("<h3 style='text-align: center;'>Resultado do Valuation</h3>", unsafe_allow_html=True)
+            
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.metric("Valuation por Múltiplos", f"R$ {formatar_numero_br(resultados['multiplos']['receita']/1000000, 1)}M")
+                with st.expander("❓ O que é valuation por múltiplos?", expanded=False):
+                    st.markdown("""
+                    **🔢 Método dos Múltiplos**
+                    
+                    **Como funciona:** Compara sua empresa com outras similares do mercado usando múltiplos de faturamento, EBITDA e lucro.
+                    
+                    **Fórmula:** Valor = Métrica Financeira × Múltiplo de Mercado
+                    
+                    **Por que este valor:** Baseado em múltiplos reais do mercado para empresas do setor {setor} em estágio {tamanho_empresa}.
+                    
+                    **Vantagens:** 
+                    - Baseado em dados reais do mercado
+                    - Fácil de entender e explicar
+                    - Reflete o que investidores pagam por empresas similares
+                    """)
+            
+            # Métricas Financeiras - MANTER COMO ESTÁ
+            st.markdown("<h3 style='text-align: center;'>Métricas Financeiras Calculadas</h3>", unsafe_allow_html=True)
+            
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col2:
+                st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
+            with col3:
+                st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
+            
+            # Multiplicadores Utilizados - MANTER COMO ESTÁ
+            st.markdown("<h3 style='text-align: center;'>Multiplicadores Utilizados</h3>", unsafe_allow_html=True)
+            mult = resultados['multiplos']['multiplos']
+            
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col1:
+                st.metric("Faturamento", f"{mult['receita']}x")
+            with col2:
+                st.metric("EBITDA", f"{mult['ebitda']}x")
+            with col3:
+                st.metric("Lucro Líquido", f"{mult['lucro']}x")
+            
+            st.markdown(f"<p style='text-align: center;'>Baseado em empresas do setor {setor} em estágio {tamanho_empresa}</p>", unsafe_allow_html=True)
+            
+            # Botão para baixar relatório completo
+            st.markdown("---")
+            st.markdown("<h3 style='text-align: center;'>Relatório Completo</h3>", unsafe_allow_html=True)
+            
+            # Centralizar todo o conteúdo
+            col1, col2, col3 = st.columns([1, 3, 1])
+            with col2:
+                st.markdown("<p style='text-align: center;'>Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:</p>", unsafe_allow_html=True)
+                
+                # Centralizar o botão
+                col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+                with col_btn2:
+                    st.download_button(
+                        label="Baixar Relatório Completo (PDF)",
+                        data=gerar_relatorio_completo_pdf(relatorio, dados_empresa),
+                        file_name=f"valuation_{nome_empresa}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                        mime='application/pdf',
+                        type="primary"
+                    )
+                
+                st.markdown("<p style='text-align: center;'>O relatório inclui: todos os métodos de valuation, projeções DCF, análise Berkus, scorecard detalhado e recomendações estratégicas.</p>", unsafe_allow_html=True)
+            
+            st.markdown("---")
+            
+            # Análise "E aí, estou bem?"
+            st.markdown("<h3 style='text-align: center;'>E aí, estou bem?</h3>", unsafe_allow_html=True)
+            
+            # Determinar status baseado no valuation
+            valor_multiplos = resultados['multiplos']['receita']
+            
+            if valor_multiplos >= 10000000:  # 10M+
+                status = "Muito bem posicionada!"
+                analise = f"Sua empresa está com um valuation excelente para o estágio de {tamanho_empresa}. Isso indica que você tem uma base sólida e potencial de crescimento significativo."
+            elif valor_multiplos >= 5000000:  # 5M-10M
+                status = "Bem posicionada!"
+                analise = f"Sua empresa está com um valuation muito bom para o estágio de {tamanho_empresa}. Continue focando no crescimento e otimização."
+            elif valor_multiplos >= 2000000:  # 2M-5M
+                status = "Posicionamento moderado"
+                analise = f"Sua empresa está com um valuation adequado para o estágio de {tamanho_empresa}. Há oportunidades de melhoria e crescimento."
+            else:  # < 2M
+                status = "Atenção necessária"
+                analise = f"Sua empresa está com um valuation baixo para o estágio de {tamanho_empresa}. Recomendamos focar em melhorias estratégicas."
+            
+            # Pontos positivos, alerta e negativos
+            pontos_positivos = []
+            pontos_alerta = []
+            pontos_negativos = []
+            
+            if produto_lancado:
+                pontos_positivos.append("**Produto já lançado**: Você tem um produto validado no mercado")
+            else:
+                pontos_negativos.append("**Produto não lançado**: Priorize o lançamento do produto")
+            
+            if margem_ebitda >= 0.25:
+                pontos_positivos.append("**Margem EBITDA alta**: Excelente eficiência operacional")
+            elif margem_ebitda >= 0.15:
+                pontos_alerta.append("**Margem EBITDA moderada**: Há espaço para otimização de custos")
+            else:
+                pontos_negativos.append("**Margem EBITDA baixa**: Foque na otimização de custos")
+            
+            if parcerias_estrategicas:
+                pontos_positivos.append("**Parcerias estratégicas**: Você tem alianças que aceleram o crescimento")
+            else:
+                pontos_negativos.append("**Sem parcerias estratégicas**: Busque alianças que possam acelerar seu crescimento")
+            
+            if vendas_organicas:
+                pontos_positivos.append("**Vendas orgânicas**: Você tem um modelo de aquisição sustentável")
+            else:
+                pontos_alerta.append("**Dependência de tráfego pago**: Considere diversificar canais de aquisição")
+            
+            if investe_trafego_pago:
+                pontos_positivos.append("**Investimento em marketing**: Você está investindo em crescimento")
+            else:
+                pontos_alerta.append("**Sem investimento em marketing**: Considere investir em aquisição de clientes")
+            
+            # Garantir pelo menos um ponto de cada tipo
+            if not pontos_positivos:
+                pontos_positivos.append("**Potencial de crescimento**: Seu setor tem boas oportunidades")
+            if not pontos_alerta:
+                pontos_alerta.append("**Atenção aos detalhes**: Foque na otimização de processos e eficiência")
+            if not pontos_negativos:
+                pontos_negativos.append("**Atenção aos detalhes**: Foque na otimização de processos e eficiência")
+            
+            # Exibir análise centralizada
+            col_analise1, col_analise2, col_analise3 = st.columns([1, 3, 1])
+            with col_analise2:
+                st.markdown(f"<h4 style='text-align: center;'>{status}</h4>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align: center;'>{analise}</p>", unsafe_allow_html=True)
+                
+                st.markdown("<h5 style='text-align: center;'>Ponto Positivo:</h5>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align: center;'>• {pontos_positivos[0]}</p>", unsafe_allow_html=True)
+                
+                st.markdown("<h5 style='text-align: center;'>Ponto Alerta:</h5>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align: center;'>• {pontos_alerta[0]}</p>", unsafe_allow_html=True)
+                
+                st.markdown("<h5 style='text-align: center;'>Ponto Negativo:</h5>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align: center;'>• {pontos_negativos[0]}</p>", unsafe_allow_html=True)
+                
+                # Recomendação de produto Don
+                st.markdown("<h5 style='text-align: center;'>Recomendação de produto Don:</h5>", unsafe_allow_html=True)
+                
+                if tamanho_empresa == "ideacao":
+                    programa = "**Don for Ideação**"
+                    descricao_programa = "Programa especializado para empresas em estágio de ideação, focado em desenvolvimento de conceito e validação inicial."
+                    dica_negocio = "Foque em validar sua ideia com o mercado antes de investir pesado em desenvolvimento."
+                elif tamanho_empresa == "validacao":
+                    programa = "**Don for Validação**"
+                    descricao_programa = "Programa para empresas em validação, focado em primeiros clientes e validação de mercado."
+                    dica_negocio = "Priorize encontrar seus primeiros clientes e validar o produto-market fit."
+                elif tamanho_empresa == "operacao":
+                    programa = "**Don for Operação**"
+                    descricao_programa = "Programa para empresas em operação estável, focado em otimização e crescimento sustentável."
+                    dica_negocio = "Foque em estabilizar processos e aumentar a eficiência operacional."
+                elif tamanho_empresa == "tracao":
+                    programa = "**Don for Tração**"
+                    descricao_programa = "Programa para empresas em tração, focado em crescimento acelerado e expansão de mercado."
+                    dica_negocio = "Acelere o crescimento focando em estratégias de aquisição e expansão."
+                else:  # escala
+                    programa = "**Don for Escala**"
+                    descricao_programa = "Programa para empresas em escala, focado em otimização e expansão estratégica."
+                    dica_negocio = "Otimize processos e busque expansão estratégica para maximizar resultados."
+                
+                st.markdown(f"<p style='text-align: center;'>Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align: center;'>{descricao_programa}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='text-align: center;'>{dica_negocio}</p>", unsafe_allow_html=True)
+            
+            # Botão de contato - centralizado
+            st.markdown("---")
+            col_contato1, col_contato2, col_contato3 = st.columns([1, 2, 1])
+            with col_contato2:
+                st.markdown("""
+                <style>
+                .stButton > button {
+                    background-color: #FF8C00;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 10px 20px;
+                    font-weight: bold;
+                }
+                .stButton > button:hover {
+                    background-color: #E67E00;
+                    color: white;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                st.link_button(
+                    "Entre em contato conosco",
+                    "https://api.whatsapp.com/send/?phone=554892254155&text&type=phone_number&app_absent=0",
                     type="primary"
                 )
-            
-            st.markdown("<p style='text-align: center;'>O relatório inclui: todos os métodos de valuation, projeções DCF, análise Berkus, scorecard detalhado e recomendações estratégicas.</p>", unsafe_allow_html=True)
-        
-        st.markdown("---")
-        
-        # Análise e recomendação - SEM EMOJIS
-        st.markdown("<h3 style='text-align: center;'>E aí, estou bem?</h3>", unsafe_allow_html=True)
-        
-        # Calcular métricas para análise
-        valuation_medio = relatorio['valuation_medio']
-        margem_ebitda = ebitda / receita_anual if receita_anual > 0 else 0
-        
-        # Determinar se está bem para o mercado
-        if tamanho_empresa == "ideacao":
-            if valuation_medio >= 2000000:  # R$ 2M
-                status = "Muito bem posicionada!"
-                analise = "Sua empresa está com um valuation excelente para o estágio de ideação. Isso indica que você tem uma base sólida e potencial de crescimento significativo."
-            elif valuation_medio >= 1000000:  # R$ 1M
-                status = "Bem posicionada"
-                analise = "Sua empresa está bem posicionada no mercado. Há espaço para crescimento, mas a base está sólida."
-            else:
-                status = "Precisa de melhorias"
-                analise = "Sua empresa precisa de melhorias para se destacar no mercado. Foque em validar o produto e gerar receita."
-        elif tamanho_empresa == "validacao":
-            if valuation_medio >= 5000000:  # R$ 5M
-                status = "Excelente posicionamento!"
-                analise = "Sua empresa está com um valuation muito forte para o estágio de validação. Você tem um produto validado e crescimento consistente."
-            elif valuation_medio >= 2500000:  # R$ 2.5M
-                status = "Bem posicionada"
-                analise = "Sua empresa está bem posicionada. Continue focando na validação de mercado."
-            else:
-                status = "Precisa de melhorias"
-                analise = "Sua empresa precisa de melhorias para se destacar. Foque em validação de mercado e primeiros clientes."
-        elif tamanho_empresa == "operacao":
-            if valuation_medio >= 15000000:  # R$ 15M
-                status = "Posicionamento excepcional!"
-                analise = "Sua empresa está com um valuation excepcional para o estágio de operação. Você tem um modelo de negócio validado e operação estável."
-            elif valuation_medio >= 7500000:  # R$ 7.5M
-                status = "Bem posicionada"
-                analise = "Sua empresa está bem posicionada. Continue focando na otimização da operação."
-            else:
-                status = "Precisa de melhorias"
-                analise = "Sua empresa precisa de melhorias para se destacar. Foque em estabilizar a operação e aumentar receita."
-        elif tamanho_empresa == "tracao":
-            if valuation_medio >= 50000000:  # R$ 50M
-                status = "Posicionamento excepcional!"
-                analise = "Sua empresa está com um valuation excepcional para o estágio de tração. Você tem crescimento acelerado e validação de mercado."
-            elif valuation_medio >= 25000000:  # R$ 25M
-                status = "Bem posicionada"
-                analise = "Sua empresa está bem posicionada. Continue focando no crescimento acelerado."
-            else:
-                status = "Precisa de melhorias"
-                analise = "Sua empresa precisa de melhorias para se destacar. Foque em crescimento acelerado e validação."
-        else:  # escala
-            if valuation_medio >= 100000000:  # R$ 100M
-                status = "Posicionamento sólido!"
-                analise = "Sua empresa em escala está com um valuation muito sólido. Você tem um negócio maduro e lucrativo."
-            elif valuation_medio >= 50000000:  # R$ 50M
-                status = "Bem posicionada"
-                analise = "Sua empresa está bem posicionada. Continue focando na otimização e expansão."
-            else:
-                status = "Precisa de melhorias"
-                analise = "Sua empresa precisa de melhorias para se destacar. Foque em eficiência e crescimento sustentável."
-        
-        # Análise específica baseada nos dados do formulário
-        pontos_positivos = []
-        pontos_alerta = []
-        pontos_negativos = []
-        
-        # Pontos positivos baseados nos dados
-        if produto_lancado:
-            pontos_positivos.append("**Produto já lançado**: Você tem um produto validado no mercado")
-        if vendas_organicas:
-            pontos_positivos.append("**Vendas orgânicas**: Você consegue gerar vendas sem investimento pesado")
-        if parcerias_estrategicas:
-            pontos_positivos.append("**Parcerias estratégicas**: Você tem alianças importantes no mercado")
-        if investe_trafego_pago:
-            pontos_positivos.append("**Investe em tráfego pago**: Você tem estratégia de aquisição ativa")
-        if margem_ebitda > 0.2:
-            pontos_positivos.append("**Margem EBITDA alta**: Sua operação é eficiente")
-        if receita_anual > 5000000:
-            pontos_positivos.append("**Faturamento sólido**: Você tem uma base financeira forte")
-        if n_vendedores > 3:
-            pontos_positivos.append("**Equipe de vendas**: Você tem capacidade de expansão")
-        
-        # Pontos de alerta (meio termo)
-        if margem_ebitda >= 0.1 and margem_ebitda <= 0.2:
-            pontos_alerta.append("**Margem EBITDA moderada**: Há espaço para otimização de custos")
-        if receita_anual >= 1000000 and receita_anual <= 5000000:
-            pontos_alerta.append("**Faturamento em crescimento**: Continue focando na expansão")
-        if n_vendedores >= 2 and n_vendedores <= 3:
-            pontos_alerta.append("**Equipe de vendas pequena**: Considere expandir para acelerar crescimento")
-        
-        # Pontos negativos específicos
-        if not produto_lancado and tamanho_empresa in ["ideacao", "validacao"]:
-            pontos_negativos.append("**Produto não lançado**: Priorize o lançamento para validar o mercado e aumentar o valuation")
-        if not vendas_organicas and tamanho_empresa in ["ideacao", "validacao"]:
-            pontos_negativos.append("**Sem vendas orgânicas**: Desenvolva estratégias de aquisição natural de clientes")
-        if not parcerias_estrategicas:
-            pontos_negativos.append("**Sem parcerias estratégicas**: Busque alianças que possam acelerar seu crescimento")
-        if not investe_trafego_pago:
-            pontos_negativos.append("**Não investe em tráfego pago**: Considere estratégias de marketing digital para crescimento")
-        if margem_ebitda < 0.1:
-            pontos_negativos.append(f"**Margem EBITDA baixa ({margem_ebitda*100:.1f}%)**: Otimize custos operacionais para aumentar lucratividade")
-        if receita_anual < 1000000:
-            pontos_negativos.append(f"**Faturamento baixo (R$ {formatar_numero_br(receita_anual)})**: Foque em crescimento de vendas e expansão de mercado")
-        if n_vendedores < 2:
-            pontos_negativos.append("**Equipe de vendas pequena**: Considere expandir a equipe para acelerar crescimento")
-        
-        # Garantir sempre pelo menos 1 de cada
-        if not pontos_positivos:
-            pontos_positivos.append("**Potencial de crescimento**: Sua empresa tem espaço para evolução significativa")
-        if not pontos_alerta:
-            pontos_alerta.append("**Continue otimizando**: Mantenha o foco na melhoria contínua")
-        if not pontos_negativos:
-            pontos_negativos.append("**Atenção aos detalhes**: Foque na otimização de processos e eficiência")
-        
-        # Exibir análise centralizada
-        col_analise1, col_analise2, col_analise3 = st.columns([1, 3, 1])
-        with col_analise2:
-            st.markdown(f"<h4 style='text-align: center;'>{status}</h4>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center;'>{analise}</p>", unsafe_allow_html=True)
-            
-            st.markdown("<h5 style='text-align: center;'>Ponto Positivo:</h5>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center;'>• {pontos_positivos[0]}</p>", unsafe_allow_html=True)
-            
-            st.markdown("<h5 style='text-align: center;'>Ponto Alerta:</h5>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center;'>• {pontos_alerta[0]}</p>", unsafe_allow_html=True)
-            
-            st.markdown("<h5 style='text-align: center;'>Ponto Negativo:</h5>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center;'>• {pontos_negativos[0]}</p>", unsafe_allow_html=True)
-            
-            # Recomendação de produto Don
-            st.markdown("<h5 style='text-align: center;'>Recomendação de produto Don:</h5>", unsafe_allow_html=True)
-            
-            if tamanho_empresa == "ideacao":
-                programa = "**Don for Ideação**"
-                descricao_programa = "Programa especializado para empresas em estágio de ideação, focado em desenvolvimento de conceito e validação inicial."
-                dica_negocio = "Foque em validar sua ideia com o mercado antes de investir pesado em desenvolvimento."
-            elif tamanho_empresa == "validacao":
-                programa = "**Don for Validação**"
-                descricao_programa = "Programa para empresas em validação, focado em primeiros clientes e validação de mercado."
-                dica_negocio = "Priorize encontrar seus primeiros clientes e validar o produto-market fit."
-            elif tamanho_empresa == "operacao":
-                programa = "**Don for Operação**"
-                descricao_programa = "Programa para empresas em operação estável, focado em otimização e crescimento sustentável."
-                dica_negocio = "Foque em estabilizar processos e aumentar a eficiência operacional."
-            elif tamanho_empresa == "tracao":
-                programa = "**Don for Tração**"
-                descricao_programa = "Programa para empresas em tração, focado em crescimento acelerado e expansão de mercado."
-                dica_negocio = "Acelere o crescimento focando em estratégias de aquisição e expansão."
-            else:  # escala
-                programa = "**Don for Escala**"
-                descricao_programa = "Programa para empresas em escala, focado em otimização e expansão estratégica."
-                dica_negocio = "Otimize processos e busque expansão estratégica para maximizar resultados."
-            
-            st.markdown(f"<p style='text-align: center;'>Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center;'>{descricao_programa}</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='text-align: center;'>{dica_negocio}</p>", unsafe_allow_html=True)
-        
-        # Botão de contato
-        st.markdown("---")
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("""
-            <style>
-            .stButton > button {
-                background-color: #FF8C00;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 10px 20px;
-                font-weight: bold;
-            }
-            .stButton > button:hover {
-                background-color: #E67E00;
-                color: white;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-            st.link_button(
-                "Entre em contato conosco",
-                "https://api.whatsapp.com/send/?phone=554892254155&text&type=phone_number&app_absent=0",
-                type="primary"
-            )
