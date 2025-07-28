@@ -559,8 +559,6 @@ def exibir_valuation():
         st.success("✅ Valuation calculado com sucesso!")
         
         # Exibir resultados após o cálculo
-        st.markdown("### 📊 Resultados do Valuation")
-        
         # APENAS MÚLTIPLOS
         st.markdown("<h3 style='text-align: center;'>Resultado do Valuation</h3>", unsafe_allow_html=True)
         
@@ -585,16 +583,18 @@ def exibir_valuation():
         
         # Métricas Financeiras - MANTER COMO ESTÁ
         st.markdown("<h3 style='text-align: center;'>Métricas Financeiras Calculadas</h3>", unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
+        
+        col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
+            st.metric("EBITDA", f"R$ {formatar_numero_br(ebitda)}")
+        with col3:
             st.metric("Margem EBITDA", f"{margem_ebitda*100:.1f}%")
         
         # Multiplicadores Utilizados - MANTER COMO ESTÁ
         st.markdown("<h3 style='text-align: center;'>Multiplicadores Utilizados</h3>", unsafe_allow_html=True)
         mult = resultados['multiplos']['multiplos']
-        col1, col2, col3 = st.columns(3)
+        
+        col1, col2, col3 = st.columns([1, 1, 1])
         with col1:
             st.metric("Faturamento", f"{mult['receita']}x")
         with col2:
@@ -602,7 +602,7 @@ def exibir_valuation():
         with col3:
             st.metric("Lucro Líquido", f"{mult['lucro']}x")
         
-        st.caption(f"Baseado em empresas do setor {setor} em estágio {tamanho_empresa}")
+        st.markdown(f"<p style='text-align: center;'>Baseado em empresas do setor {setor} em estágio {tamanho_empresa}</p>", unsafe_allow_html=True)
         
         # Botão para baixar relatório completo
         st.markdown("---")
@@ -611,7 +611,7 @@ def exibir_valuation():
         # Centralizar todo o conteúdo
         col1, col2, col3 = st.columns([1, 3, 1])
         with col2:
-            st.markdown("Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:")
+            st.markdown("<p style='text-align: center;'>Baixe o relatório completo com todos os métodos de valuation e análises detalhadas:</p>", unsafe_allow_html=True)
             
             # Centralizar o botão
             col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
@@ -624,7 +624,7 @@ def exibir_valuation():
                     type="primary"
                 )
             
-            st.caption("O relatório inclui: todos os métodos de valuation, projeções DCF, análise Berkus, scorecard detalhado e recomendações estratégicas.")
+            st.markdown("<p style='text-align: center;'>O relatório inclui: todos os métodos de valuation, projeções DCF, análise Berkus, scorecard detalhado e recomendações estratégicas.</p>", unsafe_allow_html=True)
         
         st.markdown("---")
         
@@ -740,46 +740,48 @@ def exibir_valuation():
         if not pontos_negativos:
             pontos_negativos.append("**Atenção aos detalhes**: Foque na otimização de processos e eficiência")
         
-        # Exibir análise
-        st.markdown(f"**{status}**")
-        st.markdown(analise)
-        
-        st.markdown("**Ponto Positivo:**")
-        st.markdown(f"• {pontos_positivos[0]}")
-        
-        st.markdown("**Ponto Alerta:**")
-        st.markdown(f"• {pontos_alerta[0]}")
-        
-        st.markdown("**Ponto Negativo:**")
-        st.markdown(f"• {pontos_negativos[0]}")
-        
-        # Recomendação de produto Don
-        st.markdown("**Recomendação de produto Don:**")
-        
-        if tamanho_empresa == "ideacao":
-            programa = "**Don for Ideação**"
-            descricao_programa = "Programa especializado para empresas em estágio de ideação, focado em desenvolvimento de conceito e validação inicial."
-            dica_negocio = "Foque em validar sua ideia com o mercado antes de investir pesado em desenvolvimento."
-        elif tamanho_empresa == "validacao":
-            programa = "**Don for Validação**"
-            descricao_programa = "Programa para empresas em validação, focado em primeiros clientes e validação de mercado."
-            dica_negocio = "Priorize encontrar seus primeiros clientes e validar o produto-market fit."
-        elif tamanho_empresa == "operacao":
-            programa = "**Don for Operação**"
-            descricao_programa = "Programa para empresas em operação estável, focado em otimização e crescimento sustentável."
-            dica_negocio = "Foque em estabilizar processos e aumentar a eficiência operacional."
-        elif tamanho_empresa == "tracao":
-            programa = "**Don for Tração**"
-            descricao_programa = "Programa para empresas em tração, focado em crescimento acelerado e expansão de mercado."
-            dica_negocio = "Acelere o crescimento focando em estratégias de aquisição e expansão."
-        else:  # escala
-            programa = "**Don for Escala**"
-            descricao_programa = "Programa para empresas em escala, focado em otimização e expansão estratégica."
-            dica_negocio = "Otimize processos e busque expansão estratégica para maximizar resultados."
-        
-        st.markdown(f"Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.")
-        st.markdown(descricao_programa)
-        st.markdown(dica_negocio)
+        # Exibir análise centralizada
+        col_analise1, col_analise2, col_analise3 = st.columns([1, 3, 1])
+        with col_analise2:
+            st.markdown(f"<h4 style='text-align: center;'>{status}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>{analise}</p>", unsafe_allow_html=True)
+            
+            st.markdown("<h5 style='text-align: center;'>Ponto Positivo:</h5>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>• {pontos_positivos[0]}</p>", unsafe_allow_html=True)
+            
+            st.markdown("<h5 style='text-align: center;'>Ponto Alerta:</h5>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>• {pontos_alerta[0]}</p>", unsafe_allow_html=True)
+            
+            st.markdown("<h5 style='text-align: center;'>Ponto Negativo:</h5>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>• {pontos_negativos[0]}</p>", unsafe_allow_html=True)
+            
+            # Recomendação de produto Don
+            st.markdown("<h5 style='text-align: center;'>Recomendação de produto Don:</h5>", unsafe_allow_html=True)
+            
+            if tamanho_empresa == "ideacao":
+                programa = "**Don for Ideação**"
+                descricao_programa = "Programa especializado para empresas em estágio de ideação, focado em desenvolvimento de conceito e validação inicial."
+                dica_negocio = "Foque em validar sua ideia com o mercado antes de investir pesado em desenvolvimento."
+            elif tamanho_empresa == "validacao":
+                programa = "**Don for Validação**"
+                descricao_programa = "Programa para empresas em validação, focado em primeiros clientes e validação de mercado."
+                dica_negocio = "Priorize encontrar seus primeiros clientes e validar o produto-market fit."
+            elif tamanho_empresa == "operacao":
+                programa = "**Don for Operação**"
+                descricao_programa = "Programa para empresas em operação estável, focado em otimização e crescimento sustentável."
+                dica_negocio = "Foque em estabilizar processos e aumentar a eficiência operacional."
+            elif tamanho_empresa == "tracao":
+                programa = "**Don for Tração**"
+                descricao_programa = "Programa para empresas em tração, focado em crescimento acelerado e expansão de mercado."
+                dica_negocio = "Acelere o crescimento focando em estratégias de aquisição e expansão."
+            else:  # escala
+                programa = "**Don for Escala**"
+                descricao_programa = "Programa para empresas em escala, focado em otimização e expansão estratégica."
+                dica_negocio = "Otimize processos e busque expansão estratégica para maximizar resultados."
+            
+            st.markdown(f"<p style='text-align: center;'>Baseado no estágio da sua empresa ({tamanho_empresa}), recomendamos o {programa}.</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>{descricao_programa}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='text-align: center;'>{dica_negocio}</p>", unsafe_allow_html=True)
         
         # Botão de contato
         st.markdown("---")
