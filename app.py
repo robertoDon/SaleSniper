@@ -117,6 +117,8 @@ def metas_funil():
             ticket_medio = 0.0
         try:
             n_vend = int(n_vend_raw)
+            if n_vend < 1:
+                n_vend = 1
         except ValueError:
             n_vend = 1
 
