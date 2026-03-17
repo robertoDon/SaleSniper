@@ -101,5 +101,39 @@ def _processar_correlacoes(correlacoes: dict) -> tuple:
     
     return insights
 
-def get_dashboard_data():
-    return {'message': 'Dashboard data placeholder'}
+def get_dashboard_data(arquivo) -> dict:
+    """Processa o arquivo enviado e retorna dados para a UI.
+
+    Args:
+        arquivo: arquivo enviado pelo formulário (werkzeug FileStorage)
+    """
+    try:
+        # Carregar dados do Excel
+        df_original = carregar_clientes_do_excel(arquivo)
+        df = carregar_e_preprocessar_dados(df_original)
+
+        vars_cat, vars_num = get_variaveis_default()
+        capitao, correlacoes = calcular_analise_icp(df, vars_cat, vars_num)
+
+        # Perfil ideal
+        perfil = capitao.iloc[0].to_dict() if not capitao.empty else {}
+        perfil_formatado = _formatar_perfil_capitao(perfil)
+
+        # Insights
+        insights_raw = _processar_correlacoes(correlacoes)
+        insights = []
+        for item in insights_raw:
+            insights.append({
+                'variavel': item.get('variavel'),
+                'insight': item.get('insight'),
+                'acao': gerar_acao_sugerida_para_insight(item.get('insight', ''))
+            })
+
+        return {
+            'perfil': perfil_formatado,
+            'insights': insights,
+            'num_clientes': len(df),
+            'num_colunas': len(df.columns)
+        }
+    except Exception as e:
+        return {'error': f'Erro ao processar arquivo: {e}'}

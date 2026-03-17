@@ -3,6 +3,56 @@
 {% block title %}Previsão de Churn - SaleSniper{% endblock %}
 
 {% block content %}
-<h1>🔮 Previsão de Churn</h1>
-<p>Funcionalidade em desenvolvimento.</p>
+<h1 class="text-warning">🔮 Previsão de Churn</h1>
+
+<div class="card bg-secondary p-4 mb-4">
+  <h5>1) Envie seu arquivo CSV de clientes</h5>
+  <form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <input type="file" class="form-control" name="file" accept=".csv" required>
+    </div>
+    <button class="btn btn-warning" type="submit">Executar previsão</button>
+  </form>
+
+  {% if data and data.error %}
+    <div class="alert alert-danger mt-3">{{ data.error }}</div>
+  {% endif %}
+</div>
+
+{% if data and data.stats %}
+  <div class="card bg-secondary p-4 mb-4">
+    <h4>Resultados de Churn</h4>
+    <p>Registros processados: <strong>{{ data.stats.count }}</strong></p>
+
+    <ul>
+      <li>Média (dias): {{ data.stats.media_dias | round(2) }}</li>
+      <li>Mediana (dias): {{ data.stats.mediana_dias | round(2) }}</li>
+      <li>Menor (dias): {{ data.stats.min_dias | round(2) }}</li>
+      <li>Maior (dias): {{ data.stats.max_dias | round(2) }}</li>
+    </ul>
+
+    <h5>Prévia (até 20 linhas)</h5>
+    <div class="table-responsive">
+      <table class="table table-sm table-dark">
+        <thead>
+          <tr>
+            {% for col in data.preview[0].keys() %}
+              <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.preview %}
+            <tr>
+              {% for value in row.values() %}
+                <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+
 {% endblock %}

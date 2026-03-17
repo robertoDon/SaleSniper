@@ -3,15 +3,57 @@
 {% block title %}Dashboard - SaleSniper{% endblock %}
 
 {% block content %}
-<h1 class="text-warning">SaleSniper - Análise de ICP (Ideal Customer Profile)</h1>
+<h1 class="text-warning">SaleSniper - Análise de ICP</h1>
 
-<p>Funcionalidade em desenvolvimento. Upload de arquivo e análise ICP aqui.</p>
+<div class="card bg-secondary p-4 mb-4">
+  <h5>1) Envie seu arquivo Excel de clientes</h5>
+  <form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <input type="file" class="form-control" name="file" accept=".xlsx" required>
+    </div>
+    <button class="btn btn-warning" type="submit">Processar</button>
+  </form>
+  {% if data and data.error %}
+    <div class="alert alert-danger mt-3">{{ data.error }}</div>
+  {% endif %}
+</div>
 
-<!-- Placeholder for data -->
-{% if data %}
-    <h2>Perfil de Cliente Ideal</h2>
-    <p>Dados carregados.</p>
-{% else %}
-    <p>Nenhum dado carregado ainda.</p>
+{% if data and data.perfil %}
+  <div class="card bg-secondary p-4 mb-4">
+    <h4>Perfil de Cliente Ideal</h4>
+    <p>Clientes processados: <strong>{{ data.num_clientes }}</strong> | Colunas: <strong>{{ data.num_colunas }}</strong></p>
+
+    <table class="table table-sm table-dark">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for key, value in data.perfil.items() %}
+          <tr>
+            <td>{{ key }}</td>
+            <td>{{ value }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card bg-secondary p-4 mb-4">
+    <h4>Insights & Ações</h4>
+    {% if data.insights %}
+      {% for item in data.insights %}
+        <div class="mb-3">
+          <strong>{{ item.variavel }}</strong><br>
+          <em>{{ item.insight }}</em><br>
+          <span class="text-warning">Ação:</span> {{ item.acao }}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Nenhum insight gerado.</p>
+    {% endif %}
+  </div>
 {% endif %}
 {% endblock %}

@@ -4,5 +4,154 @@
 
 {% block content %}
 <h1>💰 Valuation</h1>
-<p>Funcionalidade em desenvolvimento.</p>
+
+<div class="card bg-secondary p-4 mb-4">
+  <h5>1) Preencha os dados da empresa</h5>
+  <form method="post">
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="nome_empresa" class="form-label">Nome da Empresa</label>
+        <input type="text" class="form-control" id="nome_empresa" name="nome_empresa" placeholder="Minha Empresa">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="setor" class="form-label">Setor</label>
+        <select class="form-select" id="setor" name="setor">
+          <option value="SaaS">SaaS</option>
+          <option value="Tecnologia">Tecnologia</option>
+          <option value="E-commerce">E-commerce</option>
+          <option value="Consultoria">Consultoria</option>
+          <option value="Varejo">Varejo</option>
+          <option value="Serviços">Serviços</option>
+          <option value="Outros" selected>Outros</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="tamanho_empresa" class="form-label">Estágio</label>
+        <select class="form-select" id="tamanho_empresa" name="tamanho_empresa">
+          <option value="ideacao">Ideação</option>
+          <option value="validacao">Validação</option>
+          <option value="operacao" selected>Operação</option>
+          <option value="tracao">Tração</option>
+          <option value="escala">Escala</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label for="receita_anual" class="form-label">Receita Anual (R$)</label>
+        <input type="number" step="0.01" min="0" class="form-control" id="receita_anual" name="receita_anual" value="1000000">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="ebitda" class="form-label">EBITDA (R$)</label>
+        <input type="number" step="0.01" min="0" class="form-control" id="ebitda" name="ebitda" value="500000">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="lucro_liquido" class="form-label">Lucro Líquido (R$)</label>
+        <input type="number" step="0.01" min="0" class="form-control" id="lucro_liquido" name="lucro_liquido" value="300000">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="margem_ebitda" class="form-label">Margem EBITDA (%)</label>
+        <input type="number" step="0.1" min="0" max="100" class="form-control" id="margem_ebitda" name="margem_ebitda" value="50">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label for="crescimento_anual" class="form-label">Crescimento Anual (%)</label>
+        <input type="number" step="0.1" min="0" max="100" class="form-control" id="crescimento_anual" name="crescimento_anual" value="20">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Produto lançado?</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="produto_lancado" name="produto_lancado">
+          <label class="form-check-label" for="produto_lancado">Sim</label>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Parcerias estratégicas?</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="parcerias_estrategicas" name="parcerias_estrategicas">
+          <label class="form-check-label" for="parcerias_estrategicas">Sim</label>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Vendas orgânicas?</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="vendas_organicas" name="vendas_organicas">
+          <label class="form-check-label" for="vendas_organicas">Sim</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Investe em tráfego pago?</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="investe_trafego_pago" name="investe_trafego_pago">
+          <label class="form-check-label" for="investe_trafego_pago">Sim</label>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="equipe" class="form-label">Score - Equipe</label>
+        <input type="number" step="0.1" min="0" max="2" class="form-control" id="equipe" name="equipe" value="1">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="produto" class="form-label">Score - Produto</label>
+        <input type="number" step="0.1" min="0" max="2" class="form-control" id="produto" name="produto" value="1">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="vendas_marketing" class="form-label">Score - Vendas/Marketing</label>
+        <input type="number" step="0.1" min="0" max="2" class="form-control" id="vendas_marketing" name="vendas_marketing" value="1">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label for="financas" class="form-label">Score - Finanças</label>
+        <input type="number" step="0.1" min="0" max="2" class="form-control" id="financas" name="financas" value="1">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="concorrencia" class="form-label">Score - Concorrência</label>
+        <input type="number" step="0.1" min="0" max="2" class="form-control" id="concorrencia" name="concorrencia" value="1">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="inovacao" class="form-label">Score - Inovação</label>
+        <input type="number" step="0.1" min="0" max="2" class="form-control" id="inovacao" name="inovacao" value="1">
+      </div>
+    </div>
+
+    <button class="btn btn-warning" type="submit">Calcular Valuation</button>
+  </form>
+
+  {% if data and data.error %}
+    <div class="alert alert-danger mt-3">{{ data.error }}</div>
+  {% endif %}
+</div>
+
+{% if data and data.table_rows %}
+  <div class="card bg-secondary p-4 mb-4">
+    <h4>Resultados</h4>
+    <div class="table-responsive">
+      <table class="table table-sm table-dark">
+        <thead>
+          <tr>
+            {% for col in data.table_columns %}
+              <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.table_rows %}
+            <tr>
+              {% for col in data.table_columns %}
+                <td>{{ row[col] }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}

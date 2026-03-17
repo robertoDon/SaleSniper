@@ -4,5 +4,49 @@
 
 {% block content %}
 <h1>🎯 TAM/SAM/SOM</h1>
-<p>Funcionalidade em desenvolvimento.</p>
+<div class="card bg-secondary p-4 mb-4">
+  <h5>🔎 Análise de TAM / SAM / SOM</h5>
+  <p>Essa página usa uma base de dados de mercado (Receita Federal) e uma base de clientes de exemplo para gerar uma matriz de TAM/SAM/SOM.</p>
+</div>
+
+{% if data and data.error %}
+  <div class="alert alert-danger">{{ data.error }}</div>
+{% endif %}
+
+{% if data and data.summary %}
+  <div class="card bg-secondary p-4 mb-4">
+    <h5>Resumo</h5>
+    <ul>
+      <li><strong>TAM:</strong> {{ data.summary.total_TAM }}</li>
+      <li><strong>SAM:</strong> {{ data.summary.total_SAM }}</li>
+      <li><strong>SOM:</strong> {{ data.summary.total_SOM }}</li>
+    </ul>
+  </div>
+{% endif %}
+
+{% if data and data.table_rows %}
+  <div class="card bg-secondary p-4 mb-4">
+    <h5>Matriz TAM/SAM/SOM (primeiras 100 linhas)</h5>
+    <div class="table-responsive">
+      <table class="table table-sm table-dark">
+        <thead>
+          <tr>
+            {% for col in data.table_columns %}
+              <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.table_rows %}
+            <tr>
+              {% for col in data.table_columns %}
+                <td>{{ row[col] }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}

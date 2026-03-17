@@ -9,8 +9,8 @@ from components.dashboard import get_dashboard_data
 from components.segmentacao import get_segmentacao_data
 from components.metas_funil import get_metas_funil_data
 from components.churn import get_churn_data
-from components.valuation import get_valuation_data
-from components.tamsamsom import get_tamsamsom_data
+from components.valuation_web import get_valuation_data
+from components.tamsamsom_web import get_tamsamsom_data
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change to a secure key
@@ -54,34 +54,93 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    data = get_dashboard_data()
+    data = None
+    if request.method == 'POST':
+        arquivo = request.files.get('file')
+        if arquivo and arquivo.filename:
+            data = get_dashboard_data(arquivo)
+        else:
+            data = {'error': 'Nenhum arquivo enviado. Por favor, envie um arquivo Excel (.xlsx).'}
     return render_template('dashboard.html', data=data, user=current_user.id)
 
-@app.route('/segmentacao')
+@app.route('/segmentacao', methods=['GET', 'POST'])
 @login_required
 def segmentacao():
-    data = get_segmentacao_data()
+    data = None
+    if request.method == 'POST':
+        arquivo = request.files.get('file')
+        campo = request.form.get('campo', 'ltv')
+        tipo = request.form.get('tipo', '80/20')
+        # Percentuais opcionais (apenas para 80/20 ou customizadas)
+        percentuais = None
+        if tipo == '80/20':
+            pct = request.form.get('percentual', '')
+            if pct.isdigit():
+                percentuais = int(pct)
+        elif tipo == '20/30/30/20':
+            # Pode receber 4 valores separados por vírgula
+            tiers = request.form.get('tiers', '')
+            if tiers:
+                try:
+                    percentuais = [int(x.strip()) for x in tiers.split(',') if x.strip()]
+                    if len(percentuais) != 4:
+                        percentuais = None
+                except ValueError:
+                    percentuais = None
+        if arquivo and arquivo.filename:
+            data = get_segmentacao_data(arquivo, campo, tipo, percentuais)
+        else:
+            data = {'error': 'Nenhum arquivo enviado. Por favor, envie um arquivo Excel (.xlsx).'}
     return render_template('segmentacao.html', data=data, user=current_user.id)
 
-@app.route('/metas_funil')
+@app.route('/metas_funil', methods=['GET', 'POST'])
 @login_required
 def metas_funil():
-    data = get_metas_funil_data()
+    data = None
+    if request.method == 'POST':
+        segmento = request.form.get('segmento', 'Software por Recorrência')
+        tipo_obj = request.form.get('tipo_obj', 'Clientes')
+        val_obj_raw = request.form.get('val_obj', '0').replace(',', '.')
+        ticket_medio_raw = request.form.get('ticket_medio', '0').replace(',', '.')
+        n_vend_raw = request.form.get('n_vend', '1')
+
+        try:
+            val_obj = float(val_obj_raw)
+        except ValueError:
+            val_obj = 0.0
+        try:
+            ticket_medio = float(ticket_medio_raw)
+        except ValueError:
+            ticket_medio = 0.0
+        try:
+            n_vend = int(n_vend_raw)
+        except ValueError:
+            n_vend = 1
+
+        data = get_metas_funil_data(segmento, tipo_obj, val_obj, ticket_medio, n_vend)
     return render_template('metas_funil.html', data=data, user=current_user.id)
 
-@app.route('/churn')
+@app.route('/churn', methods=['GET', 'POST'])
 @login_required
 def churn():
-    data = get_churn_data()
+    data = None
+    if request.method == 'POST':
+        arquivo = request.files.get('file')
+        if arquivo and arquivo.filename:
+            data = get_churn_data(arquivo)
+        else:
+            data = {'error': 'Nenhum arquivo enviado. Por favor, envie um arquivo CSV.'}
     return render_template('churn.html', data=data, user=current_user.id)
 
-@app.route('/valuation')
+@app.route('/valuation', methods=['GET', 'POST'])
 @login_required
 def valuation():
-    data = get_valuation_data()
+    data = None
+    if request.method == 'POST':
+        data = get_valuation_data(request.form)
     return render_template('valuation.html', data=data, user=current_user.id)
 
 @app.route('/tamsamsom')

@@ -3,6 +3,82 @@
 {% block title %}Segmentação - SaleSniper{% endblock %}
 
 {% block content %}
-<h1>🎯 Segmentação</h1>
-<p>Funcionalidade em desenvolvimento.</p>
+<h1 class="text-warning">🎯 Segmentação de Clientes</h1>
+
+<div class="card bg-secondary p-4 mb-4">
+  <h5>1) Envie seu arquivo Excel de clientes</h5>
+  <form method="post" enctype="multipart/form-data">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Campo base para segmentação</label>
+        <select class="form-select" name="campo">
+          <option value="ltv" {% if data and data.campo == 'ltv' %}selected{% endif %}>LTV</option>
+          <option value="ticket_medio" {% if data and data.campo == 'ticket_medio' %}selected{% endif %}>Ticket Médio</option>
+          <option value="faturamento" {% if data and data.campo == 'faturamento' %}selected{% endif %}>Faturamento</option>
+        </select>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Tipo de segmentação</label>
+        <select class="form-select" name="tipo">
+          <option value="80/20" {% if data and data.tipo == '80/20' %}selected{% endif %}>80/20</option>
+          <option value="20/30/30/20" {% if data and data.tipo == '20/30/30/20' %}selected{% endif %}>20/30/30/20</option>
+        </select>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Percentual / Tiers</label>
+        <input type="text" class="form-control" name="percentual" placeholder="Ex: 20" value="{% if data and data.tipo == '80/20' and data.metricas %}20{% endif %}">
+        <small class="text-muted">Para 20/30/30/20, use 4 valores separados por vírgula (ex: 20,30,30,20)</small>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <input type="file" class="form-control" name="file" accept=".xlsx" required>
+    </div>
+    <button class="btn btn-warning" type="submit">Processar segmentação</button>
+  </form>
+
+  {% if data and data.error %}
+    <div class="alert alert-danger mt-3">{{ data.error }}</div>
+  {% endif %}
+</div>
+
+{% if data and data.segmentacao %}
+  <div class="card bg-secondary p-4 mb-4">
+    <h4>Segmentação - resultados</h4>
+    <p>Clientes: <strong>{{ data.num_clientes }}</strong> | Colunas: <strong>{{ data.colunas | join(', ') }}</strong></p>
+
+    <div class="table-responsive">
+      <table class="table table-sm table-dark">
+        <thead>
+          <tr>
+            {% for key in data.segmentacao[0].keys() %}
+              <th>{{ key }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data.segmentacao[:25] %}
+            <tr>
+              {% for value in row.values() %}
+                <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if data.metricas %}
+      <div class="mt-3">
+        <h5>Resumo</h5>
+        <ul>
+          <li>Segmentos: {{ data.metricas.n_segmentos }}</li>
+          <li>Maior valor ({{ data.campo }}): {{ data.metricas.maior_valor }}</li>
+          <li>Menor valor ({{ data.campo }}): {{ data.metricas.menor_valor }}</li>
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
 {% endblock %}
