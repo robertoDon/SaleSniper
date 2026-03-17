@@ -1,4 +1,3 @@
-import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -280,13 +279,8 @@ def exibir_botoes_exportacao(df: pd.DataFrame, nome_arquivo: str):
             mime='application/pdf'
         )
 
-def exibir_valuation():
-    # Verificar se é a primeira execução
-    if "valuation_initialized" not in st.session_state:
-        st.session_state["valuation_initialized"] = True
-        st.session_state["valuation_result"] = None
-    
-    st.markdown("<h1 style='color: #FF8C00;'>SaleSniper - Valuation de Empresas</h1>", unsafe_allow_html=True)
+def get_valuation_data():
+    return {'message': 'Valuation data placeholder'}
     
     st.markdown("""
     <h3>Calculadora de Valuation Empresarial</h3>

@@ -1,4 +1,3 @@
-import streamlit as st
 import pandas as pd
 from typing import Tuple, Dict, Any, List
 import numpy as np
@@ -25,7 +24,6 @@ def formatar_valor(valor):
             
     return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-@st.cache_data(ttl=3600)  # Cache por 1 hora
 def carregar_e_preprocessar_dados(df: pd.DataFrame) -> pd.DataFrame:
     """
     Função cacheada para preprocessamento de dados com otimizações de memória
@@ -111,7 +109,6 @@ def carregar_e_preprocessar_dados(df: pd.DataFrame) -> pd.DataFrame:
     
     return df
 
-@st.cache_data(ttl=3600)
 def calcular_analise_icp(df: pd.DataFrame, 
                         variaveis_categoricas: Tuple[str, ...],
                         variaveis_numericas: Tuple[str, ...]) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
@@ -195,7 +192,6 @@ def calcular_segmentacao(df: pd.DataFrame, campo: str, tipo_segmentacao: str, pe
         percentuais = percentuais if percentuais is not None else [20, 30, 30, 20]
         return sistema.rodar_segmentacao_por_quantidade(campo, percentuais)
 
-@st.cache_data(ttl=3600)
 def get_variaveis_default() -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
     """
     Retorna as variáveis padrão para análise ICP
@@ -205,7 +201,6 @@ def get_variaveis_default() -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
         ("faturamento", "ticket_medio", "tempo_negociacao", "ltv")
     )
 
-@st.cache_data(ttl=1800)  # Cache por 30 minutos
 def calcular_correlacoes_batch(df: pd.DataFrame, 
                              variaveis_numericas: List[str],
                              variaveis_categoricas: List[str]) -> Dict[str, pd.DataFrame]:
@@ -244,7 +239,6 @@ def calcular_correlacoes_batch(df: pd.DataFrame,
     
     return pd.DataFrame(correlacoes)
 
-@st.cache_data(ttl=3600)
 def calcular_metricas_segmentacao(df: pd.DataFrame, 
                                 campo: str,
                                 tipo_segmentacao: str = "80/20") -> Tuple[pd.DataFrame, Dict]:

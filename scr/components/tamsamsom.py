@@ -1,11 +1,10 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-def exibir_tamsamsom():
-    st.title("🎯 Análise de TAM / SAM / SOM por cnae")
+def get_tamsamsom_data():
+    return {'message': 'TAM/SAM/SOM data placeholder'}
     
     # Limpar cache se necessário
     if st.button("🔄 Limpar Cache"):
