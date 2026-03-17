@@ -1,5 +1,5 @@
 numpy==1.26.3
-pandas
+pandas==2.2.0
 rich==13.7.1
 flask
 flask-login
