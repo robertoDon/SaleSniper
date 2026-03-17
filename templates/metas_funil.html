@@ -112,8 +112,28 @@
           </div>
         {% endfor %}
       </div>
+    <h5 class="mt-4">📅 Projeção Mensal do Funil (Média por Mês)</h5>
+    <p>Assumindo distribuição uniforme ao longo de 12 meses.</p>
+    <p>Clientes por mês: <strong>{{ data.meta_clientes_mensal | round(2) }}</strong></p>
+    <div class="table-responsive">
+      <table class="table table-sm table-dark">
+        <thead>
+          <tr>
+            <th>Etapa do Funil</th>
+            <th>Quantidade por Mês</th>
+            <th>Por Vendedor/Mês</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for etapa, valor in data.projecao_mensal.items() %}
+            <tr>
+              <td>{{ etapa }}</td>
+              <td>{{ valor }}</td>
+              <td>{{ (valor / data.n_vendedores) | round(2) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </div>
-{% endif %}
 
 {% endblock %}

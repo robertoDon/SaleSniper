@@ -49,6 +49,9 @@ def get_metas_funil_data(segmento: str,
         # Para exibir com formatação básica
         proj_formatada = {k: (round(v, 2) if isinstance(v, (int, float)) else v) for k, v in proj.items()}
 
+        # Projeção mensal (assumindo distribuição uniforme ao longo do ano)
+        proj_mensal = {k: round(v / 12, 2) for k, v in proj.items()}
+
         return {
             'segmento': segmento,
             'tipo_obj': tipo_obj,
@@ -59,7 +62,9 @@ def get_metas_funil_data(segmento: str,
             'ajuste': ajuste,
             'taxas_ajustadas': taxas_ajustadas,
             'projecao': proj_formatada,
-            'meta_clientes': round(meta_clientes, 2)
+            'projecao_mensal': proj_mensal,
+            'meta_clientes': round(meta_clientes, 2),
+            'meta_clientes_mensal': round(meta_clientes / 12, 2)
         }
 
     except Exception as e:
